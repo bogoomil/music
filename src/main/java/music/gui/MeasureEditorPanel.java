@@ -1,68 +1,159 @@
 package music.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.sound.midi.Instrument;
+import javax.sound.midi.MidiChannel;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
+import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
+import javax.swing.plaf.ColorUIResource;
 
 import com.google.common.eventbus.Subscribe;
 
 import music.event.MeasureSelectedEvent;
+import music.logic.Player;
+import music.theory.ChordType;
 import music.theory.Measure;
 import music.theory.Note;
+import music.theory.NoteLength;
 import music.theory.NoteName;
 import music.theory.Pitch;
+import music.theory.Scale;
 
-public class MeasureEditorPanel extends JPanel{
+public class MeasureEditorPanel extends JPanel implements MouseListener{
 
-    private Map<Pitch, JToggleButton[]> rows;
+    private Map<Pitch, PitchToggleButton[]> rows;
+
+    private Measure measure;
+
+    private JPanel buttons = new JPanel();
+
+    private int currentInstrument;
+
+    private JLabel lblHangnem;
+
+    private JCheckBox chckbxEnableAllPitches;
+
 
     public MeasureEditorPanel() {
         super();
         MainFrame.eventBus.register(this);
+
+        this.setLayout(new BorderLayout());
+
+        this.add(buttons, BorderLayout.CENTER);
+
+        JPanel panel = new JPanel();
+        add(panel, BorderLayout.NORTH);
+        panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+
+        lblHangnem = new JLabel("");
+        panel.add(lblHangnem);
+
+        chckbxEnableAllPitches = new JCheckBox("Enable all pitches");
+        chckbxEnableAllPitches.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                setRowsEnabled(chckbxEnableAllPitches.isSelected());
+
+            }
+
+        });
+        chckbxEnableAllPitches.setSelected(true);
+        panel.add(chckbxEnableAllPitches);
+
+        JButton btnPlay = new JButton("Play");
+        panel.add(btnPlay);
+
+        btnPlay.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                play(currentInstrument);
+
+            }
+        });
+
+        JComboBox<Instrument> cbInstr = new JComboBox();
+        cbInstr.setModel(new DefaultComboBoxModel(Player.getSynth().getAvailableInstruments()));
+        cbInstr.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+
+                currentInstrument = cbInstr.getItemAt(cbInstr.getSelectedIndex()).getPatch().getProgram();
+
+            }
+        });
+
+        panel.add(cbInstr);
+
+
+        UIManager.put("ToggleButton.select", new ColorUIResource( Color.RED ));
     }
 
     @Subscribe
-    public void setMeasure(MeasureSelectedEvent ev) {
+    public void handleMeasureEvent(MeasureSelectedEvent ev) {
 
-        GridLayout gl = new GridLayout(1 + (this.getOctaves(ev.getMeasure()).size() * 12), 65);
 
-        this.setLayout(gl);
+        this.setMeasure(ev.getMeasure());
+
+
+    }
+
+    private void setMeasure(Measure measure) {
+        this.measure = measure;
+
+        chckbxEnableAllPitches.setSelected(true);
+
+        lblHangnem.setText(measure.getRoot().name() + " " + measure.getHangnem().name());
+
+
+        GridLayout gl = new GridLayout(1 + (this.getOctaves(measure).size() * 12), 65);
+
+        this.buttons.setLayout(gl);
 
         rows = new HashMap<>();
 
-        this.removeAll();
+        this.buttons.removeAll();
 
+        int counter = 0;
         for(int i = 0; i < 65; i++) {
             JLabel negyed = new JLabel() ;
             negyed.setOpaque(true);
-            if((i - 1) % 32 == 0 ) {
-                negyed.setBackground(Color.green);
+            if((i - 1) % 8 == 0 ) {
+                counter++;
+                negyed.setText(counter + "/4");
             }
-            else if((i - 1) % 16 == 0 ) {
-                negyed.setBackground(Color.red);
-            }
-            else if((i - 1) % 4 == 0 ) {
-                negyed.setBackground(Color.black);
-            }
-            this.add(negyed);
+            //            if((i - 1) % 32 == 0 ) {
+            //                negyed.setText("1");
+            //            }
+            this.buttons.add(negyed);
         }
-
-
-
-        this.getOctaves(ev.getMeasure()).forEach(oct -> {
+        this.getOctaves(measure).forEach(oct -> {
             for(int i = 1; i < 13; i++) {
 
                 NoteName nn = NoteName.values()[12 -i];
@@ -77,9 +168,9 @@ public class MeasureEditorPanel extends JPanel{
                     bill.setBackground(Color.WHITE);
                     bill.setForeground(Color.BLACK);
                 }
-                this.add(bill);
+                this.buttons.add(bill);
 
-                JToggleButton[] row = new JToggleButton[64];
+                PitchToggleButton[] row = new PitchToggleButton[64];
 
 
                 Pitch rowKey =new Pitch(nn.getMidiCode() + (oct * 12));
@@ -93,54 +184,17 @@ public class MeasureEditorPanel extends JPanel{
                     btn.setPreferredSize(new Dimension(10, 10));
                     row[j] = btn;
 
-                    btn.setBackground(Color.WHITE);
+                    btn.setBackground(Color.BLUE);
 
-                    btn.addMouseListener(new MouseListener() {
-
-                        @Override
-                        public void mouseReleased(MouseEvent arg0) {
-                            // TODO Auto-generated method stub
-
-                        }
-
-                        @Override
-                        public void mousePressed(MouseEvent arg0) {
-                            // TODO Auto-generated method stub
-
-                        }
-
-                        @Override
-                        public void mouseExited(MouseEvent arg0) {
-                            // TODO Auto-generated method stub
-
-                        }
-
-                        @Override
-                        public void mouseEntered(MouseEvent arg0) {
-                            if(arg0.isShiftDown()) {
-                                PitchToggleButton btn = (PitchToggleButton) arg0.getComponent();
-                                btn.setSelected(!btn.isSelected());
-                            }
-                            // TODO Auto-generated method stub
-
-                        }
-
-                        @Override
-                        public void mouseClicked(MouseEvent arg0) {
-                            // TODO Auto-generated method stub
-
-                        }
-                    });
-
-                    this.add(btn);
-
+                    btn.addMouseListener(this);
+                    this.buttons.add(btn);
                 }
             }
 
         });
 
 
-        for(Note note : ev.getMeasure().getNotes()) {
+        for(Note note : measure.getNotes()) {
             JToggleButton[] row = this.rows.get(note.getPitch());
 
             int endTick = note.getStartInTick() + ( 32 / note.getLength().getErtek());
@@ -149,17 +203,10 @@ public class MeasureEditorPanel extends JPanel{
                 row[i].setSelected(true);
             }
         }
-    }
 
-    private void resetButtons() {
+        this.validate();
 
-        rows.keySet().forEach(nn -> {
-            JToggleButton[] row = rows.get(nn);
-            for(int i = 0; i < row.length; i++) {
-                row[i].setBackground(Color.CYAN);
-                row[i].setSelected(false);
-            }
-        });
+
     }
 
     private List<Integer> getOctaves(Measure measure) {
@@ -193,5 +240,113 @@ public class MeasureEditorPanel extends JPanel{
         return octaves;
     }
 
+
+    private void play(int instrument) {
+        MidiChannel[] channels = Player.getSynth().getChannels();
+        channels[Player.CHORD_CHANNEL].programChange(instrument);
+
+        this.measure.setNotes(getNotes());
+
+        Player.playMeasure(this.measure, channels[Player.CHORD_CHANNEL]);
+
+
+    }
+
+    private List<Note> getNotes(){
+        List<Note> retVal = new ArrayList<>();
+        rows.keySet().forEach(key -> {
+            PitchToggleButton[] row = rows.get(key);
+
+            for(int i = 0; i < row.length; i++) {
+                if(!row[i].isSelected() || (i > 0 && row[i-1].isSelected())) {
+                    continue;
+                }
+                int startTick = i;
+                NoteLength length = getNoteLengthFromTick(row, startTick);
+                Note note = new Note();
+                note.setPitch(row[i].getPitch());
+                note.setStartInTick(startTick);
+                note.setLength(length);
+                note.setVol(100);
+                retVal.add(note);
+            }
+        });
+
+        return retVal;
+
+    }
+
+    private NoteLength getNoteLengthFromTick(PitchToggleButton[] row, int startTick) {
+        int harmincKettedCount = 0;
+        for(int i = startTick; i < row.length; i++) {
+            if(row[i].isSelected()) {
+                harmincKettedCount++;
+            }else {
+                break;
+            }
+        }
+
+        NoteLength length = NoteLength.ofErtek(32 / harmincKettedCount);
+
+        return length;
+    }
+
+    private void setRowsEnabled(boolean selected) {
+
+        if(selected) {
+            this.setMeasure(this.measure);
+        } else {
+            List<NoteName> scaleNotes = new ArrayList<>();
+            Pitch[] scale = this.measure.getHangnem() == ChordType.MAJ ? Scale.majorScale(this.measure.getRoot()) : Scale.minorScale(this.measure.getRoot());
+            for(Pitch p : scale) {
+                scaleNotes.add(p.getName());
+            }
+            rows.keySet().forEach(p -> {
+                if(!scaleNotes.contains(p.getName())) {
+                    Arrays.asList(rows.get(p)).forEach(btn -> {
+                        btn.setEnabled(selected);
+                        if(!btn.isEnabled()) {
+                            btn.setBackground(Color.GRAY);
+                        }
+                    });
+                }
+            });
+        }
+        this.validate();
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent arg0) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent arg0) {
+        if(arg0.isShiftDown()) {
+            PitchToggleButton btn = (PitchToggleButton) arg0.getComponent();
+            if(btn.isEnabled()) {
+                btn.setSelected(!btn.isSelected());
+            }
+        }
+    }
+
+    @Override
+    public void mouseExited(MouseEvent arg0) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void mousePressed(MouseEvent arg0) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent arg0) {
+        // TODO Auto-generated method stub
+
+    }
 
 }

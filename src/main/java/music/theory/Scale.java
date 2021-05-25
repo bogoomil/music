@@ -4,7 +4,7 @@ public class Scale {
 
     public static Pitch[] majorScale(NoteName root) {
         int[] codes = getMajorCodes(root);
-        Pitch[] retVal = new Pitch[8];
+        Pitch[] retVal = new Pitch[7];
         for(int i = 0; i < codes.length; i++) {
             retVal[i] = new Pitch(codes[i]);
 
@@ -14,7 +14,7 @@ public class Scale {
 
     public static Pitch[] minorScale(NoteName root) {
         int[] codes = getMinorCodes(root);
-        Pitch[] retVal = new Pitch[8];
+        Pitch[] retVal = new Pitch[7];
         for(int i = 0; i < codes.length; i++) {
             retVal[i] = new Pitch(codes[i]);
         }

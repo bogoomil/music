@@ -13,4 +13,13 @@ public enum NoteLength {
         return this.ertek;
     }
 
+    public static NoteLength ofErtek(int ertek) {
+        for(NoteLength nl : NoteLength.values()) {
+            if(nl.getErtek() == ertek) {
+                return nl;
+            }
+        }
+        return null;
+    }
+
 }

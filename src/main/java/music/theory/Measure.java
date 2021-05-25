@@ -13,13 +13,17 @@ public class Measure {
     private static final Logger LOG = LoggerFactory.getLogger(Measure.class);
     private List<Note> notes = new ArrayList<>();
     int num;
+    NoteName root;
+    ChordType hangnem;
 
 
 
-    public Measure(int num, int tempo) {
+    public Measure(int num, int tempo, NoteName root, ChordType hangnem) {
         super();
         this.tempo = tempo;
         this.num = num;
+        this.root = root;
+        this.hangnem = hangnem;
     }
 
     //    public int getTickLengthInMs(int tickNum) {
@@ -55,8 +59,8 @@ public class Measure {
     public void addNote(Note note) {
         this.notes.add(note);
     }
-    public static Measure createMeasureFromChord(int measureNum, Chord ch, NoteLength chordLength, NoteLength arpeggioOffset) {
-        Measure measure = new Measure(measureNum, App.getTEMPO());
+    public static Measure createMeasureFromChord(int measureNum, Chord ch, NoteLength chordLength, NoteLength arpeggioOffset, NoteName root, ChordType hangnem) {
+        Measure measure = new Measure(measureNum, App.getTEMPO(), root, hangnem );
         int counter = 0;
         for(Pitch p : ch.getPitches()) {
             Note note = new Note();
@@ -74,6 +78,22 @@ public class Measure {
             counter++;
         }
         return measure;
+    }
+
+    public NoteName getRoot() {
+        return root;
+    }
+
+    public void setRoot(NoteName root) {
+        this.root = root;
+    }
+
+    public ChordType getHangnem() {
+        return hangnem;
+    }
+
+    public void setHangnem(ChordType hangnem) {
+        this.hangnem = hangnem;
     }
 
 }

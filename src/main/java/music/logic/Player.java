@@ -183,5 +183,11 @@ public class Player {
         return track;
     }
 
+    public static void playMeasure(Measure measure, MidiChannel channel) {
+        measure.getNotes().forEach(n -> {
+            playNote(n, channel, measure.getTempo());
+        });
+    }
+
 
 }

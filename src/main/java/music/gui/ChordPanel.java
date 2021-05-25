@@ -22,9 +22,11 @@ import music.event.MeasureSelectedEvent;
 import music.logic.Player;
 import music.theory.Chord;
 import music.theory.ChordDegree;
+import music.theory.ChordType;
 import music.theory.Measure;
 import music.theory.Note;
 import music.theory.NoteLength;
+import music.theory.NoteName;
 import music.theory.Pitch;
 
 public class ChordPanel extends JPanel {
@@ -42,6 +44,8 @@ public class ChordPanel extends JPanel {
 
     private static int instrument = 0;
 
+
+
     /**
      *
      * @param synth
@@ -49,9 +53,11 @@ public class ChordPanel extends JPanel {
      * @param deg
      * @param chordLength
      * @param arpeggioOffset
+     * @param root
+     * @param hangnem
      * @param listener
      */
-    public ChordPanel(Synthesizer synth, Chord chord, ChordDegree deg, NoteLength chordLength, NoteLength arpeggioOffset, EventListener listener) {
+    public ChordPanel(Synthesizer synth, Chord chord, ChordDegree deg, NoteLength chordLength, NoteLength arpeggioOffset, NoteName root, ChordType hangnem, EventListener listener) {
         this.chord = chord;
         this.eventListener = listener;
         this.degree = deg;
@@ -92,7 +98,7 @@ public class ChordPanel extends JPanel {
             public void actionPerformed(ActionEvent arg0) {
                 playChord(synth, chord, chordLength, arpeggioOffset,instrument);
 
-                Measure measure = Measure.createMeasureFromChord(0, chord, getChordLength(), getArpeggioOffset());
+                Measure measure = Measure.createMeasureFromChord(0, chord, getChordLength(), getArpeggioOffset(), root, hangnem);
                 MeasureSelectedEvent ev = new MeasureSelectedEvent(measure);
 
                 MainFrame.eventBus.post(ev);
