@@ -1,0 +1,50 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>hu.boga.music</groupId>
+	<artifactId>music</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>music</name>
+	<description>	Zene Bona</description>
+
+<!-- 	<repositories> -->
+<!-- 		<repository> -->
+<!-- 			<id>jfugue</id> -->
+<!-- 			<name>jfugue</name> -->
+<!-- 			<url>https://maven.sing-group.org/repository/maven/</url> -->
+<!-- 		</repository> -->
+<!-- 	</repositories> -->
+
+	<dependencies>
+		<dependency>
+			<groupId>com.illposed.osc</groupId>
+			<artifactId>javaosc-core</artifactId>
+			<version>0.7</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/de.sojamo/oscp5 -->
+		<!-- https://clojars.org/repo/ -->
+		<!-- <dependency> -->
+		<!-- <groupId>de.sojamo</groupId> -->
+		<!-- <artifactId>oscp5</artifactId> -->
+		<!-- <version>0.9.8</version> -->
+		<!-- </dependency> -->
+		<!-- https://mvnrepository.com/artifact/org.java-websocket/Java-WebSocket -->
+		<dependency>
+			<groupId>org.java-websocket</groupId>
+			<artifactId>Java-WebSocket</artifactId>
+			<version>1.3.0</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/jfugue/jfugue -->
+		<!-- <dependency> -->
+		<!-- <groupId>jfugue</groupId> -->
+		<!-- <artifactId>jfugue</artifactId> -->
+		<!-- <version>5.0.9</version> -->
+		<!-- </dependency> -->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>29.0-jre</version>
+		</dependency>
+	</dependencies>
+</project>
