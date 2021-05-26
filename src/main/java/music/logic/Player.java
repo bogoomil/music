@@ -1,5 +1,8 @@
 package music.logic;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,6 +14,7 @@ import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Sequence;
 import javax.sound.midi.Sequencer;
 import javax.sound.midi.ShortMessage;
+import javax.sound.midi.Soundbank;
 import javax.sound.midi.Synthesizer;
 import javax.sound.midi.Track;
 
@@ -34,6 +38,8 @@ public class Player {
      * negyed hang felbontása tick-ekre. 4 negyed = 32 tick;
      */
     public static final int RESOLUTION = 8;
+
+    public static final int TICKS_IN_MEASURE = RESOLUTION * 4;
 
     private static Synthesizer synth;
 
@@ -66,11 +72,11 @@ public class Player {
         for(int i = 0; i < measure.getNotes().size();i++) {
             Note note = measure.getNotes().get(i);
 
-            int startInTick = note.getStartInTick() + (measure.getNum() * 32);
-            int endInTick = startInTick + (32 / note.getLength().getErtek());
+            int startInTick = note.getStartInTick() + (measure.getNum() * Player.TICKS_IN_MEASURE);
+            int endInTick = startInTick + (Player.TICKS_IN_MEASURE / note.getLength().getErtek());
 
-            if(endInTick > (measure.getNum() + 1) * 32) {
-                endInTick = (measure.getNum() + 1) * 32;
+            if(endInTick > (measure.getNum() + 1) * Player.TICKS_IN_MEASURE) {
+                endInTick = (measure.getNum() + 1) * Player.TICKS_IN_MEASURE;
             }
 
             ShortMessage a = new ShortMessage();
@@ -89,7 +95,7 @@ public class Player {
     }
 
     public static int getNoteLenghtInMs(NoteLength length, int tempo) {
-        int tickCount = 32 / length.getErtek();
+        int tickCount = Player.TICKS_IN_MEASURE / length.getErtek();
         return getTickLengthInMs(tickCount, tempo);
     }
 
@@ -102,19 +108,50 @@ public class Player {
     public static int getTickLengthInMs(int tick, int tempo) {
         int msInNegyed = 60000 / tempo; // 120-as tempo esetén 500 ms egy negyed hang hossza
         int measureLengthInMs = msInNegyed * 4; // ütem hossza 120-as temponál 2000 ms
-        return (measureLengthInMs / 32) * tick;
+        return (measureLengthInMs / Player.TICKS_IN_MEASURE) * tick;
     }
 
 
     private static void initSynth() {
         try {
+
+
+
+            File file = new File("/home/kunb/Java/workspace/music/src/main/resources/roland_sc_8820_1.sf2");
+            Soundbank soundbank = MidiSystem.getSoundbank(file);
+            LOG.debug("ROLAND SB LENGTH: {}", soundbank.getInstruments().length);
+
             synth = MidiSystem.getSynthesizer();
-
-            synth.getDefaultSoundbank();
-
             synth.open();
 
+            Soundbank defaultSB = synth.getDefaultSoundbank();
+            LOG.debug("DEFAULT SB LENGTH: {}", defaultSB.getInstruments().length);
+
+            if(synth.isSoundbankSupported(soundbank)) {
+
+                Arrays.asList(defaultSB.getInstruments()).forEach(instr -> {
+                    synth.unloadInstrument(instr);
+                });
+
+                //                synth.unloadAllInstruments(synth.getDefaultSoundbank());
+                LOG.debug("unloaded instruments, synth available instr count: {}", synth.getAvailableInstruments().length);
+                synth.loadAllInstruments(soundbank);
+                LOG.debug("loaded instruments, synth available instr count: {}", synth.getAvailableInstruments().length);
+            }
+
+            Arrays.asList(synth.getAvailableInstruments()).forEach(instr -> {
+                LOG.debug("Instrument: {}", instr);
+            });
+
+            LOG.debug("synthy initialized...");
+
         } catch (MidiUnavailableException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InvalidMidiDataException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }

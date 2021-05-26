@@ -197,7 +197,7 @@ public class MeasureEditorPanel extends JPanel implements MouseListener{
         for(Note note : measure.getNotes()) {
             JToggleButton[] row = this.rows.get(note.getPitch());
 
-            int endTick = note.getStartInTick() + ( 32 / note.getLength().getErtek());
+            int endTick = note.getStartInTick() + ( Player.TICKS_IN_MEASURE / note.getLength().getErtek());
 
             for(int i = note.getStartInTick(); i < endTick; i++) {
                 row[i].setSelected(true);
@@ -286,7 +286,7 @@ public class MeasureEditorPanel extends JPanel implements MouseListener{
             }
         }
 
-        NoteLength length = NoteLength.ofErtek(32 / harmincKettedCount);
+        NoteLength length = NoteLength.ofErtek(Player.TICKS_IN_MEASURE / harmincKettedCount);
 
         return length;
     }

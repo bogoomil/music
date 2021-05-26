@@ -9,6 +9,8 @@ import java.awt.GridLayout;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowStateListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -91,6 +93,14 @@ public class MainFrame extends JFrame implements EventListener {
 
     public MainFrame(String title) throws HeadlessException {
         super(title);
+
+        this.addWindowStateListener(new WindowStateListener() {
+
+            @Override
+            public void windowStateChanged(WindowEvent arg0) {
+
+            }
+        });
 
         eventBus.register(this);
 
@@ -237,7 +247,8 @@ public class MainFrame extends JFrame implements EventListener {
         northPanel.add(panel_5);
 
         cbInstr = new JComboBox();
-        cbInstr.setModel(new DefaultComboBoxModel(Player.getSynth().getAvailableInstruments()));
+        Instrument[] instrs = Player.getSynth().getAvailableInstruments();
+        cbInstr.setModel(new DefaultComboBoxModel(instrs));
         cbInstr.addActionListener(new ActionListener() {
 
             @Override

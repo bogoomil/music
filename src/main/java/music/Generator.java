@@ -205,8 +205,6 @@ public class Generator {
 
         List<Chord> retVal = new ArrayList<>();
 
-
-        //         Ebben van az első élvezhetó akkor menet
         retVal = Arrays.asList(new Chord("MIN7", 57, 60, 64, 67),// A
                 new Chord("MIN7", 57, 60, 64, 67),// A
                 new Chord("MIN7", 57, 60, 64, 67),// A

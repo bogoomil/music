@@ -216,7 +216,7 @@ public class ChordPanel extends JPanel {
             n.setVol(100);
             n.setLength(chordLength);
             if(arpeggioOffset != null) {
-                int startTick = 32 / arpeggioOffset.getErtek();
+                int startTick = Player.TICKS_IN_MEASURE / arpeggioOffset.getErtek();
                 n.setStartInTick(startTick * counter);
             }
             Player.playNote(n, channels[Player.CHORD_CHANNEL], App.getTEMPO());
