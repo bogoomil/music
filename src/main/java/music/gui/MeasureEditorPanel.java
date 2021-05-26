@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -25,9 +26,13 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
 import javax.swing.JToggleButton;
 import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.plaf.ColorUIResource;
 
 import com.google.common.eventbus.Subscribe;
@@ -55,7 +60,10 @@ public class MeasureEditorPanel extends JPanel implements MouseListener{
     private JLabel lblHangnem;
 
     private JCheckBox chckbxEnableAllPitches;
-
+    private JSlider slVolume;
+    private JSlider slTempo;
+    TitledBorder tbTempo;
+    TitledBorder tbVolume;
 
     public MeasureEditorPanel() {
         super();
@@ -81,6 +89,32 @@ public class MeasureEditorPanel extends JPanel implements MouseListener{
 
             }
 
+        });
+
+        JButton btnOctUp = new JButton("Oct up");
+        panel.add(btnOctUp);
+        btnOctUp.setMargin(new Insets(0, 0, 0, 0));
+
+        btnOctUp.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                changeOctave(1);
+
+            }
+
+        });
+
+        JButton btnOctDown = new JButton("Oct down");
+        panel.add(btnOctDown);
+        btnOctDown.setMargin(new Insets(0, 0, 0, 0));
+
+        btnOctDown.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                changeOctave(-1);
+            }
         });
         chckbxEnableAllPitches.setSelected(true);
         panel.add(chckbxEnableAllPitches);
@@ -109,7 +143,50 @@ public class MeasureEditorPanel extends JPanel implements MouseListener{
             }
         });
 
+        slTempo = new JSlider();
+        slTempo.setMinimum(60);
+
+        tbTempo = new TitledBorder(null, "Tempo", TitledBorder.LEADING, TitledBorder.TOP, null, null);
+
+        slTempo.setBorder(tbTempo);
+        slTempo.setMaximum(300);
+        panel.add(slTempo);
+        slTempo.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                measure.setTempo(slTempo.getValue());
+                tbTempo.setTitle("Tempo: " + slTempo.getValue());;
+
+            }
+        });
+
+        slVolume = new JSlider();
+        tbVolume = new TitledBorder(null, "Volume", TitledBorder.LEADING, TitledBorder.TOP, null, null);
+        slVolume.setBorder(tbVolume);
+        slVolume.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                tbVolume.setTitle("Volume: " + slVolume.getValue());
+
+            }
+        });
+        panel.add(slVolume);
+
+
         panel.add(cbInstr);
+
+        JPanel pnWest = new JPanel();
+        add(pnWest, BorderLayout.WEST);
+        pnWest.setLayout(new GridLayout(0, 1, 0, 0));
+
+        JPanel panel_1 = new JPanel();
+        panel_1.setOpaque(false);
+        panel_1.setMaximumSize(new Dimension(50, 32767));
+        pnWest.add(panel_1);
+        panel_1.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+
 
 
         UIManager.put("ToggleButton.select", new ColorUIResource( Color.RED ));
@@ -130,6 +207,10 @@ public class MeasureEditorPanel extends JPanel implements MouseListener{
         chckbxEnableAllPitches.setSelected(true);
 
         lblHangnem.setText(measure.getRoot().name() + " " + measure.getHangnem().name());
+
+        slTempo.setValue(measure.getTempo());
+
+        tbVolume.setTitle("Volume: " + slVolume.getValue());
 
 
         GridLayout gl = new GridLayout(1 + (this.getOctaves(measure).size() * 12), 65);
@@ -168,6 +249,35 @@ public class MeasureEditorPanel extends JPanel implements MouseListener{
                     bill.setBackground(Color.WHITE);
                     bill.setForeground(Color.BLACK);
                 }
+                bill.addMouseListener(new MouseListener() {
+
+                    @Override
+                    public void mouseReleased(MouseEvent e) {
+                        // TODO Auto-generated method stub
+
+                    }
+
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                    }
+
+                    @Override
+                    public void mouseExited(MouseEvent e) {
+                        // TODO Auto-generated method stub
+
+                    }
+
+                    @Override
+                    public void mouseEntered(MouseEvent e) {
+                        playNote(nn, oct);
+                    }
+
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        playNote(nn, oct);
+
+                    }
+                });
                 this.buttons.add(bill);
 
                 PitchToggleButton[] row = new PitchToggleButton[64];
@@ -267,7 +377,7 @@ public class MeasureEditorPanel extends JPanel implements MouseListener{
                 note.setPitch(row[i].getPitch());
                 note.setStartInTick(startTick);
                 note.setLength(length);
-                note.setVol(100);
+                note.setVol(slVolume.getValue());
                 retVal.add(note);
             }
         });
@@ -317,7 +427,8 @@ public class MeasureEditorPanel extends JPanel implements MouseListener{
 
     @Override
     public void mouseClicked(MouseEvent arg0) {
-        // TODO Auto-generated method stub
+        PitchToggleButton btn = (PitchToggleButton) arg0.getSource();
+        this.playNote(btn.getPitch().getName(), btn.getPitch().getOctave());
 
     }
 
@@ -348,5 +459,28 @@ public class MeasureEditorPanel extends JPanel implements MouseListener{
         // TODO Auto-generated method stub
 
     }
+
+    private void changeOctave(int i) {
+        this.measure.getNotes().forEach(n -> {
+            n.setPitch(n.getPitch().shift(i));
+        });
+        this.setMeasure(this.measure);
+
+    }
+
+    private void playNote(NoteName nn, int oct) {
+        MidiChannel[] channels = Player.getSynth().getChannels();
+        channels[Player.CHORD_CHANNEL].programChange(currentInstrument);
+
+
+        Note note = new Note();
+        note.setLength(NoteLength.NEGYED);
+        note.setPitch(new Pitch(nn.getMidiCode()).shift(oct));
+        note.setStartInTick(0);
+        note.setVol(slVolume.getValue());
+        Player.playNote(note, channels[Player.CHORD_CHANNEL], slTempo.getValue());
+
+    }
+
 
 }

@@ -1,8 +1,5 @@
 package music.logic;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,7 +11,6 @@ import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Sequence;
 import javax.sound.midi.Sequencer;
 import javax.sound.midi.ShortMessage;
-import javax.sound.midi.Soundbank;
 import javax.sound.midi.Synthesizer;
 import javax.sound.midi.Track;
 
@@ -117,41 +113,37 @@ public class Player {
 
 
 
-            File file = new File("/home/kunb/Java/workspace/music/src/main/resources/roland_sc_8820_1.sf2");
-            Soundbank soundbank = MidiSystem.getSoundbank(file);
-            LOG.debug("ROLAND SB LENGTH: {}", soundbank.getInstruments().length);
+            //            File file = new File("/home/kunb/Java/workspace/music/src/main/resources/roland_sc_8820_1.sf2");
+            //            Soundbank rolandSB = MidiSystem.getSoundbank(file);
+            //            LOG.debug("ROLAND SB LENGTH: {}", rolandSB.getInstruments().length);
 
             synth = MidiSystem.getSynthesizer();
             synth.open();
 
-            Soundbank defaultSB = synth.getDefaultSoundbank();
-            LOG.debug("DEFAULT SB LENGTH: {}", defaultSB.getInstruments().length);
-
-            if(synth.isSoundbankSupported(soundbank)) {
-
-                Arrays.asList(defaultSB.getInstruments()).forEach(instr -> {
-                    synth.unloadInstrument(instr);
-                });
-
-                //                synth.unloadAllInstruments(synth.getDefaultSoundbank());
-                LOG.debug("unloaded instruments, synth available instr count: {}", synth.getAvailableInstruments().length);
-                synth.loadAllInstruments(soundbank);
-                LOG.debug("loaded instruments, synth available instr count: {}", synth.getAvailableInstruments().length);
-            }
-
-            Arrays.asList(synth.getAvailableInstruments()).forEach(instr -> {
-                LOG.debug("Instrument: {}", instr);
-            });
+            //            Soundbank defaultSB = synth.getDefaultSoundbank();
+            //            LOG.debug("DEFAULT SB LENGTH: {}", defaultSB.getInstruments().length);
+            //
+            //            if(synth.isSoundbankSupported(rolandSB)) {
+            //
+            //                synth.unloadAllInstruments(defaultSB);
+            //                //                Arrays.asList(defaultSB.getInstruments()).forEach(instr -> {
+            //                //                    synth.unloadInstrument(instr);
+            //                //                });
+            //
+            //                //                synth.unloadAllInstruments(synth.getDefaultSoundbank());
+            //                LOG.debug("unloaded instruments, synth available instr count: {}", synth.getAvailableInstruments().length);
+            //                synth.loadAllInstruments(rolandSB);
+            //                LOG.debug("loaded instruments, synth available instr count: {}", synth.getAvailableInstruments().length);
+            //            }
+            //
+            //            Arrays.asList(synth.getAvailableInstruments()).forEach(instr -> {
+            //                LOG.debug("Instrument: {}", instr);
+            //            });
+            //
 
             LOG.debug("synthy initialized...");
 
         } catch (MidiUnavailableException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InvalidMidiDataException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
