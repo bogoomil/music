@@ -22,6 +22,12 @@ import music.theory.Measure;
 import music.theory.Note;
 import music.theory.NoteLength;
 
+/**
+ * Soundfont sf2 fájlokat a /usr/local/share/soundfonts könyvtárban keresi, default.sf2 néven
+ * @author kunb
+ *
+ */
+
 public class Player {
 
     public static final int CHORD_CHANNEL = 0;
