@@ -98,7 +98,7 @@ public class Player {
 
     public static int getNoteLenghtInMs(NoteLength length, int tempo) {
         int tickCount = Player.TICKS_IN_MEASURE / length.getErtek();
-        return getTickLengthInMs(tickCount, tempo);
+        return getTickLengthInMeasureMs(tickCount, tempo);
     }
 
     public static Synthesizer getSynth() {
@@ -107,10 +107,16 @@ public class Player {
         }
         return synth;
     }
-    public static int getTickLengthInMs(int tick, int tempo) {
+    public static int getTickLengthInMeasureMs(int tick, int tempo) {
         int msInNegyed = 60000 / tempo; // 120-as tempo esetén 500 ms egy negyed hang hossza
         int measureLengthInMs = msInNegyed * 4; // ütem hossza 120-as temponál 2000 ms
         return (measureLengthInMs / Player.TICKS_IN_MEASURE) * tick;
+    }
+
+    public static int getTickLengthInMs(int tempo) {
+        int msInNegyed = 60000 / tempo; // 120-as tempo esetén 500 ms egy negyed hang hossza
+        int measureLengthInMs = msInNegyed; // ütem hossza 120-as temponál 2000 ms
+        return (measureLengthInMs / Player.TICKS_IN_MEASURE);
     }
 
 
@@ -176,7 +182,7 @@ public class Player {
 
                 try {
 
-                    int offset = getTickLengthInMs(note.getStartInTick(), tempo );
+                    int offset = getTickLengthInMeasureMs(note.getStartInTick(), tempo );
                     int length = getNoteLenghtInMs(note.getLength(), tempo);
 
                     LOG.debug("pitch: {}, offset: {}, length: {}", note.getPitch(), offset, length);

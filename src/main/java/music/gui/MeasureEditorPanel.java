@@ -65,6 +65,9 @@ public class MeasureEditorPanel extends JPanel implements MouseListener{
     TitledBorder tbTempo;
     TitledBorder tbVolume;
 
+    private List<JLabel> labels = new ArrayList<>();
+    private Color defaultLabelColor;
+
     public MeasureEditorPanel() {
         super();
         MainFrame.eventBus.register(this);
@@ -224,14 +227,15 @@ public class MeasureEditorPanel extends JPanel implements MouseListener{
         int counter = 0;
         for(int i = 0; i < 65; i++) {
             JLabel negyed = new JLabel() ;
+
+            labels.add(negyed);
+            negyed.setOpaque(true);
+            defaultLabelColor = negyed.getBackground();
             negyed.setOpaque(true);
             if((i - 1) % 8 == 0 ) {
                 counter++;
                 negyed.setText(counter + "/4");
             }
-            //            if((i - 1) % 32 == 0 ) {
-            //                negyed.setText("1");
-            //            }
             this.buttons.add(negyed);
         }
         this.getOctaves(measure).forEach(oct -> {
@@ -354,10 +358,30 @@ public class MeasureEditorPanel extends JPanel implements MouseListener{
     private void play(int instrument) {
         MidiChannel[] channels = Player.getSynth().getChannels();
         channels[Player.CHORD_CHANNEL].programChange(instrument);
-
         this.measure.setNotes(getNotes());
-
         Player.playMeasure(this.measure, channels[Player.CHORD_CHANNEL]);
+
+        int tickLength = Player.getTickLengthInMs(measure.getTempo());
+        System.out.println("tick length: " + tickLength);
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                try {
+                    for(int i = 1; i < labels.size(); i++) {
+                        labels.get(i).setBackground(Color.RED);
+                        Thread.sleep(tickLength * 4);
+                    }
+                    Thread.sleep(100);
+                    for(int i = 1; i < labels.size(); i++) {
+                        labels.get(i).setBackground(defaultLabelColor);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        thread.start();
 
 
     }
