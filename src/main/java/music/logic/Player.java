@@ -113,13 +113,6 @@ public class Player {
         return (measureLengthInMs / Player.TICKS_IN_MEASURE) * tick;
     }
 
-    public static int getTickLengthInMs(int tempo) {
-        int msInNegyed = 60000 / tempo; // 120-as tempo esetén 500 ms egy negyed hang hossza
-        int measureLengthInMs = msInNegyed; // ütem hossza 120-as temponál 2000 ms
-        return (measureLengthInMs / Player.TICKS_IN_MEASURE);
-    }
-
-
     private static void initSynth() {
         try {
 
