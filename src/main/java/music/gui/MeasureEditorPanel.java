@@ -361,27 +361,27 @@ public class MeasureEditorPanel extends JPanel implements MouseListener{
         this.measure.setNotes(getNotes());
         Player.playMeasure(this.measure, channels[Player.CHORD_CHANNEL]);
 
-        int tickLength = Player.getTickLengthInMeasureMs(1, measure.getTempo());
-        System.out.println("tick length: " + tickLength);
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-
-                try {
-                    for(int i = 1; i < labels.size(); i++) {
-                        labels.get(i).setBackground(Color.RED);
-                        Thread.sleep(tickLength);
-                    }
-                    Thread.sleep(100);
-                    for(int i = 1; i < labels.size(); i++) {
-                        labels.get(i).setBackground(defaultLabelColor);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        thread.start();
+        //        int tickLength = Player.getTickLengthInMeasureMs(1, measure.getTempo());
+        //        System.out.println("tick length: " + tickLength);
+        //        Thread thread = new Thread(new Runnable() {
+        //            @Override
+        //            public void run() {
+        //
+        //                try {
+        //                    for(int i = 1; i < labels.size(); i++) {
+        //                        labels.get(i).setBackground(Color.RED);
+        //                        Thread.sleep(tickLength);
+        //                    }
+        //                    Thread.sleep(100);
+        //                    for(int i = 1; i < labels.size(); i++) {
+        //                        labels.get(i).setBackground(defaultLabelColor);
+        //                    }
+        //                } catch (Exception e) {
+        //                    e.printStackTrace();
+        //                }
+        //            }
+        //        });
+        //        thread.start();
 
 
     }
