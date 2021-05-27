@@ -18,6 +18,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import music.App;
+import music.event.NoteOffEvent;
+import music.event.NoteOnEvent;
+import music.gui.MainFrame;
 import music.theory.Measure;
 import music.theory.Note;
 import music.theory.NoteLength;
@@ -28,11 +31,11 @@ import music.theory.NoteLength;
  *
  */
 
-public class Player {
+public class MidiEngine {
 
     public static final int CHORD_CHANNEL = 0;
 
-    private static final Logger LOG = LoggerFactory.getLogger(Player.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MidiEngine.class);
 
     private static Map<String, Track> namedTracks = new HashMap<>();
 
@@ -74,11 +77,11 @@ public class Player {
         for(int i = 0; i < measure.getNotes().size();i++) {
             Note note = measure.getNotes().get(i);
 
-            int startInTick = note.getStartInTick() + (measure.getNum() * Player.TICKS_IN_MEASURE);
-            int endInTick = startInTick + (Player.TICKS_IN_MEASURE / note.getLength().getErtek());
+            int startInTick = note.getStartInTick() + (measure.getNum() * MidiEngine.TICKS_IN_MEASURE);
+            int endInTick = startInTick + (MidiEngine.TICKS_IN_MEASURE / note.getLength().getErtek());
 
-            if(endInTick > (measure.getNum() + 1) * Player.TICKS_IN_MEASURE) {
-                endInTick = (measure.getNum() + 1) * Player.TICKS_IN_MEASURE;
+            if(endInTick > (measure.getNum() + 1) * MidiEngine.TICKS_IN_MEASURE) {
+                endInTick = (measure.getNum() + 1) * MidiEngine.TICKS_IN_MEASURE;
             }
 
             ShortMessage a = new ShortMessage();
@@ -97,7 +100,7 @@ public class Player {
     }
 
     public static int getNoteLenghtInMs(NoteLength length, int tempo) {
-        int tickCount = Player.TICKS_IN_MEASURE / length.getErtek();
+        int tickCount = MidiEngine.TICKS_IN_MEASURE / length.getErtek();
         return getTickLengthInMeasureMs(tickCount, tempo);
     }
 
@@ -110,7 +113,7 @@ public class Player {
     public static int getTickLengthInMeasureMs(int tick, int tempo) {
         int msInNegyed = 60000 / tempo; // 120-as tempo esetén 500 ms egy negyed hang hossza
         int measureLengthInMs = msInNegyed * 4; // ütem hossza 120-as temponál 2000 ms
-        return (measureLengthInMs / Player.TICKS_IN_MEASURE) * tick;
+        return (measureLengthInMs / MidiEngine.TICKS_IN_MEASURE) * tick;
     }
 
     private static void initSynth() {
@@ -178,14 +181,17 @@ public class Player {
                     int offset = getTickLengthInMeasureMs(note.getStartInTick(), tempo );
                     int length = getNoteLenghtInMs(note.getLength(), tempo);
 
-                    LOG.debug("pitch: {}, offset: {}, length: {}", note.getPitch(), offset, length);
-
                     Thread.sleep(offset);
+
+                    MainFrame.eventBus.post(new NoteOnEvent(note.getPitch(), note.getStartInTick()));
+
                     channel.noteOn(note.getPitch().getMidiCode(), note.getVol());
 
 
                     Thread.sleep(length);
+                    MainFrame.eventBus.post(new NoteOffEvent(note.getPitch(), note.getStartInTick()));
                     channel.noteOff(note.getPitch().getMidiCode());
+
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -197,16 +203,16 @@ public class Player {
     }
 
     public static void setSynth(Synthesizer synth) {
-        Player.synth = synth;
+        MidiEngine.synth = synth;
     }
 
 
     public static Track getInstrumentTrack(int channel, int program) throws InvalidMidiDataException {
 
-        Sequence seq = new Sequence(Sequence.PPQ, Player.RESOLUTION);
+        Sequence seq = new Sequence(Sequence.PPQ, MidiEngine.RESOLUTION);
         Track track = seq.createTrack();
 
-        Player.getSequencer().setSequence(seq);
+        MidiEngine.getSequencer().setSequence(seq);
 
 
         ShortMessage instrumentChange = new ShortMessage();

@@ -19,7 +19,7 @@ import music.App;
 import music.event.ChordEvent;
 import music.event.EventListener;
 import music.event.MeasureSelectedEvent;
-import music.logic.Player;
+import music.logic.MidiEngine;
 import music.theory.Chord;
 import music.theory.ChordDegree;
 import music.theory.ChordType;
@@ -208,7 +208,7 @@ public class ChordPanel extends JPanel {
     public static void playChord(Synthesizer synth, Chord chord, NoteLength chordLength, NoteLength arpeggioOffset, int instrument) {
 
         MidiChannel[] channels = synth.getChannels();
-        channels[Player.CHORD_CHANNEL].programChange(instrument);
+        channels[MidiEngine.CHORD_CHANNEL].programChange(instrument);
         int counter = 0;
         for(Pitch p : chord.getPitches()) {
             Note n = new Note();
@@ -216,10 +216,10 @@ public class ChordPanel extends JPanel {
             n.setVol(100);
             n.setLength(chordLength);
             if(arpeggioOffset != null) {
-                int startTick = Player.TICKS_IN_MEASURE / arpeggioOffset.getErtek();
+                int startTick = MidiEngine.TICKS_IN_MEASURE / arpeggioOffset.getErtek();
                 n.setStartInTick(startTick * counter);
             }
-            Player.playNote(n, channels[Player.CHORD_CHANNEL], App.getTEMPO());
+            MidiEngine.playNote(n, channels[MidiEngine.CHORD_CHANNEL], App.getTEMPO());
             counter++;
         }
     }

@@ -6,6 +6,7 @@ import java.awt.GridLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import music.gui.measureeditor.MeasureEditorPanel;
 import music.model.Project;
 
 public class ProjectEditorPanel extends JPanel {

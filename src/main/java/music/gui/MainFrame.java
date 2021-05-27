@@ -42,7 +42,7 @@ import com.google.common.eventbus.EventBus;
 import music.App;
 import music.event.ChordEvent;
 import music.event.EventListener;
-import music.logic.Player;
+import music.logic.MidiEngine;
 import music.theory.Chord;
 import music.theory.ChordDegree;
 import music.theory.ChordType;
@@ -93,7 +93,6 @@ public class MainFrame extends JFrame implements EventListener {
 
     public MainFrame(String title) throws HeadlessException {
         super(title);
-
         this.addWindowStateListener(new WindowStateListener() {
 
             @Override
@@ -247,7 +246,7 @@ public class MainFrame extends JFrame implements EventListener {
         northPanel.add(panel_5);
 
         cbInstr = new JComboBox();
-        Instrument[] instrs = Player.getSynth().getAvailableInstruments();
+        Instrument[] instrs = MidiEngine.getSynth().getAvailableInstruments();
         cbInstr.setModel(new DefaultComboBoxModel(instrs));
         cbInstr.addActionListener(new ActionListener() {
 
@@ -359,7 +358,7 @@ public class MainFrame extends JFrame implements EventListener {
 
             NoteLength arpOffset = chckbxArp.isSelected() ? cbArpeggio.getItemAt(cbArpeggio.getSelectedIndex()) : null;
 
-            ChordPanel cp = new ChordPanel(Player.getSynth(), c, deg, cbChordLength.getItemAt(cbChordLength.getSelectedIndex()), arpOffset, getRootKey().getName(), chordType, this);
+            ChordPanel cp = new ChordPanel(MidiEngine.getSynth(), c, deg, cbChordLength.getItemAt(cbChordLength.getSelectedIndex()), arpOffset, getRootKey().getName(), chordType, this);
             this.generatedChordPanels.add(cp);
             jp.add(cp);
 
@@ -370,7 +369,7 @@ public class MainFrame extends JFrame implements EventListener {
                     continue;
                 }
 
-                cp = new ChordPanel(Player.getSynth(), s, deg, cbChordLength.getItemAt(cbChordLength.getSelectedIndex()), arpOffset, getRootKey().getName(), chordType, this);
+                cp = new ChordPanel(MidiEngine.getSynth(), s, deg, cbChordLength.getItemAt(cbChordLength.getSelectedIndex()), arpOffset, getRootKey().getName(), chordType, this);
                 this.generatedChordPanels.add(cp);
                 jp.add(cp);
 
@@ -412,7 +411,7 @@ public class MainFrame extends JFrame implements EventListener {
             }
             NoteLength arpOffset = chckbxArp.isSelected() ? cbArpeggio.getItemAt(cbArpeggio.getSelectedIndex()) : null;
 
-            panelRecord.add(new ChordPanel(Player.getSynth(), event.getChord(), null, cbChordLength.getItemAt(cbChordLength.getSelectedIndex()), arpOffset, getRootKey().getName(), ChordType.valueOf(minMaj), null));
+            panelRecord.add(new ChordPanel(MidiEngine.getSynth(), event.getChord(), null, cbChordLength.getItemAt(cbChordLength.getSelectedIndex()), arpOffset, getRootKey().getName(), ChordType.valueOf(minMaj), null));
             this.pack();
 
         }
@@ -439,7 +438,7 @@ public class MainFrame extends JFrame implements EventListener {
 
     private void play() throws MidiUnavailableException, InvalidMidiDataException, InterruptedException, IOException {
 
-        Track chordTrack = Player.getInstrumentTrack(Player.CHORD_CHANNEL, cbInstr.getItemAt(cbInstr.getSelectedIndex()).getPatch().getProgram());
+        Track chordTrack = MidiEngine.getInstrumentTrack(MidiEngine.CHORD_CHANNEL, cbInstr.getItemAt(cbInstr.getSelectedIndex()).getPatch().getProgram());
         Measure m = null;
 
         LOG.debug("CHORD ==================================================");
@@ -455,14 +454,14 @@ public class MainFrame extends JFrame implements EventListener {
             LOG.debug("chord: {}, degree: {}", c, deg);
 
             Measure measure = Measure.createMeasureFromChord(i, c, cp.getChordLength(), cp.getArpeggioOffset(), getRootKey().getName(), ChordType.valueOf(cbMinMaj.getItemAt(cbMinMaj.getSelectedIndex())));
-            Player.addNotesToTrack(chordTrack, Player.CHORD_CHANNEL, measure);
+            MidiEngine.addNotesToTrack(chordTrack, MidiEngine.CHORD_CHANNEL, measure);
 
         }
 
-        Player.getSequencer().start();
+        MidiEngine.getSequencer().start();
         File f = new File("piece.mid");
         LOG.debug("creating midi file: {}", f.getAbsolutePath());
-        MidiSystem.write(Player.getSequencer().getSequence(),1,f);
+        MidiSystem.write(MidiEngine.getSequencer().getSequence(),1,f);
     }
 
 }

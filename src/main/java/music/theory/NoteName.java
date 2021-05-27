@@ -14,7 +14,7 @@ public enum NoteName {
         return midiCode;
     }
 
-    public static NoteName byCode(int code) throws Exception {
+    public static NoteName byCode(int code){
         if (code > 11) {
             code = code % 12;
         }
@@ -24,6 +24,6 @@ public enum NoteName {
                 return NoteName.values()[i];
             }
         }
-        throw new Exception("Hibás kód: " + code);
+        return null;
     }
 }
