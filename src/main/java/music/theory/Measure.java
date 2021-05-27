@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import music.App;
-import music.logic.MidiEngine;
 
 public class Measure {
     private int tempo;
@@ -70,7 +69,7 @@ public class Measure {
             note.setLength(chordLength);
             int start = 0;
             if(arpeggioOffset != null) {
-                start = counter * (MidiEngine.TICKS_IN_MEASURE / arpeggioOffset.getErtek());
+                start = (counter * arpeggioOffset.getErtek()) + (counter * measureNum);
                 LOG.debug("counter: {} * (32/{}) = {}", counter, arpeggioOffset.getErtek(), start);
 
             }

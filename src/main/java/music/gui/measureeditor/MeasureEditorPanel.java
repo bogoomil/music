@@ -298,7 +298,7 @@ public class MeasureEditorPanel extends JPanel{
             for(Component comp : this.pnTickRows.getComponents()) {
                 TickRowPanel trp = (TickRowPanel) comp;
                 if(trp.getPitch().equals(note.getPitch())) {
-                    int endTick = note.getStartInTick() + ( MidiEngine.TICKS_IN_MEASURE * (measure.getNum() + 1) / note.getLength().getErtek());
+                    int endTick = note.getStartInTick() +  note.getLength().getErtek();
 
                     for(int i = note.getStartInTick(); i < endTick; i++) {
                         trp.setSelectedTick(i);

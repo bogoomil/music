@@ -137,9 +137,28 @@ public class TickRowPanel extends JPanel {
             }
         }
 
-        NoteLength length = NoteLength.ofErtek(MidiEngine.TICKS_IN_MEASURE / harmincKettedCount);
+        NoteLength length = NoteLength.ofErtek(harmincKettedCount);
+
+        if(length == null) {
+            length = getNextLength(harmincKettedCount);
+        }
 
         return length;
+    }
+
+
+
+    private NoteLength getNextLength(int harmincKettedCount) {
+        while(harmincKettedCount < NoteLength.NEGYSZERES.getErtek()) {
+            for(NoteLength l : NoteLength.values()) {
+                NoteLength nl = NoteLength.ofErtek(harmincKettedCount);
+                if(nl != null) {
+                    return nl;
+                }
+                harmincKettedCount++;
+            }
+        }
+        return NoteLength.NEGYSZERES;
     }
 
     public Pitch getPitch() {

@@ -216,7 +216,7 @@ public class ChordPanel extends JPanel {
             n.setVol(100);
             n.setLength(chordLength);
             if(arpeggioOffset != null) {
-                int startTick = MidiEngine.TICKS_IN_MEASURE / arpeggioOffset.getErtek();
+                int startTick = arpeggioOffset.getErtek();
                 n.setStartInTick(startTick * counter);
             }
             MidiEngine.playNote(n, channels[MidiEngine.CHORD_CHANNEL], App.getTEMPO());

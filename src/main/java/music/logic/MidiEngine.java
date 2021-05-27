@@ -78,7 +78,7 @@ public class MidiEngine {
             Note note = measure.getNotes().get(i);
 
             int startInTick = note.getStartInTick() + (measure.getNum() * MidiEngine.TICKS_IN_MEASURE);
-            int endInTick = startInTick + (MidiEngine.TICKS_IN_MEASURE / note.getLength().getErtek());
+            int endInTick = startInTick + note.getLength().getErtek();
 
             if(endInTick > (measure.getNum() + 1) * MidiEngine.TICKS_IN_MEASURE) {
                 endInTick = (measure.getNum() + 1) * MidiEngine.TICKS_IN_MEASURE;
@@ -100,7 +100,7 @@ public class MidiEngine {
     }
 
     public static int getNoteLenghtInMs(NoteLength length, int tempo) {
-        int tickCount = MidiEngine.TICKS_IN_MEASURE / length.getErtek();
+        int tickCount = length.getErtek();
         return getTickLengthInMeasureMs(tickCount, tempo);
     }
 
