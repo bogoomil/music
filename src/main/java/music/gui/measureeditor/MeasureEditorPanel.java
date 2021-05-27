@@ -183,6 +183,11 @@ public class MeasureEditorPanel extends JPanel{
         });
 
         slTempo = new JSlider();
+        slTempo.setSnapToTicks(true);
+        slTempo.setMinorTickSpacing(10);
+        slTempo.setMajorTickSpacing(60);
+        slTempo.setPaintLabels(true);
+        slTempo.setPaintTicks(true);
         slTempo.setMinimum(60);
 
         tbTempo = new TitledBorder(null, "Tempo", TitledBorder.LEADING, TitledBorder.TOP, null, null);
@@ -194,6 +199,7 @@ public class MeasureEditorPanel extends JPanel{
 
             @Override
             public void stateChanged(ChangeEvent e) {
+                System.out.println("Tempo: " + slTempo.getValue());
                 measure.setTempo(slTempo.getValue());
                 tbTempo.setTitle("Tempo: " + slTempo.getValue());;
 
@@ -201,12 +207,18 @@ public class MeasureEditorPanel extends JPanel{
         });
 
         slVolume = new JSlider();
+        slVolume.setMinorTickSpacing(5);
+        slVolume.setPaintLabels(true);
+        slVolume.setPaintTicks(true);
+        slVolume.setSnapToTicks(true);
+        slVolume.setMajorTickSpacing(20);
         tbVolume = new TitledBorder(null, "Volume", TitledBorder.LEADING, TitledBorder.TOP, null, null);
         slVolume.setBorder(tbVolume);
         slVolume.addChangeListener(new ChangeListener() {
 
             @Override
             public void stateChanged(ChangeEvent e) {
+                System.out.println("Vol: " + slVolume.getValue());
                 tbVolume.setTitle("Volume: " + slVolume.getValue());
 
             }
