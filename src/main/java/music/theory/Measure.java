@@ -96,4 +96,9 @@ public class Measure {
         this.hangnem = hangnem;
     }
 
+    public int getRelativeNum() {
+        return this.num % 4;
+
+    }
+
 }

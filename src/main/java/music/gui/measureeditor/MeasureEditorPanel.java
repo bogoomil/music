@@ -29,6 +29,9 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.ColorUIResource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.eventbus.Subscribe;
 
 import music.event.MeasureSelectedEvent;
@@ -69,6 +72,8 @@ public class MeasureEditorPanel extends JPanel{
     private JButton btnGenerateArp;
 
     private int measureCount;
+
+    private static final Logger LOG = LoggerFactory.getLogger(MeasureEditorPanel.class);
 
     //    private NoteName root;
     //    private ChordType chordType;
@@ -338,10 +343,14 @@ public class MeasureEditorPanel extends JPanel{
 
         measures[measureCount] = ev.getMeasure();
         measures[measureCount].setNum(measureCount);
+
+        LOG.debug("measure event: count: {}, measure num: {}", measureCount, measures[measureCount].getRelativeNum());
+
         this.measureCount++;
         if(measureCount == 4) {
             measureCount = 0;
         }
+
 
         this.generateNotes();
     }
@@ -389,7 +398,7 @@ public class MeasureEditorPanel extends JPanel{
 
                     TickRowPanel trp = this.getTickRowByPitch(note.getPitch());
 
-                    int startTick = measure.getNum() * (MidiEngine.TICKS_IN_MEASURE) + note.getStartInTick();
+                    int startTick = measure.getRelativeNum() * (MidiEngine.TICKS_IN_MEASURE) + note.getStartInTick();
 
                     int endTick = startTick +  note.getLength().getErtek();
 
