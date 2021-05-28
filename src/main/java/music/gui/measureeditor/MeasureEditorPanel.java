@@ -75,9 +75,6 @@ public class MeasureEditorPanel extends JPanel{
 
     private static final Logger LOG = LoggerFactory.getLogger(MeasureEditorPanel.class);
 
-    //    private NoteName root;
-    //    private ChordType chordType;
-
     private List<Measure> measures = new ArrayList<>();
 
     public MeasureEditorPanel() {
@@ -93,7 +90,7 @@ public class MeasureEditorPanel extends JPanel{
         pnCenter.add(pnTickRows, BorderLayout.CENTER);
 
         JPanel panel = new JPanel();
-        panel.setPreferredSize(new Dimension(230, 10));
+        panel.setPreferredSize(new Dimension(230, 600));
         add(panel, BorderLayout.WEST);
         panel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
 
@@ -399,6 +396,7 @@ public class MeasureEditorPanel extends JPanel{
         List<Integer> octaves = new ArrayList<>();
 
         int min = 100;
+        int max = 0;
 
         for(int i = 0; i < this.measures.size(); i++) {
             Measure m = this.measures.get(i);
@@ -411,15 +409,14 @@ public class MeasureEditorPanel extends JPanel{
                     if(min > curr.getPitch().getOctave()) {
                         min = curr.getPitch().getOctave();
                     }
+                    if(max < curr.getPitch().getOctave()) {
+                        max = curr.getPitch().getOctave();
+                    }
                 }
             }
         }
-        if(octaves.size() == 1) {
-            octaves.add(octaves.get(0) - 1);
-            octaves.add(octaves.get(0) + 1);
-        } else {
-            octaves.add(min-1);
-        }
+        octaves.add(min - 1);
+        octaves.add(max + 1);
         Collections.sort(octaves);
         Collections.reverse(octaves);
         return octaves;
