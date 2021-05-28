@@ -5,6 +5,7 @@ import java.awt.GridLayout;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.JSplitPane;
 
 import music.gui.measureeditor.MeasureEditorPanel;
 import music.model.Project;
@@ -17,10 +18,6 @@ public class ProjectEditorPanel extends JPanel {
     public ProjectEditorPanel() {
         setLayout(new BorderLayout(0, 0));
 
-        pnTracks = new JPanel();
-        add(pnTracks, BorderLayout.CENTER);
-        pnTracks.setLayout(new GridLayout(1, 0, 0, 0));
-
         JPanel pnButtons = new JPanel();
         add(pnButtons, BorderLayout.NORTH);
 
@@ -31,10 +28,21 @@ public class ProjectEditorPanel extends JPanel {
         pnButtons.add(btnDel);
 
         JPanel mesEditor = new JPanel();
-        this.add(mesEditor, BorderLayout.SOUTH);
+
 
         MeasureEditorPanel measureEditor = new MeasureEditorPanel();
         mesEditor.add(measureEditor);
+
+        pnTracks = new JPanel();
+        pnTracks.setLayout(new GridLayout(1, 0, 0, 0));
+
+        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+                pnTracks, mesEditor);
+
+        //        splitPane.setOneTouchExpandable(true);
+        splitPane.setDividerLocation(200);
+        this.add(splitPane, BorderLayout.CENTER);
+
     }
 
     public void setProject(Project project) {

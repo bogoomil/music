@@ -98,12 +98,14 @@ public class TickRowPanel extends JPanel {
             });
         }
     }
-    public List<Note> getNotes(){
+    public List<Note> getNotes(int measureIndex){
         List<Note> retVal = new ArrayList<>();
 
-        for(int i = 0; i < this.buttons.getComponentCount(); i++) {
+        int startIndex = (measureIndex * MidiEngine.TICKS_IN_MEASURE);
+
+        for(int i = startIndex; i < startIndex + MidiEngine.TICKS_IN_MEASURE; i++) {
             JToggleButton btn = (JToggleButton) this.buttons.getComponents()[i];
-            if(!btn.isSelected() || (i > 0 && ((JToggleButton)this.buttons.getComponents()[i - 1]).isSelected())) {
+            if(!btn.isSelected() || (i % MidiEngine.TICKS_IN_MEASURE != 0 && (i > 0 && ((JToggleButton)this.buttons.getComponents()[i - 1]).isSelected()))) {
                 continue;
             }
             int startTick = i;
