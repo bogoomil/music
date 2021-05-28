@@ -3,11 +3,14 @@ package music.gui.measureeditor;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -62,6 +65,11 @@ public class MeasureEditorPanel extends JPanel{
     private JPanel pnCenter = new JPanel(new BorderLayout());
 
     private static final int VISIBLE_MEASURE_COUNT = 4;
+    private JPanel panel_1;
+    private JPanel panel_2;
+    private JPanel panel_3;
+    private JComboBox cbArpeggio;
+    private JButton btnGenerateArp;
 
     public MeasureEditorPanel() {
         super();
@@ -75,9 +83,25 @@ public class MeasureEditorPanel extends JPanel{
 
         pnCenter.add(pnTickRows, BorderLayout.CENTER);
 
+        pnTickRows.addMouseMotionListener(new MouseMotionListener() {
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                System.out.println("dragged: " + e.getX() + ":" + e.getY());
+
+            }
+        });;
+
         JPanel panel = new JPanel();
-        add(panel, BorderLayout.NORTH);
-        panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+        panel.setPreferredSize(new Dimension(230, 10));
+        add(panel, BorderLayout.WEST);
+        panel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
 
         lblHangnem = new JLabel("");
         panel.add(lblHangnem);
@@ -152,18 +176,6 @@ public class MeasureEditorPanel extends JPanel{
             }
         });
 
-        JComboBox<Instrument> cbInstr = new JComboBox();
-        cbInstr.setModel(new DefaultComboBoxModel(MidiEngine.getSynth().getAvailableInstruments()));
-        cbInstr.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-
-                currentInstrument = cbInstr.getItemAt(cbInstr.getSelectedIndex()).getPatch().getProgram();
-
-            }
-        });
-
         slTempo = new JSlider();
         slTempo.setMinimum(60);
 
@@ -171,16 +183,6 @@ public class MeasureEditorPanel extends JPanel{
 
         tglbtnLoop = new JToggleButton("Loop");
         panel.add(tglbtnLoop);
-        cbInstr.setModel(new DefaultComboBoxModel(MidiEngine.getSynth().getAvailableInstruments()));
-        cbInstr.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-
-                currentInstrument = cbInstr.getItemAt(cbInstr.getSelectedIndex()).getPatch().getProgram();
-
-            }
-        });
 
         slTempo = new JSlider();
         slTempo.setSnapToTicks(true);
@@ -225,8 +227,39 @@ public class MeasureEditorPanel extends JPanel{
         });
         panel.add(slVolume);
 
+        panel_1 = new JPanel();
+        panel_1.setBorder(new TitledBorder(null, "Instrument", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+        panel.add(panel_1);
 
-        panel.add(cbInstr);
+        JComboBox<Instrument> cbInstr = new JComboBox();
+        panel_1.add(cbInstr);
+        cbInstr.setPreferredSize(new Dimension(200, 24));
+
+        DefaultComboBoxModel<Instrument> model = new DefaultComboBoxModel(MidiEngine.getSynth().getAvailableInstruments());
+        cbInstr.setModel(model);
+        cbInstr.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+
+                currentInstrument = cbInstr.getItemAt(cbInstr.getSelectedIndex()).getPatch().getProgram();
+
+            }
+        });
+        cbInstr.setModel(new DefaultComboBoxModel(MidiEngine.getSynth().getAvailableInstruments()));
+        cbInstr.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+
+                currentInstrument = cbInstr.getItemAt(cbInstr.getSelectedIndex()).getPatch().getProgram();
+
+            }
+        });
+
+        panel_2 = new JPanel();
+        panel_2.setBorder(new TitledBorder(null, "MIDI Channel", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+        panel.add(panel_2);
 
         //        JPanel pnWest = new JPanel();
         //        add(pnWest, BorderLayout.WEST);
@@ -238,13 +271,59 @@ public class MeasureEditorPanel extends JPanel{
         //        pnWest.add(panel_1);
         //        panel_1.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
         cbChannel = new JComboBox();
-        cbChannel.setBorder(new TitledBorder(null, "MIDI ch", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+        cbChannel.setPreferredSize(new Dimension(200, 24));
+        panel_2.add(cbChannel);
         cbChannel.setModel(new DefaultComboBoxModel(new String[] {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"}));
-        panel.add(cbChannel);
 
+        panel_3 = new JPanel();
+        panel_3.setBorder(new TitledBorder(null, "Arpeggio preset", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+        panel.add(panel_3);
 
+        cbArpeggio = new JComboBox();
+        cbArpeggio.setPreferredSize(new Dimension(200, 24));
+        cbArpeggio.setModel(new DefaultComboBoxModel(new String[] {"Preset 1 (1,2,3) 1/8", "Preset 1 (3,2,1) 1/8", "Preset 1 (1,2,3,2,1) 1/8", "Preset 1 (3,2,1,2,3) 1/8"}));
+        panel_3.add(cbArpeggio);
 
+        btnGenerateArp = new JButton("Generate arp.");
+        panel.add(btnGenerateArp);
 
+        btnGenerateArp.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                generateArpeggio(cbArpeggio.getSelectedIndex());
+
+            }
+
+        });
+    }
+    private void generateArpeggio(int selectedIndex) {
+        switch(selectedIndex) {
+        case 0: {
+            generatePreset1();
+            break;
+        }
+        }
+
+    }
+
+    private void generatePreset1() {
+        ArrayList<Note> newNotes = new ArrayList<>();
+        int startTick = 0;
+        for(int i = 0; i < 11; i++) {
+            int pitchCount = measure.getNotes().size();
+            for(int j = 0; j < pitchCount; j++) {
+                Note n = new Note();
+                n.setLength(NoteLength.NEGYED);
+                n.setPitch(measure.getNotes().get(j).getPitch());
+                n.setStartInTick(startTick);
+                n.setVol(slVolume.getValue());
+                newNotes.add(n);
+                startTick += NoteLength.NEGYED.getErtek();
+            }
+        }
+        measure.setNotes(newNotes);
+        this.setMeasure(measure);
     }
 
     @Subscribe
@@ -283,6 +362,8 @@ public class MeasureEditorPanel extends JPanel{
 
         this.pnTickRows.removeAll();
 
+        this.pnCenter.add(new TickRowProgressBar(), BorderLayout.NORTH);
+
         this.getOctaves(measure).forEach(o -> {
             for(int i = 11; i >=0; i--) {
 
@@ -301,7 +382,11 @@ public class MeasureEditorPanel extends JPanel{
                     int endTick = note.getStartInTick() +  note.getLength().getErtek();
 
                     for(int i = note.getStartInTick(); i < endTick; i++) {
-                        trp.setSelectedTick(i);
+                        try {
+                            trp.setSelectedTick(i);
+                        }catch(Exception ex) {
+                            ex.printStackTrace();
+                        }
                     }
 
                 }

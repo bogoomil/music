@@ -18,8 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import music.App;
-import music.event.NoteOffEvent;
-import music.event.NoteOnEvent;
+import music.event.TickOffEvent;
+import music.event.TickOnEvent;
 import music.gui.MainFrame;
 import music.theory.Measure;
 import music.theory.Note;
@@ -183,13 +183,13 @@ public class MidiEngine {
 
                     Thread.sleep(offset);
 
-                    MainFrame.eventBus.post(new NoteOnEvent(note.getPitch(), note.getStartInTick()));
+                    MainFrame.eventBus.post(new TickOnEvent(note.getStartInTick()));
 
                     channel.noteOn(note.getPitch().getMidiCode(), note.getVol());
 
 
                     Thread.sleep(length);
-                    MainFrame.eventBus.post(new NoteOffEvent(note.getPitch(), note.getStartInTick()));
+                    MainFrame.eventBus.post(new TickOffEvent(note.getStartInTick()));
                     channel.noteOff(note.getPitch().getMidiCode());
 
 

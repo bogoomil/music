@@ -16,10 +16,6 @@ import javax.swing.JToggleButton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.eventbus.Subscribe;
-
-import music.event.NoteOffEvent;
-import music.event.NoteOnEvent;
 import music.event.PianoKeyEvent;
 import music.gui.MainFrame;
 import music.gui.PianoKey;
@@ -35,10 +31,6 @@ public class TickRowPanel extends JPanel {
     private Pitch pitch;
 
     private JPanel buttons = new JPanel(new GridLayout(1, 0, 0, 0));
-
-    private Color originalColor;
-
-    private boolean selectionState;
 
     public TickRowPanel() {
         this(new Pitch(NoteName.C.getMidiCode()).shift(3));
@@ -182,24 +174,5 @@ public class TickRowPanel extends JPanel {
         JToggleButton btn = (JToggleButton) this.buttons.getComponent(i);
         btn.setSelected(true);
 
-    }
-
-    @Subscribe
-    public void handleNoteOnEvent(NoteOnEvent e) {
-        if(e.getPitch().equals(pitch)) {
-            JToggleButton btn = (JToggleButton) this.buttons.getComponent(e.getTick());
-            this.originalColor = btn.getBackground();
-            this.selectionState = btn.isSelected();
-            btn.setSelected(false);
-            btn.setBackground(Color.green);
-        }
-    }
-    @Subscribe
-    public void handleNoteOffEvent(NoteOffEvent e) {
-        if(e.getPitch().equals(pitch)) {
-            JToggleButton btn = (JToggleButton) this.buttons.getComponent(e.getTick());
-            btn.setSelected(selectionState);
-            btn.setBackground(originalColor);
-        }
     }
 }

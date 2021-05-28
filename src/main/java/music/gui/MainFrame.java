@@ -108,7 +108,7 @@ public class MainFrame extends JFrame implements EventListener {
 
 
         centerPanel = new JPanel();
-        centerPanel.setPreferredSize(new Dimension(1200, 700));
+        centerPanel.setPreferredSize(new Dimension(1800, 700));
         //        getContentPane().add(centerPanel, BorderLayout.WEST);
         centerPanel.setLayout(new GridLayout(0, 1, 3, 3));
 
@@ -210,7 +210,7 @@ public class MainFrame extends JFrame implements EventListener {
             }
         });
 
-        cbArpeggio = new JComboBox();
+        cbArpeggio = new JComboBox<>();
         panel_4.add(cbArpeggio);
         cbArpeggio.setModel(new DefaultComboBoxModel(NoteLength.values()));
         cbArpeggio.setSelectedIndex(4);
@@ -318,6 +318,10 @@ public class MainFrame extends JFrame implements EventListener {
         this.setVisible(true);
 
         this.generateChords();
+
+        cbChordLength.setSelectedIndex(4);
+        cbArpeggio.setSelectedIndex(7);
+
     }
 
 
