@@ -97,6 +97,33 @@ public class TickRowPanel extends JPanel {
                 }
             });
         }
+
+        //        this.addComponentListener(new ComponentListener() {
+        //
+        //            @Override
+        //            public void componentShown(ComponentEvent e) {
+        //                // TODO Auto-generated method stub
+        //
+        //            }
+        //
+        //            @Override
+        //            public void componentResized(ComponentEvent e) {
+        //                MainFrame.eventBus.post(new TickRowResizedEvent(e.getComponent().getWidth()));
+        //
+        //            }
+        //
+        //            @Override
+        //            public void componentMoved(ComponentEvent e) {
+        //                // TODO Auto-generated method stub
+        //
+        //            }
+        //
+        //            @Override
+        //            public void componentHidden(ComponentEvent e) {
+        //                // TODO Auto-generated method stub
+        //
+        //            }
+        //        });
     }
     public List<Note> getNotes(int measureIndex){
         List<Note> retVal = new ArrayList<>();
@@ -136,8 +163,12 @@ public class TickRowPanel extends JPanel {
                 break;
             }
         }
-
-        NoteLength length = NoteLength.ofErtek(harmincKettedCount);
+        NoteLength length = null;
+        if(harmincKettedCount > 32) {
+            length = NoteLength.EGESZ;
+        }else {
+            length = NoteLength.ofErtek(harmincKettedCount);
+        }
 
         if(length == null) {
             length = getNextLength(harmincKettedCount);

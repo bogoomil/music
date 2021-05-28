@@ -2,13 +2,18 @@ package music.theory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class Track {
+
+    private int id;
     private String name;
     private int instrument;
+    private int channel;
 
-    public Track() {
+    public Track(int id) {
         super();
+        this.id = id;
     }
 
     private List<Measure> measures = new ArrayList<>();
@@ -37,7 +42,30 @@ public class Track {
         this.measures = measures;
     }
 
+    public int getId() {
+        return id;
+    }
 
+    public void setId(int id) {
+        this.id = id;
+    }
 
+    public void addMeasure(Measure m) {
+        m.setNum(measures.size());
+        this.measures.add(m);
+
+    }
+
+    public Optional<Measure> getMeasureByNum(int num) {
+        return this.measures.stream().filter(m -> m.getNum() == num).findAny();
+    }
+
+    public int getChannel() {
+        return channel;
+    }
+
+    public void setChannel(int channel) {
+        this.channel = channel;
+    }
 
 }

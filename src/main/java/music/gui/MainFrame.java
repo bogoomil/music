@@ -9,19 +9,11 @@ import java.awt.GridLayout;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowStateListener;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.sound.midi.Instrument;
-import javax.sound.midi.InvalidMidiDataException;
-import javax.sound.midi.MidiSystem;
-import javax.sound.midi.MidiUnavailableException;
-import javax.sound.midi.Track;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -39,11 +31,11 @@ import com.google.common.eventbus.EventBus;
 import music.App;
 import music.event.ChordEvent;
 import music.event.EventListener;
+import music.event.PlayEvent;
 import music.logic.MidiEngine;
 import music.theory.Chord;
 import music.theory.ChordDegree;
 import music.theory.ChordType;
-import music.theory.Measure;
 import music.theory.NoteLength;
 import music.theory.NoteName;
 import music.theory.Pitch;
@@ -90,14 +82,14 @@ public class MainFrame extends JFrame implements EventListener {
 
     public MainFrame(String title) throws HeadlessException {
         super(title);
-        this.addWindowStateListener(new WindowStateListener() {
-
+        this.addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
-            public void windowStateChanged(WindowEvent arg0) {
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+
+                MidiEngine.getSynth().close();
 
             }
         });
-
         eventBus.register(this);
 
         setTitle("MusicApp");
@@ -294,13 +286,7 @@ public class MainFrame extends JFrame implements EventListener {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                try {
-                    play();
-                } catch (MidiUnavailableException | InvalidMidiDataException | InterruptedException | IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-
+                eventBus.post(new PlayEvent());
             }
         });
 
@@ -438,32 +424,34 @@ public class MainFrame extends JFrame implements EventListener {
         return rootKey;
     }
 
-    private void play() throws MidiUnavailableException, InvalidMidiDataException, InterruptedException, IOException {
-
-        Track chordTrack = MidiEngine.getInstrumentTrack(MidiEngine.CHORD_CHANNEL, cbInstr.getItemAt(cbInstr.getSelectedIndex()).getPatch().getProgram());
-        Measure m = null;
-
-        //        LOG.debug("CHORD ==================================================");
-        for(int i = 0; i < this.panelRecord.getComponents().length; i++) {
-
-
-            ChordPanel cp = (ChordPanel) this.panelRecord.getComponent(i);
-            m = new Measure(i, App.getTEMPO(), getRootKey().getName(), ChordType.valueOf(cbMinMaj.getItemAt(cbMinMaj.getSelectedIndex())));
-
-
-            ChordDegree deg = cp.getDegree();
-            Chord c = cp.getChord();
-            //            LOG.debug("chord: {}, degree: {}", c, deg);
-
-            Measure measure = Measure.createMeasureFromChord(i, c, cp.getChordLength(), cp.getArpeggioOffset(), getRootKey().getName(), ChordType.valueOf(cbMinMaj.getItemAt(cbMinMaj.getSelectedIndex())));
-            MidiEngine.addNotesToTrack(chordTrack, MidiEngine.CHORD_CHANNEL, measure);
-
-        }
-
-        MidiEngine.getSequencer().start();
-        File f = new File("piece.mid");
-        //        LOG.debug("creating midi file: {}", f.getAbsolutePath());
-        MidiSystem.write(MidiEngine.getSequencer().getSequence(),1,f);
-    }
+    //    private void play() throws MidiUnavailableException, InvalidMidiDataException, InterruptedException, IOException {
+    //
+    //        Sequence seq = MidiEngine.getSequence();
+    //
+    //        Track chordTrack = MidiEngine.getInstrumentTrack(seq, MidiEngine.CHORD_CHANNEL, cbInstr.getItemAt(cbInstr.getSelectedIndex()).getPatch().getProgram());
+    //        Measure m = null;
+    //
+    //        //        LOG.debug("CHORD ==================================================");
+    //        for(int i = 0; i < this.panelRecord.getComponents().length; i++) {
+    //
+    //
+    //            ChordPanel cp = (ChordPanel) this.panelRecord.getComponent(i);
+    //            m = new Measure(i, App.getTEMPO(), getRootKey().getName(), ChordType.valueOf(cbMinMaj.getItemAt(cbMinMaj.getSelectedIndex())));
+    //
+    //
+    //            ChordDegree deg = cp.getDegree();
+    //            Chord c = cp.getChord();
+    //            //            LOG.debug("chord: {}, degree: {}", c, deg);
+    //
+    //            Measure measure = Measure.createMeasureFromChord(i, c, cp.getChordLength(), cp.getArpeggioOffset(), getRootKey().getName(), ChordType.valueOf(cbMinMaj.getItemAt(cbMinMaj.getSelectedIndex())));
+    //            MidiEngine.addNotesToTrack(chordTrack, MidiEngine.CHORD_CHANNEL, measure);
+    //
+    //        }
+    //
+    //        MidiEngine.getSequencer().start();
+    //        File f = new File("piece.mid");
+    //        //        LOG.debug("creating midi file: {}", f.getAbsolutePath());
+    //        MidiSystem.write(MidiEngine.getSequencer().getSequence(),1,f);
+    //    }
 
 }

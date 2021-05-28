@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import music.App;
 
-public class Measure {
+public class Measure implements Cloneable{
     private int tempo;
     private static final Logger LOG = LoggerFactory.getLogger(Measure.class);
     private List<Note> notes = new ArrayList<>();
@@ -95,6 +95,15 @@ public class Measure {
 
     public void setHangnem(ChordType hangnem) {
         this.hangnem = hangnem;
+    }
+
+    @Override
+    public Measure clone() {
+        Measure m = new Measure(num, tempo, root, hangnem);
+        this.notes.forEach(n -> {
+            m.addNote(n.clone());
+        });
+        return m;
     }
 
 }

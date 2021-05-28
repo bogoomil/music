@@ -67,4 +67,15 @@ public class Note {
         this.absoluteStartTick = absoluteStartTick;
     }
 
+    @Override
+    public Note clone() {
+        Note n = new Note();
+        n.setLength(getLength());
+        n.setPitch(getPitch());
+        n.setRelativStartTick(getRelativStartTick());
+        n.setVol(getVol());
+
+        return n;
+    }
+
 }

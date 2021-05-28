@@ -13,6 +13,7 @@ import com.google.common.eventbus.Subscribe;
 
 import music.event.TickOffEvent;
 import music.event.TickOnEvent;
+import music.event.TickRowResizedEvent;
 import music.gui.MainFrame;
 
 public class TickRowProgressBar extends JPanel {
@@ -30,6 +31,7 @@ public class TickRowProgressBar extends JPanel {
         flowLayout.setAlignment(FlowLayout.RIGHT);
 
         JLabel placeHolder = new JLabel("");
+        placeHolder.setOpaque(true);
         placeHolder.setBackground(Color.CYAN);
         placeHolder.setForeground(Color.BLACK);
         placeHolder.setPreferredSize(new Dimension(114, 20));
@@ -56,6 +58,11 @@ public class TickRowProgressBar extends JPanel {
     public void handleTickOffEvent(TickOffEvent e) {
         ((JLabel)this.labels.getComponent(e.getTick())).setOpaque(false);
         ((JLabel)this.labels.getComponent(e.getTick())).repaint();
+    }
+    @Subscribe
+    public void handleTickRowResized(TickRowResizedEvent e) {
+        this.setPreferredSize(new Dimension(e.getWidth(), this.getHeight()));
+        this.validate();
     }
 
 }

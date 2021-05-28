@@ -33,7 +33,7 @@ public class PianoKey extends JButton{
         NoteName nn = this.pitch.getName();
         int oct = this.pitch.getOctave();
 
-        this.setText(nn.name() + " (" + oct + ")");
+        this.setText(nn.name() + " (" + oct + "/ "+ ((oct * 12) +  nn.getMidiCode()) + ")");
 
         if(nn == NoteName.Ab || nn == NoteName.Bb || nn == NoteName.Cs || nn == NoteName.Eb || nn == NoteName.Fs) {
             this.setBackground(Color.BLACK);

@@ -17,7 +17,6 @@ import javax.sound.midi.Track;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import music.App;
 import music.event.TickOffEvent;
 import music.event.TickOnEvent;
 import music.gui.MainFrame;
@@ -59,15 +58,13 @@ public class MidiEngine {
                 e.printStackTrace();
             }
         }
-        if(!sequencer.isOpen()) {
-            try {
-                sequencer.open();
-            } catch (MidiUnavailableException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
 
+        try {
+            sequencer.getTransmitter().setReceiver(getSynth().getReceiver());
+        } catch (MidiUnavailableException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         return sequencer;
     }
 
@@ -160,7 +157,6 @@ public class MidiEngine {
 
     private static void initSequencer() throws MidiUnavailableException, InvalidMidiDataException {
         sequencer = MidiSystem.getSequencer();
-        sequencer.setTempoInBPM(App.getTEMPO());
     }
 
 
@@ -206,20 +202,24 @@ public class MidiEngine {
         MidiEngine.synth = synth;
     }
 
+    //    public static Sequence getSequence() throws InvalidMidiDataException {
+    //        Sequence seq = new Sequence(Sequence.PPQ, MidiEngine.RESOLUTION);
+    //
+    //        MidiEngine.getSequencer().setSequence(seq);
+    //
+    //        return seq;
+    //
+    //    }
 
-    public static Track getInstrumentTrack(int channel, int program) throws InvalidMidiDataException {
 
-        Sequence seq = new Sequence(Sequence.PPQ, MidiEngine.RESOLUTION);
+    public static Track getInstrumentTrack(Sequence seq, int channel, int program) throws InvalidMidiDataException {
+
+
         Track track = seq.createTrack();
-
-        MidiEngine.getSequencer().setSequence(seq);
-
-
         ShortMessage instrumentChange = new ShortMessage();
         instrumentChange.setMessage(ShortMessage.PROGRAM_CHANGE, channel, program,0);
         MidiEvent changeInstrument = new MidiEvent(instrumentChange, 1);
         track.add(changeInstrument);
-
         return track;
     }
 

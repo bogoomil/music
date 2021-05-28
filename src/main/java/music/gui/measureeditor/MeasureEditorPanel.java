@@ -9,6 +9,8 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -24,6 +26,7 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JToggleButton;
 import javax.swing.UIManager;
+import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -34,8 +37,10 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.eventbus.Subscribe;
 
+import music.event.AddMeasureToTrackEvent;
 import music.event.MeasureSelectedEvent;
 import music.event.PianoKeyEvent;
+import music.event.TickRowResizedEvent;
 import music.gui.MainFrame;
 import music.logic.MidiEngine;
 import music.theory.ChordType;
@@ -76,6 +81,7 @@ public class MeasureEditorPanel extends JPanel{
     private static final Logger LOG = LoggerFactory.getLogger(MeasureEditorPanel.class);
 
     private List<Measure> measures = new ArrayList<>();
+    private JButton btnAddToTrack;
 
     public MeasureEditorPanel() {
         super();
@@ -84,6 +90,7 @@ public class MeasureEditorPanel extends JPanel{
         MainFrame.eventBus.register(this);
 
         this.setLayout(new BorderLayout());
+        pnCenter.setBorder(new LineBorder(new Color(0, 0, 0), 2, true));
 
         this.add(pnCenter, BorderLayout.CENTER);
 
@@ -170,8 +177,6 @@ public class MeasureEditorPanel extends JPanel{
 
         tbTempo = new TitledBorder(null, "Tempo", TitledBorder.LEADING, TitledBorder.TOP, null, null);
 
-        tglbtnLoop = new JToggleButton("Loop");
-        panel.add(tglbtnLoop);
 
         slTempo = new JSlider();
         slTempo.setSnapToTicks(true);
@@ -267,6 +272,22 @@ public class MeasureEditorPanel extends JPanel{
         btnGenerateArp = new JButton("Generate arp.");
         panel.add(btnGenerateArp);
 
+        btnAddToTrack = new JButton("Add to track");
+        panel.add(btnAddToTrack);
+
+        btnAddToTrack.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                for(int i = 0; i < measures.size(); i++) {
+                    Measure m = measures.get(i);
+                    m.setNotes(getNotes(i));
+                    m.setTempo(slTempo.getValue());
+                    MainFrame.eventBus.post(new AddMeasureToTrackEvent(m));
+                }
+            }
+        });
+
         btnGenerateArp.addActionListener(new ActionListener() {
 
             @Override
@@ -275,6 +296,33 @@ public class MeasureEditorPanel extends JPanel{
 
             }
 
+        });
+
+        pnTickRows.addComponentListener(new ComponentListener() {
+
+            @Override
+            public void componentShown(ComponentEvent e) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void componentResized(ComponentEvent e) {
+                MainFrame.eventBus.post(new TickRowResizedEvent(e.getComponent().getWidth()));
+
+            }
+
+            @Override
+            public void componentMoved(ComponentEvent e) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void componentHidden(ComponentEvent e) {
+                // TODO Auto-generated method stub
+
+            }
         });
     }
     private void generateArpeggio(int selectedIndex) {
@@ -315,7 +363,7 @@ public class MeasureEditorPanel extends JPanel{
             measures.remove(0);
         }
 
-        measures.get(measureCount).setNum(measureCount);
+        //measures.get(measureCount).setNum(measureCount);
 
 
         this.measureCount++;
@@ -377,7 +425,14 @@ public class MeasureEditorPanel extends JPanel{
                     try {
                         trp.setSelectedTick(j);
                     }catch(Exception ex) {
-                        ex.printStackTrace();
+                        LOG.error("HIBA: {}, i: {}, measure: {}, note: {}, rel st: {}, abs st: {}, note length: {}",
+                                ex.getMessage(),
+                                i,
+                                measure.getNum(),
+                                note.getPitch(),
+                                note.getRelativStartTick(),
+                                note.getAbsoluteStartTick(),
+                                note.getLength().name() + ":" + note.getLength().getErtek());
                     }
                 }
 
