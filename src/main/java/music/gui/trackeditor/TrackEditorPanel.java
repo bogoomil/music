@@ -1,4 +1,4 @@
-package music.gui;
+package music.gui.trackeditor;
 
 import java.awt.GridLayout;
 

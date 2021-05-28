@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
 import music.gui.measureeditor.MeasureEditorPanel;
+import music.gui.trackeditor.TrackEditorPanel;
 import music.model.Project;
 
 public class ProjectEditorPanel extends JPanel {
