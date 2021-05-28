@@ -77,7 +77,7 @@ public class MidiEngine {
         for(int i = 0; i < measure.getNotes().size();i++) {
             Note note = measure.getNotes().get(i);
 
-            int startInTick = note.getStartInTick() + (measure.getNum() * MidiEngine.TICKS_IN_MEASURE);
+            int startInTick = note.getRelativStartTick() + (measure.getNum() * MidiEngine.TICKS_IN_MEASURE);
             int endInTick = startInTick + note.getLength().getErtek();
 
             if(endInTick > (measure.getNum() + 1) * MidiEngine.TICKS_IN_MEASURE) {
@@ -178,18 +178,18 @@ public class MidiEngine {
 
                 try {
 
-                    int offset = getTickLengthInMeasureMs(note.getStartInTick(), tempo );
+                    int offset = getTickLengthInMeasureMs(note.getAbsoluteStartTick(), tempo );
                     int length = getNoteLenghtInMs(note.getLength(), tempo);
 
                     Thread.sleep(offset);
 
-                    MainFrame.eventBus.post(new TickOnEvent(note.getStartInTick()));
+                    MainFrame.eventBus.post(new TickOnEvent(note.getAbsoluteStartTick()));
 
                     channel.noteOn(note.getPitch().getMidiCode(), note.getVol());
 
 
                     Thread.sleep(length);
-                    MainFrame.eventBus.post(new TickOffEvent(note.getStartInTick()));
+                    MainFrame.eventBus.post(new TickOffEvent(note.getAbsoluteStartTick()));
                     channel.noteOff(note.getPitch().getMidiCode());
 
 

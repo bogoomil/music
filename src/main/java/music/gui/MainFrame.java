@@ -34,9 +34,6 @@ import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.border.TitledBorder;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.eventbus.EventBus;
 
 import music.App;
@@ -54,7 +51,7 @@ import music.theory.Scale;
 
 public class MainFrame extends JFrame implements EventListener {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MainFrame.class);
+    //private static final Logger LOG = LoggerFactory.getLogger(MainFrame.class);
 
 
     private JComboBox<String> cbOctave, cbRoot, cbMinMaj;
@@ -198,7 +195,7 @@ public class MainFrame extends JFrame implements EventListener {
         panel_4.setBorder(new TitledBorder(null, "Arpeggio", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
         chckbxArp = new JCheckBox("Arp");
-        chckbxArp.setSelected(true);
+        chckbxArp.setSelected(false);
         panel_4.add(chckbxArp);
         chckbxArp.addActionListener(new ActionListener() {
 
@@ -223,6 +220,7 @@ public class MainFrame extends JFrame implements EventListener {
             }
 
         });
+        cbArpeggio.setEnabled(false);
 
         panel = new JPanel();
         panel.setBorder(new TitledBorder(null, "Tempo", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -319,7 +317,7 @@ public class MainFrame extends JFrame implements EventListener {
 
         this.generateChords();
 
-        cbChordLength.setSelectedIndex(4);
+        cbChordLength.setSelectedIndex(3);
         cbArpeggio.setSelectedIndex(7);
 
     }
@@ -338,9 +336,9 @@ public class MainFrame extends JFrame implements EventListener {
 
         scale = chordType == ChordType.MAJ ? Scale.majorScale(getRootKey().getName()) : Scale.minorScale(getRootKey().getName()) ;
 
-        Arrays.asList(scale).forEach(s -> {
-            LOG.debug("pitch: {}", s);
-        });
+        //        Arrays.asList(scale).forEach(s -> {
+        //            LOG.debug("pitch: {}", s);
+        //        });
 
         this.centerPanel.removeAll();
 
@@ -445,7 +443,7 @@ public class MainFrame extends JFrame implements EventListener {
         Track chordTrack = MidiEngine.getInstrumentTrack(MidiEngine.CHORD_CHANNEL, cbInstr.getItemAt(cbInstr.getSelectedIndex()).getPatch().getProgram());
         Measure m = null;
 
-        LOG.debug("CHORD ==================================================");
+        //        LOG.debug("CHORD ==================================================");
         for(int i = 0; i < this.panelRecord.getComponents().length; i++) {
 
 
@@ -455,7 +453,7 @@ public class MainFrame extends JFrame implements EventListener {
 
             ChordDegree deg = cp.getDegree();
             Chord c = cp.getChord();
-            LOG.debug("chord: {}, degree: {}", c, deg);
+            //            LOG.debug("chord: {}, degree: {}", c, deg);
 
             Measure measure = Measure.createMeasureFromChord(i, c, cp.getChordLength(), cp.getArpeggioOffset(), getRootKey().getName(), ChordType.valueOf(cbMinMaj.getItemAt(cbMinMaj.getSelectedIndex())));
             MidiEngine.addNotesToTrack(chordTrack, MidiEngine.CHORD_CHANNEL, measure);
@@ -464,7 +462,7 @@ public class MainFrame extends JFrame implements EventListener {
 
         MidiEngine.getSequencer().start();
         File f = new File("piece.mid");
-        LOG.debug("creating midi file: {}", f.getAbsolutePath());
+        //        LOG.debug("creating midi file: {}", f.getAbsolutePath());
         MidiSystem.write(MidiEngine.getSequencer().getSequence(),1,f);
     }
 

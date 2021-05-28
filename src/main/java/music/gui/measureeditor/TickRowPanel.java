@@ -104,6 +104,7 @@ public class TickRowPanel extends JPanel {
         int startIndex = (measureIndex * MidiEngine.TICKS_IN_MEASURE);
 
         for(int i = startIndex; i < startIndex + MidiEngine.TICKS_IN_MEASURE; i++) {
+
             JToggleButton btn = (JToggleButton) this.buttons.getComponents()[i];
             if(!btn.isSelected() || (i % MidiEngine.TICKS_IN_MEASURE != 0 && (i > 0 && ((JToggleButton)this.buttons.getComponents()[i - 1]).isSelected()))) {
                 continue;
@@ -112,7 +113,12 @@ public class TickRowPanel extends JPanel {
             NoteLength length = getNoteLengthFromTick(startTick);
             Note note = new Note();
             note.setPitch(pitch);
-            note.setStartInTick(startTick);
+
+            int relativeStartTick = startTick - startIndex;
+
+
+            note.setRelativStartTick(relativeStartTick);
+            note.setAbsoluteStartTick(startTick);
             note.setLength(length);
             retVal.add(note);
         }

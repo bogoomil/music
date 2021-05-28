@@ -69,11 +69,12 @@ public class Measure {
             note.setLength(chordLength);
             int start = 0;
             if(arpeggioOffset != null) {
-                start = (counter * arpeggioOffset.getErtek()) + (counter * measureNum);
+                start = (counter * arpeggioOffset.getErtek());
+
                 LOG.debug("counter: {} * (32/{}) = {}", counter, arpeggioOffset.getErtek(), start);
 
             }
-            note.setStartInTick(start);
+            note.setRelativStartTick(start);
             measure.addNote(note);
             counter++;
         }
@@ -94,11 +95,6 @@ public class Measure {
 
     public void setHangnem(ChordType hangnem) {
         this.hangnem = hangnem;
-    }
-
-    public int getRelativeNum() {
-        return this.num % 4;
-
     }
 
 }

@@ -78,7 +78,7 @@ public class MeasureEditorPanel extends JPanel{
     //    private NoteName root;
     //    private ChordType chordType;
 
-    private Measure[] measures = new Measure[4];
+    private List<Measure> measures = new ArrayList<>();
 
     public MeasureEditorPanel() {
         super();
@@ -119,25 +119,11 @@ public class MeasureEditorPanel extends JPanel{
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                measures = new Measure[4];
+                measures = new ArrayList<>();
                 measureCount = 0;
                 pnTickRows.removeAll();
 
                 pnTickRows.repaint();
-
-                //                for(int i = 0; i< measures.size(); i++) {
-                //                    Measure m = measures.get(i);
-                //
-                //                    m.setNotes(new ArrayList<Note>());
-                //                    Note n = new Note();
-                //                    n.setLength(NoteLength.HARMICKETTED);
-                //                    n.setPitch(new Pitch(NoteName.C.getMidiCode()).shift(4));
-                //                    n.setStartInTick(0);
-                //                    m.addNote(n);
-                //
-                //                }
-
-                //generateNotes();
 
             }
         });
@@ -184,7 +170,6 @@ public class MeasureEditorPanel extends JPanel{
         });
 
         slTempo = new JSlider();
-        slTempo.setMinimum(60);
 
         tbTempo = new TitledBorder(null, "Tempo", TitledBorder.LEADING, TitledBorder.TOP, null, null);
 
@@ -203,18 +188,14 @@ public class MeasureEditorPanel extends JPanel{
 
         slTempo.setBorder(tbTempo);
         slTempo.setMaximum(300);
+
+        slTempo.setValue(200);
+
         panel.add(slTempo);
         slTempo.addChangeListener(new ChangeListener() {
 
             @Override
             public void stateChanged(ChangeEvent e) {
-                System.out.println("Tempo: " + slTempo.getValue());
-                for(int i= 0; i< measures.length; i++) {
-                    if(measures[i] != null) {
-                        measures[i].setTempo(slTempo.getValue());
-                    }
-                }
-                //                measure.setTempo(slTempo.getValue());
                 tbTempo.setTitle("Tempo: " + slTempo.getValue());;
 
             }
@@ -232,7 +213,6 @@ public class MeasureEditorPanel extends JPanel{
 
             @Override
             public void stateChanged(ChangeEvent e) {
-                System.out.println("Vol: " + slVolume.getValue());
                 tbVolume.setTitle("Volume: " + slVolume.getValue());
 
             }
@@ -273,15 +253,6 @@ public class MeasureEditorPanel extends JPanel{
         panel_2.setBorder(new TitledBorder(null, "MIDI Channel", TitledBorder.LEADING, TitledBorder.TOP, null, null));
         panel.add(panel_2);
 
-        //        JPanel pnWest = new JPanel();
-        //        add(pnWest, BorderLayout.WEST);
-        //        pnWest.setLayout(new GridLayout(0, 1, 0, 0));
-        //
-        //        JPanel panel_1 = new JPanel();
-        //        panel_1.setOpaque(false);
-        //        panel_1.setMaximumSize(new Dimension(50, 32767));
-        //        pnWest.add(panel_1);
-        //        panel_1.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
         cbChannel = new JComboBox();
         cbChannel.setPreferredSize(new Dimension(200, 24));
         panel_2.add(cbChannel);
@@ -341,10 +312,14 @@ public class MeasureEditorPanel extends JPanel{
     @Subscribe
     public void handleMeasureEvent(MeasureSelectedEvent ev) {
 
-        measures[measureCount] = ev.getMeasure();
-        measures[measureCount].setNum(measureCount);
+        measures.add(ev.getMeasure());
 
-        LOG.debug("measure event: count: {}, measure num: {}", measureCount, measures[measureCount].getRelativeNum());
+        if(measures.size() == 5) {
+            measures.remove(0);
+        }
+
+        measures.get(measureCount).setNum(measureCount);
+
 
         this.measureCount++;
         if(measureCount == 4) {
@@ -374,45 +349,42 @@ public class MeasureEditorPanel extends JPanel{
             }
         });
 
-        for(int i = 0; i < this.measures.length; i++) {
+        for(int i = 0; i < this.measures.size(); i++) {
 
-            if(measures[i] != null) {
-                Measure measure = measures[i];
+            Measure measure = measures.get(i);
 
-                chckbxEnableAllPitches.setSelected(true);
+            chckbxEnableAllPitches.setSelected(true);
 
-                lblHangnem.setText(measure.getRoot().name() + " " + measure.getHangnem().name());
+            lblHangnem.setText(measure.getRoot().name() + " " + measure.getHangnem().name());
 
-                slTempo.setValue(measure.getTempo());
+            //            slTempo.setValue(measure.getTempo());
 
-                tbVolume.setTitle("Volume: " + slVolume.getValue());
+            tbVolume.setTitle("Volume: " + slVolume.getValue());
 
-                GridLayout gl = new GridLayout(0, 1);
+            GridLayout gl = new GridLayout(0, 1);
 
-                this.pnTickRows.setLayout(gl);
+            this.pnTickRows.setLayout(gl);
 
-                this.pnCenter.add(new TickRowProgressBar(), BorderLayout.NORTH);
+            this.pnCenter.add(new TickRowProgressBar(), BorderLayout.NORTH);
 
 
-                for(Note note : measure.getNotes()) {
+            for(Note note : measure.getNotes()) {
 
-                    TickRowPanel trp = this.getTickRowByPitch(note.getPitch());
+                TickRowPanel trp = this.getTickRowByPitch(note.getPitch());
 
-                    int startTick = measure.getRelativeNum() * (MidiEngine.TICKS_IN_MEASURE) + note.getStartInTick();
+                int startTick = i * (MidiEngine.TICKS_IN_MEASURE) + note.getRelativStartTick();
 
-                    int endTick = startTick +  note.getLength().getErtek();
+                int endTick = startTick +  note.getLength().getErtek();
 
-                    for(int j = startTick; j < endTick; j++) {
-                        try {
-                            trp.setSelectedTick(j);
-                        }catch(Exception ex) {
-                            ex.printStackTrace();
-                        }
+                for(int j = startTick; j < endTick; j++) {
+                    try {
+                        trp.setSelectedTick(j);
+                    }catch(Exception ex) {
+                        ex.printStackTrace();
                     }
-
                 }
-            }
-        }
+
+            }        }
         this.validate();
     }
 
@@ -428,23 +400,19 @@ public class MeasureEditorPanel extends JPanel{
 
         int min = 100;
 
-        for(int i = 0; i < this.measures.length; i++) {
-            if(measures[i] != null) {
-                Measure m = this.measures[i];
-                for(int j = 0; j < m.getNotes().size(); j++) {
+        for(int i = 0; i < this.measures.size(); i++) {
+            Measure m = this.measures.get(i);
+            for(int j = 0; j < m.getNotes().size(); j++) {
 
-                    Note curr = m.getNotes().get(j);
+                Note curr = m.getNotes().get(j);
 
-                    if(!octaves.contains(curr.getPitch().getOctave())) {
-                        octaves.add(curr.getPitch().getOctave());
-                        if(min > curr.getPitch().getOctave()) {
-                            min = curr.getPitch().getOctave();
-                        }
+                if(!octaves.contains(curr.getPitch().getOctave())) {
+                    octaves.add(curr.getPitch().getOctave());
+                    if(min > curr.getPitch().getOctave()) {
+                        min = curr.getPitch().getOctave();
                     }
                 }
-
             }
-
         }
         if(octaves.size() == 1) {
             octaves.add(octaves.get(0) - 1);
@@ -462,16 +430,12 @@ public class MeasureEditorPanel extends JPanel{
         MidiChannel[] channels = MidiEngine.getSynth().getChannels();
         channels[MidiEngine.CHORD_CHANNEL].programChange(instrument);
 
-        for(int i = 0; i < this.measures.length; i++) {
-            if(this.measures[i] != null) {
-                Measure m = this.measures[i];
-                m.setNotes(getNotes(i));
-                MidiEngine.playMeasure(m, channels[cbChannel.getSelectedIndex()]);
-
-            }
-
+        for(int i = 0; i < this.measures.size(); i++) {
+            Measure m = measures.get(i);
+            m.setNotes(getNotes(i));
+            m.setTempo(slTempo.getValue());
+            MidiEngine.playMeasure(m, channels[cbChannel.getSelectedIndex()]);
         }
-
     }
 
     private List<Note> getNotes(int measureIndex){
@@ -492,7 +456,7 @@ public class MeasureEditorPanel extends JPanel{
         } else {
 
             List<NoteName> scaleNotes = new ArrayList<>();
-            Pitch[] scale = this.measures[0].getHangnem() == ChordType.MAJ ? Scale.majorScale(this.measures[0].getRoot()) : Scale.minorScale(this.measures[0].getRoot());
+            Pitch[] scale = this.measures.get(0).getHangnem() == ChordType.MAJ ? Scale.majorScale(this.measures.get(0).getRoot()) : Scale.minorScale(this.measures.get(0).getRoot());
             for(Pitch p : scale) {
                 scaleNotes.add(p.getName());
             }
@@ -510,12 +474,10 @@ public class MeasureEditorPanel extends JPanel{
 
 
     private void changeOctave(int oct) {
-        for(int i = 0; i < this.measures.length; i++) {
-            if(measures[i] != null) {
-                this.measures[i].getNotes().forEach(n -> {
-                    n.setPitch(n.getPitch().shift(oct));
-                });
-            }
+        for(int i = 0; i < this.measures.size(); i++) {
+            this.measures.get(i).getNotes().forEach(n -> {
+                n.setPitch(n.getPitch().shift(oct));
+            });
         }
         this.generateNotes();
 
@@ -529,7 +491,7 @@ public class MeasureEditorPanel extends JPanel{
         Note note = new Note();
         note.setLength(NoteLength.NEGYED);
         note.setPitch(pitch);
-        note.setStartInTick(0);
+        note.setAbsoluteStartTick(0);
         note.setVol(slVolume.getValue());
         MidiEngine.playNote(note, channels[cbChannel.getSelectedIndex()], slTempo.getValue());
 
