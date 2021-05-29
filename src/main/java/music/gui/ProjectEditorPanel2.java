@@ -28,7 +28,7 @@ import com.google.common.eventbus.Subscribe;
 import music.event.AddMeasureToTrackEvent;
 import music.event.PlayEvent;
 import music.event.TrackSelectedEvent;
-import music.gui.measureeditor.MeasureEditorPanel;
+import music.gui.measure.MeasureEditorPanel;
 import music.gui.trackeditor.TrackEditorPanel;
 import music.logic.MidiEngine;
 import music.model.Project;
@@ -36,7 +36,7 @@ import music.theory.Measure;
 import music.theory.Note;
 import music.theory.Track;
 
-public class ProjectEditorPanel extends JPanel {
+public class ProjectEditorPanel2 extends JPanel {
 
     private Project project;
     private JPanel pnTracks;
@@ -50,7 +50,7 @@ public class ProjectEditorPanel extends JPanel {
     private JSlider slVolume;
     private JSlider slTempo;
 
-    public ProjectEditorPanel() {
+    public ProjectEditorPanel2() {
         super();
         MainFrame.eventBus.register(this);
         setLayout(new BorderLayout(0, 0));
@@ -80,8 +80,8 @@ public class ProjectEditorPanel extends JPanel {
         pnTracks.setLayout(new BoxLayout(pnTracks, BoxLayout.Y_AXIS));
 
 
-        spTop = new JScrollPane(pnTracks, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        spBottom = new JScrollPane(measureEditor, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        spTop = new JScrollPane(pnTracks, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        spBottom = new JScrollPane(measureEditor, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                 spTop, spBottom);

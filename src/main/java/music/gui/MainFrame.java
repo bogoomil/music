@@ -77,6 +77,8 @@ public class MainFrame extends JFrame implements EventListener {
 
     ProjectEditorPanel pep = new ProjectEditorPanel();
 
+    ProjectEditorPanel2 pep2 = new ProjectEditorPanel2();
+
 
     private Pitch[] scale;
 
@@ -278,7 +280,7 @@ public class MainFrame extends JFrame implements EventListener {
         tabbedPane.addTab("Project", null, pnProject, null);
         pnProject.setLayout(new BorderLayout());
 
-        pnProject.add(pep, BorderLayout.CENTER);
+        pnProject.add(pep2, BorderLayout.CENTER);
 
 
 
