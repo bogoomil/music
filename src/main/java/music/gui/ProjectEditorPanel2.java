@@ -14,7 +14,9 @@ import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Sequence;
 import javax.sound.midi.Sequencer;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
@@ -46,8 +48,8 @@ public class ProjectEditorPanel2 extends JPanel {
     JScrollPane spBottom;
 
     TrackEditorPanel currentTrackEditor;
-    private JSlider slVolume;
     private JSlider slTempo;
+    private JComboBox cbTempoFactor;
 
     public ProjectEditorPanel2() {
         super();
@@ -114,23 +116,9 @@ public class ProjectEditorPanel2 extends JPanel {
         });
         pnButtons.add(slTempo);
 
-        slVolume = new JSlider();
-        slVolume.setMinorTickSpacing(5);
-        slVolume.setPaintLabels(true);
-        slVolume.setPaintTicks(true);
-        slVolume.setSnapToTicks(true);
-        slVolume.setMajorTickSpacing(20);
-        TitledBorder tbVolume = new TitledBorder(null, "Volume", TitledBorder.LEADING, TitledBorder.TOP, null, null);
-        slVolume.setBorder(tbVolume);
-        slVolume.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                tbVolume.setTitle("Volume: " + slVolume.getValue());
-
-            }
-        });
-        pnButtons.add(slVolume);
+        cbTempoFactor = new JComboBox();
+        cbTempoFactor.setModel(new DefaultComboBoxModel(new String[] {"0.1", "0.25", "0.5", "0.75", "1.0", "2", "3", "4"}));
+        pnButtons.add(cbTempoFactor);
 
 
     }
@@ -169,8 +157,10 @@ public class ProjectEditorPanel2 extends JPanel {
 
         Sequencer sequencer = MidiEngine.getSequencer();
 
-        sequencer.setTempoInBPM(slTempo.getValue());
-        sequencer.setTempoFactor(4);
+
+        //        float f = Float.parseFloat(cbTempoFactor.getSelectedItem() + "");
+        //
+        //        sequencer.setTempoFactor(f);
 
         for(Track t :this.tracks) {
             javax.sound.midi.Track track = MidiEngine.getInstrumentTrack(seq, t.getChannel(), t.getInstrument());
@@ -187,14 +177,16 @@ public class ProjectEditorPanel2 extends JPanel {
         }
 
         sequencer.start();
+        sequencer.setTempoInBPM(slTempo.getValue());
+
 
         System.out.println("seq running: " + sequencer.isRunning());
 
-        File f = new File("piece.mid");
+        File file = new File("piece.mid");
 
-        System.out.println("creating midi file: " + f.getAbsolutePath());
+        System.out.println("creating midi file: " + file.getAbsolutePath());
 
-        MidiSystem.write(seq,1,f);
+        MidiSystem.write(seq,1,file);
 
         //sequencer.close();
 
