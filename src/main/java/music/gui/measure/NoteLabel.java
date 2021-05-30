@@ -13,6 +13,7 @@ import javax.swing.border.LineBorder;
 import com.google.common.eventbus.Subscribe;
 
 import music.event.MeasureNotesUpdatedEvent;
+import music.event.NoteSelectionEvent;
 import music.event.TickOffEvent;
 import music.event.TickOnEvent;
 import music.gui.MainFrame;
@@ -27,6 +28,7 @@ public class NoteLabel extends JLabel {
 
     private Color origColor = Color.CYAN;
     private Color selectColor = Color.ORANGE;
+    private Color playingColor = Color.PINK;
 
     private boolean selected;
 
@@ -124,6 +126,11 @@ public class NoteLabel extends JLabel {
                         } else {
                             selected = !selected;
                             setBackground(selected ? selectColor : origColor);
+                            if(selected) {
+                                MainFrame.eventBus.post(new NoteSelectionEvent(note));
+                            }else {
+                                MainFrame.eventBus.post(new NoteSelectionEvent(null));
+                            }
                         }
                     }
                 }
@@ -177,14 +184,14 @@ public class NoteLabel extends JLabel {
     @Subscribe
     void handleTickOnEvent(TickOnEvent e) {
         if(e.getTick()  == note.getStartTick()) {
-            setBackground(selectColor);
+            setBackground(playingColor);
         }
     }
 
     @Subscribe
     void handleTickOffEvent(TickOffEvent e) {
         if(e.getTick()  == note.getStartTick()) {
-            setBackground(origColor);
+            setBackground(selected ? selectColor : origColor);
         }
     }
 

@@ -33,7 +33,6 @@ import music.gui.trackeditor.TrackEditorPanel;
 import music.logic.MidiEngine;
 import music.model.Project;
 import music.theory.Measure;
-import music.theory.Note;
 import music.theory.Track;
 
 public class ProjectEditorPanel2 extends JPanel {
@@ -176,9 +175,6 @@ public class ProjectEditorPanel2 extends JPanel {
         for(Track t :this.tracks) {
             javax.sound.midi.Track track = MidiEngine.getInstrumentTrack(seq, t.getChannel(), t.getInstrument());
             for(Measure m : t.getMeasures()) {
-                for(Note note : m.getNotes()) {
-                    note.setVol(slVolume.getValue());
-                }
                 MidiEngine.addNotesToTrack(track, t.getChannel(), m);
             }
 

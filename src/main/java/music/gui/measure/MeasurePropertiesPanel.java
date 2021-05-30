@@ -214,8 +214,6 @@ public class MeasurePropertiesPanel extends JPanel{
         Measure m = measure.clone();
         m.setNum(0);
         MidiEngine.playMeasure(m, channels[cbChannel.getSelectedIndex()]);
-
-
     }
 
 

@@ -213,7 +213,6 @@ public class ChordPanel extends JPanel {
         for(Pitch p : chord.getPitches()) {
             Note n = new Note();
             n.setPitch(p);
-            n.setVol(100);
             n.setLength(chordLength);
             if(arpeggioOffset != null) {
                 int startTick = arpeggioOffset.getErtek();

@@ -29,7 +29,7 @@ public class MeasureEditorPanel extends JPanel {
 
     private MeasurePropertiesPanel pnToolbar = new MeasurePropertiesPanel();
     private JPanel pnCenter = new JPanel();
-    private JPanel pnProperties = new JPanel();
+    private NotePropertiesPanel pnProperties = new NotePropertiesPanel();
 
     public MeasureEditorPanel() {
         super();
@@ -64,8 +64,11 @@ public class MeasureEditorPanel extends JPanel {
 
             nlp.getTrep().add(nl);
         });
+        pnCenter.repaint();
+        pnCenter.validate();
 
         this.validate();
+        this.repaint();
 
     }
 
@@ -124,10 +127,6 @@ public class MeasureEditorPanel extends JPanel {
         this.validate();
     }
 
-    @Subscribe
-    private void handleMeasureNotesUpdatedEvent(MeasureNotesUpdatedEvent e) {
-        this.measure.setNotes(this.generateNotes());
-    }
 
     private List<Note> generateNotes() {
         List<Note> notes = new ArrayList<>();
@@ -139,6 +138,26 @@ public class MeasureEditorPanel extends JPanel {
             }
         }
         return notes;
+    }
+
+    @Subscribe
+    private void handleMeasureNotesUpdatedEvent(MeasureNotesUpdatedEvent e) {
+        this.measure.setNotes(this.generateNotes());
+        pnCenter.revalidate();
+        pnCenter.repaint();
+        for(Component c :pnCenter.getComponents()) {
+            c.revalidate();
+            c.repaint();
+        }
+        for (int i = 0; i < pnCenter.getComponentCount(); i++) {
+            NoteLinePanel nlp = (NoteLinePanel) pnCenter.getComponent(i);
+            for(Component t : nlp.getTrep().getComponents()) {
+                NoteLabel nl = (NoteLabel) t;
+                nl.reCalculateSizeAndLocation();
+            }
+
+        }
+
     }
 
 }
