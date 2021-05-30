@@ -118,6 +118,7 @@ public class ProjectEditorPanel2 extends JPanel {
 
         cbTempoFactor = new JComboBox();
         cbTempoFactor.setModel(new DefaultComboBoxModel(new String[] {"0.1", "0.25", "0.5", "0.75", "1.0", "2", "3", "4"}));
+        cbTempoFactor.setSelectedIndex(4);
         pnButtons.add(cbTempoFactor);
 
 
@@ -158,9 +159,9 @@ public class ProjectEditorPanel2 extends JPanel {
         Sequencer sequencer = MidiEngine.getSequencer();
 
 
-        //        float f = Float.parseFloat(cbTempoFactor.getSelectedItem() + "");
-        //
-        //        sequencer.setTempoFactor(f);
+        float f = Float.parseFloat(cbTempoFactor.getSelectedItem() + "");
+
+        sequencer.setTempoFactor(f);
 
         for(Track t :this.tracks) {
             javax.sound.midi.Track track = MidiEngine.getInstrumentTrack(seq, t.getChannel(), t.getInstrument());
