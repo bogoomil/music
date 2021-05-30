@@ -5,9 +5,8 @@ public class Note {
 
     Pitch pitch;
     NoteLength length;
-    int relativStartTick;
-    int absoluteStartTick;
-    int vol;
+    int startTick;
+    int vol = 100;
 
     public Pitch getPitch() {
         return pitch;
@@ -43,28 +42,14 @@ public class Note {
         this.vol = vol;
     }
 
-
-
-    public int getRelativStartTick() {
-        return relativStartTick;
+    public int getStartTick() {
+        return startTick;
     }
 
 
 
-    public void setRelativStartTick(int startInTick) {
-        this.relativStartTick = startInTick;
-    }
-
-
-
-    public int getAbsoluteStartTick() {
-        return absoluteStartTick;
-    }
-
-
-
-    public void setAbsoluteStartTick(int absoluteStartTick) {
-        this.absoluteStartTick = absoluteStartTick;
+    public void setStartTick(int startInTick) {
+        this.startTick = startInTick;
     }
 
     @Override
@@ -72,7 +57,7 @@ public class Note {
         Note n = new Note();
         n.setLength(getLength());
         n.setPitch(getPitch());
-        n.setRelativStartTick(getRelativStartTick());
+        n.setStartTick(getStartTick());
         n.setVol(getVol());
 
         return n;

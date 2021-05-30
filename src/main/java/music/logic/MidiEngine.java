@@ -74,7 +74,7 @@ public class MidiEngine {
         for(int i = 0; i < measure.getNotes().size();i++) {
             Note note = measure.getNotes().get(i);
 
-            int startInTick = note.getRelativStartTick() + (measure.getNum() * MidiEngine.TICKS_IN_MEASURE);
+            int startInTick = note.getStartTick() + (measure.getNum() * MidiEngine.TICKS_IN_MEASURE);
             int endInTick = startInTick + note.getLength().getErtek();
 
             if(endInTick > (measure.getNum() + 1) * MidiEngine.TICKS_IN_MEASURE) {
@@ -167,25 +167,25 @@ public class MidiEngine {
      * @param channel
      * @param tempo
      */
-    public static void playNote(Note note, MidiChannel channel, int tempo) {
+    public static void playNote(int measureNum, Note note, MidiChannel channel, int tempo) {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
 
                 try {
 
-                    int offset = getTickLengthInMeasureMs(note.getAbsoluteStartTick(), tempo );
+                    int offset = getTickLengthInMeasureMs(note.getStartTick() + (32 * measureNum), tempo );
                     int length = getNoteLenghtInMs(note.getLength(), tempo);
 
                     Thread.sleep(offset);
 
-                    MainFrame.eventBus.post(new TickOnEvent(note.getAbsoluteStartTick()));
+                    MainFrame.eventBus.post(new TickOnEvent(note.getStartTick() + (32 * measureNum)));
 
                     channel.noteOn(note.getPitch().getMidiCode(), note.getVol());
 
 
                     Thread.sleep(length);
-                    MainFrame.eventBus.post(new TickOffEvent(note.getAbsoluteStartTick()));
+                    MainFrame.eventBus.post(new TickOffEvent(note.getStartTick() + (32 * measureNum)));
                     channel.noteOff(note.getPitch().getMidiCode());
 
 
@@ -225,7 +225,7 @@ public class MidiEngine {
 
     public static void playMeasure(Measure measure, MidiChannel channel) {
         measure.getNotes().forEach(n -> {
-            playNote(n, channel, measure.getTempo());
+            playNote(measure.getNum(), n, channel, measure.getTempo());
         });
     }
 

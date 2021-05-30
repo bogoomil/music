@@ -16,7 +16,6 @@ import javax.swing.JPanel;
 
 import music.event.TrackSelectedEvent;
 import music.gui.MainFrame;
-import music.gui.measureeditor.MeasureButton;
 import music.logic.MidiEngine;
 import music.theory.Track;
 

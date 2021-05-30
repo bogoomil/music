@@ -74,9 +74,6 @@ public class MainFrame extends JFrame implements EventListener {
 
     private Color defaultColor = this.getBackground();
 
-
-    ProjectEditorPanel pep = new ProjectEditorPanel();
-
     ProjectEditorPanel2 pep2 = new ProjectEditorPanel2();
 
 

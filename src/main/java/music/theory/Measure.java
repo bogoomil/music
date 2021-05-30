@@ -74,7 +74,7 @@ public class Measure implements Cloneable{
                 LOG.debug("counter: {} * (32/{}) = {}", counter, arpeggioOffset.getErtek(), start);
 
             }
-            note.setRelativStartTick(start);
+            note.setStartTick(start);
             measure.addNote(note);
             counter++;
         }
@@ -104,6 +104,12 @@ public class Measure implements Cloneable{
             m.addNote(n.clone());
         });
         return m;
+    }
+
+    public void shiftOctave(int o) {
+        this.notes.forEach(n -> {
+            n.setPitch(n.getPitch().shift(o));
+        });
     }
 
 }

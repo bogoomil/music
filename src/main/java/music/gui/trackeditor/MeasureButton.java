@@ -1,4 +1,4 @@
-package music.gui.measureeditor;
+package music.gui.trackeditor;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

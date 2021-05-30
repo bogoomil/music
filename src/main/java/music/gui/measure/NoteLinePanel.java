@@ -11,10 +11,11 @@ import music.theory.Pitch;
 public class NoteLinePanel extends JPanel {
     private Pitch pitch;
 
-    TickRowEditorPanel trep = new TickRowEditorPanel();
+    TickRowEditorPanel trep;;
 
     public NoteLinePanel(Pitch pitch) {
         super();
+        trep = new TickRowEditorPanel(pitch);
         setPreferredSize(new Dimension(700, 20));
         this.pitch = pitch;
         setLayout(new BorderLayout(0, 0));
@@ -23,5 +24,19 @@ public class NoteLinePanel extends JPanel {
 
     }
 
+    public Pitch getPitch() {
+        return pitch;
+    }
 
+    public void setPitch(Pitch pitch) {
+        this.pitch = pitch;
+    }
+
+    public TickRowEditorPanel getTrep() {
+        return trep;
+    }
+
+    public void setTrep(TickRowEditorPanel trep) {
+        this.trep = trep;
+    }
 }
