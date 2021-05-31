@@ -159,11 +159,11 @@ public class NoteLabel extends JLabel {
         g.drawRect(this.getWidth() -10, 0, this.getWidth(), this.getHeight());
 
         if(note.getLength().getErtek() > 1) {
-            g.setColor(Color.GREEN);
-            g.fillRect(0, 0, 9, this.getHeight());
+            g.setColor(Color.RED);
+            g.fillRect(0, 0, 10, this.getHeight());
         }
 
-        g.setColor(Color.RED);
+        g.setColor(Color.GREEN);
         g.fillRect(this.getWidth() -9, 0, this.getWidth(), this.getHeight());
 
     }
