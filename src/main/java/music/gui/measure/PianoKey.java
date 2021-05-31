@@ -1,4 +1,4 @@
-package music.gui;
+package music.gui.measure;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -12,6 +12,7 @@ import java.awt.event.MouseListener;
 import javax.swing.JButton;
 import javax.swing.SwingConstants;
 
+import music.App;
 import music.event.PianoKeyEvent;
 import music.theory.NoteName;
 import music.theory.Pitch;
@@ -67,7 +68,7 @@ public class PianoKey extends JButton{
 
             @Override
             public void mouseEntered(MouseEvent e) {
-                MainFrame.eventBus.post(new PianoKeyEvent(pitch));
+                App.eventBus.post(new PianoKeyEvent(pitch));
 
             }
 
@@ -82,7 +83,7 @@ public class PianoKey extends JButton{
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                MainFrame.eventBus.post(new PianoKeyEvent(pitch));
+                App.eventBus.post(new PianoKeyEvent(pitch));
             }
         });
     }

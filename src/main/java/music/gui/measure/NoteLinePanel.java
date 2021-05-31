@@ -1,7 +1,6 @@
 package music.gui.measure;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Insets;
@@ -11,9 +10,8 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import music.App;
 import music.event.MeasureNotesUpdatedEvent;
-import music.gui.MainFrame;
-import music.gui.PianoKey;
 import music.theory.Pitch;
 
 public class NoteLinePanel extends JPanel {
@@ -39,14 +37,14 @@ public class NoteLinePanel extends JPanel {
         pnButtons.add(btnClear);
 
         this.add(pnButtons, BorderLayout.WEST);
-        btnClear.setBackground(Color.RED);
+        btnClear.setBackground(App.RED);
 
         btnClear.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 trep.removeAll();
-                MainFrame.eventBus.post(new MeasureNotesUpdatedEvent());
+                App.eventBus.post(new MeasureNotesUpdatedEvent());
 
             }
         });

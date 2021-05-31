@@ -12,12 +12,12 @@ import javax.swing.border.LineBorder;
 
 import com.google.common.eventbus.Subscribe;
 
+import music.App;
 import music.event.MeasureNotesUpdatedEvent;
 import music.event.NoteSelectionEvent;
 import music.event.PianoKeyEvent;
 import music.event.TickOffEvent;
 import music.event.TickOnEvent;
-import music.gui.MainFrame;
 import music.theory.Note;
 import music.theory.NoteLength;
 
@@ -27,9 +27,9 @@ public class NoteLabel extends JLabel {
     TickRowEditorPanel trep;
     int startDragX;
 
-    private Color origColor = Color.CYAN;
-    private Color selectColor = Color.ORANGE;
-    private Color playingColor = Color.PINK;
+    private Color origColor = App.DEFAULT_NOTE_LABEL_COLOR;
+    private Color selectColor = App.SELECT_COLOR;
+    private Color playingColor = App.PLAYING_COLOR;
 
     private boolean selected;
 
@@ -37,14 +37,14 @@ public class NoteLabel extends JLabel {
     public NoteLabel(TickRowEditorPanel trep, Note note) {
         super();
 
-        MainFrame.eventBus.register(this);
+        App.eventBus.register(this);
 
         setBorder(new LineBorder(new Color(0, 0, 0), 3, true));
         this.note = note;
         this.trep = trep;
 
         this.setOpaque(true);
-        this.setBackground(Color.CYAN);
+        this.setBackground(App.DEFAULT_NOTE_LABEL_COLOR);
         this.addMouseMotionListener(new MouseMotionListener() {
 
 
@@ -72,7 +72,7 @@ public class NoteLabel extends JLabel {
                     int x = getBounds().x;
                     int newCellIndex = trep.getCellIndexByX(x);
                     snap(newCellIndex);
-                    MainFrame.eventBus.post(new MeasureNotesUpdatedEvent());
+                    App.eventBus.post(new MeasureNotesUpdatedEvent());
 
                 }
             }
@@ -106,7 +106,7 @@ public class NoteLabel extends JLabel {
                         NoteLength uj =NoteLength.ofErtek(note.getLength().getErtek() * 2);
                         note.setLength(uj);
                         reCalculateSizeAndLocation();
-                        MainFrame.eventBus.post(new MeasureNotesUpdatedEvent());
+                        App.eventBus.post(new MeasureNotesUpdatedEvent());
 
                     } else if (e.getX() < 10) {
                         if(old.getErtek() > 1) {
@@ -114,27 +114,27 @@ public class NoteLabel extends JLabel {
                             note.setLength(uj);
                             reCalculateSizeAndLocation();
                         }
-                        MainFrame.eventBus.post(new MeasureNotesUpdatedEvent());
+                        App.eventBus.post(new MeasureNotesUpdatedEvent());
 
                     } else {
                         if(e.getClickCount() == 2) {
                             Container c = NoteLabel.this.getParent();
                             c.remove(NoteLabel.this);
                             c.repaint();
-                            MainFrame.eventBus.post(new MeasureNotesUpdatedEvent());
+                            App.eventBus.post(new MeasureNotesUpdatedEvent());
 
                         }else {
                             selected = !selected;
                             setBackground(selected ? selectColor : origColor);
                             if(selected) {
-                                MainFrame.eventBus.post(new NoteSelectionEvent(note));
+                                App.eventBus.post(new NoteSelectionEvent(note));
                             }else {
-                                MainFrame.eventBus.post(new NoteSelectionEvent(null));
+                                App.eventBus.post(new NoteSelectionEvent(null));
                             }
                         }
                     }
 
-                    MainFrame.eventBus.post(new PianoKeyEvent(note.getPitch()));
+                    App.eventBus.post(new PianoKeyEvent(note.getPitch()));
                 }
             }
         });
@@ -159,11 +159,11 @@ public class NoteLabel extends JLabel {
         g.drawRect(this.getWidth() -10, 0, this.getWidth(), this.getHeight());
 
         if(note.getLength().getErtek() > 1) {
-            g.setColor(Color.RED);
+            g.setColor(App.RED);
             g.fillRect(0, 0, 10, this.getHeight());
         }
 
-        g.setColor(Color.GREEN);
+        g.setColor(App.GREEN);
         g.fillRect(this.getWidth() -9, 0, this.getWidth(), this.getHeight());
 
     }

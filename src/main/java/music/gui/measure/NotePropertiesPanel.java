@@ -14,9 +14,9 @@ import javax.swing.event.ChangeListener;
 
 import com.google.common.eventbus.Subscribe;
 
+import music.App;
 import music.event.MeasureNotesUpdatedEvent;
 import music.event.NoteSelectionEvent;
-import music.gui.MainFrame;
 import music.theory.Note;
 import music.theory.NoteLength;
 
@@ -30,7 +30,7 @@ public class NotePropertiesPanel extends JPanel{
         super();
         this.setPreferredSize(new Dimension(230, 600));
 
-        MainFrame.eventBus.register(this);
+        App.eventBus.register(this);
 
 
     }
@@ -60,7 +60,7 @@ public class NotePropertiesPanel extends JPanel{
                 public void stateChanged(ChangeEvent e) {
                     if(note != null) {
                         note.setVol(slVolume.getValue());
-                        MainFrame.eventBus.post(new MeasureNotesUpdatedEvent());
+                        App.eventBus.post(new MeasureNotesUpdatedEvent());
                     }
                 }
             });
@@ -74,7 +74,7 @@ public class NotePropertiesPanel extends JPanel{
                 public void actionPerformed(ActionEvent e) {
                     if(note != null) {
                         note.setLength(cbLength.getItemAt(cbLength.getSelectedIndex()));
-                        MainFrame.eventBus.post(new MeasureNotesUpdatedEvent());
+                        App.eventBus.post(new MeasureNotesUpdatedEvent());
                     }
 
                 }

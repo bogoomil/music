@@ -68,4 +68,8 @@ public class Track {
         this.channel = channel;
     }
 
+    public void removeMeasure(int measureNum) {
+        this.measures.remove(measureNum);
+    }
+
 }

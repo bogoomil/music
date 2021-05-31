@@ -17,9 +17,9 @@ import javax.sound.midi.Track;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import music.App;
 import music.event.TickOffEvent;
 import music.event.TickOnEvent;
-import music.gui.MainFrame;
 import music.theory.Measure;
 import music.theory.Note;
 import music.theory.NoteLength;
@@ -186,13 +186,13 @@ public class MidiEngine {
 
                     Thread.sleep(offset);
 
-                    MainFrame.eventBus.post(new TickOnEvent(note.getStartTick() + (32 * measureNum)));
+                    App.eventBus.post(new TickOnEvent(note.getStartTick() + (32 * measureNum)));
 
                     channel.noteOn(note.getPitch().getMidiCode(), note.getVol());
 
 
                     Thread.sleep(length);
-                    MainFrame.eventBus.post(new TickOffEvent(note.getStartTick() + (32 * measureNum)));
+                    App.eventBus.post(new TickOffEvent(note.getStartTick() + (32 * measureNum)));
                     channel.noteOff(note.getPitch().getMidiCode());
 
 

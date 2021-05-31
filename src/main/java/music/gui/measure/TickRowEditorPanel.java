@@ -12,8 +12,8 @@ import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.border.EtchedBorder;
 
+import music.App;
 import music.event.MeasureNotesUpdatedEvent;
-import music.gui.MainFrame;
 import music.theory.Note;
 import music.theory.NoteLength;
 import music.theory.Pitch;
@@ -26,7 +26,7 @@ public class TickRowEditorPanel extends JPanel {
 
     private Color origColor;
 
-    private Color disabledColor = Color.DARK_GRAY;
+    private Color disabledColor = App.DISABLED_COLOR;
 
     public TickRowEditorPanel(Pitch pitch) {
         super();
@@ -119,7 +119,7 @@ public class TickRowEditorPanel extends JPanel {
                         validate();
                         repaint();
 
-                        MainFrame.eventBus.post(new MeasureNotesUpdatedEvent());
+                        App.eventBus.post(new MeasureNotesUpdatedEvent());
                     }
 
                 }
@@ -142,7 +142,7 @@ public class TickRowEditorPanel extends JPanel {
                     validate();
                     repaint();
 
-                    MainFrame.eventBus.post(new MeasureNotesUpdatedEvent());
+                    App.eventBus.post(new MeasureNotesUpdatedEvent());
                 }
             }
         });

@@ -11,11 +11,11 @@ import javax.swing.JPanel;
 
 import com.google.common.eventbus.Subscribe;
 
+import music.App;
 import music.event.EnablePitchesEvent;
 import music.event.MeasureNotesUpdatedEvent;
 import music.event.MeasurePropertiesChangedEvent;
 import music.event.MeasureSelectedEvent;
-import music.gui.MainFrame;
 import music.theory.ChordType;
 import music.theory.Measure;
 import music.theory.Note;
@@ -33,7 +33,7 @@ public class MeasureEditorPanel extends JPanel {
 
     public MeasureEditorPanel() {
         super();
-        MainFrame.eventBus.register(this);
+        App.eventBus.register(this);
         setLayout(new BorderLayout(10, 10));
 
         this.add(pnToolbar, BorderLayout.WEST);

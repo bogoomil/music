@@ -1,6 +1,5 @@
 package music.gui.measure;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Insets;
@@ -23,12 +22,12 @@ import javax.swing.event.ChangeListener;
 
 import com.google.common.eventbus.Subscribe;
 
+import music.App;
 import music.event.AddMeasureToTrackEvent;
 import music.event.EnablePitchesEvent;
 import music.event.MeasurePropertiesChangedEvent;
 import music.event.MeasureSelectedEvent;
 import music.event.PianoKeyEvent;
-import music.gui.MainFrame;
 import music.logic.MidiEngine;
 import music.theory.Measure;
 import music.theory.Note;
@@ -61,12 +60,12 @@ public class MeasurePropertiesPanel extends JPanel{
 
     public MeasurePropertiesPanel() {
         super();
-        MainFrame.eventBus.register(this);
+        App.eventBus.register(this);
         this.setPreferredSize(new Dimension(230, 600));
         this.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
         this.add(lblHangnem);
         btnPlay.setPreferredSize(new Dimension(200, 25));
-        btnPlay.setBackground(Color.GREEN);
+        btnPlay.setBackground(App.GREEN);
 
         this.add(btnPlay);
 
@@ -77,7 +76,7 @@ public class MeasurePropertiesPanel extends JPanel{
                 play(cbInstr.getItemAt(cbInstr.getSelectedIndex()).getPatch().getProgram());
             }
         });
-        btnClear.setBackground(Color.RED);
+        btnClear.setBackground(App.RED);
 
         btnClear.setMargin(new Insets(0, 0, 0, 0));
         this.add(btnClear);
@@ -87,7 +86,7 @@ public class MeasurePropertiesPanel extends JPanel{
             public void actionPerformed(ActionEvent e) {
                 if(measure != null) {
                     measure.setNotes(new ArrayList<>());
-                    MainFrame.eventBus.post(new MeasurePropertiesChangedEvent());
+                    App.eventBus.post(new MeasurePropertiesChangedEvent());
                 }
 
             }
@@ -105,7 +104,7 @@ public class MeasurePropertiesPanel extends JPanel{
             public void actionPerformed(ActionEvent e) {
                 if(measure != null) {
                     measure.shiftOctave(1);
-                    MainFrame.eventBus.post(new MeasurePropertiesChangedEvent());
+                    App.eventBus.post(new MeasurePropertiesChangedEvent());
                 }
 
             }
@@ -119,7 +118,7 @@ public class MeasurePropertiesPanel extends JPanel{
             public void actionPerformed(ActionEvent e) {
                 if(measure != null) {
                     measure.shiftOctave(-1);
-                    MainFrame.eventBus.post(new MeasurePropertiesChangedEvent());
+                    App.eventBus.post(new MeasurePropertiesChangedEvent());
                 }
 
             }
@@ -132,7 +131,7 @@ public class MeasurePropertiesPanel extends JPanel{
 
             @Override
             public void stateChanged(ChangeEvent e) {
-                MainFrame.eventBus.post(new EnablePitchesEvent(chckbxEnableAllPitches.isSelected()));
+                App.eventBus.post(new EnablePitchesEvent(chckbxEnableAllPitches.isSelected()));
 
             }
         });
@@ -202,7 +201,7 @@ public class MeasurePropertiesPanel extends JPanel{
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                MainFrame.eventBus.post(new AddMeasureToTrackEvent(measure));
+                App.eventBus.post(new AddMeasureToTrackEvent(measure));
 
             }
         });

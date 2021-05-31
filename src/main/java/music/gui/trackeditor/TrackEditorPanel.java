@@ -15,8 +15,8 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import music.App;
 import music.event.TrackSelectedEvent;
-import music.gui.MainFrame;
 import music.logic.MidiEngine;
 import music.theory.Track;
 
@@ -34,7 +34,7 @@ public class TrackEditorPanel extends JPanel {
     public TrackEditorPanel(Track track) {
         super();
         setTrack(track);
-        MainFrame.eventBus.register(this);
+        App.eventBus.register(this);
     }
 
     public void setTrack(Track track) {
@@ -80,7 +80,7 @@ public class TrackEditorPanel extends JPanel {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                MainFrame.eventBus.post(new TrackSelectedEvent(track.getId()));
+                App.eventBus.post(new TrackSelectedEvent(track.getId()));
 
             }
         });
@@ -139,7 +139,7 @@ public class TrackEditorPanel extends JPanel {
     public void setSelected(boolean s) {
         this.selected = s;
         if(s) {
-            lbId.setBackground(Color.RED);
+            lbId.setBackground(App.RED);
         } else {
             lbId.setBackground(origColor);
         }
@@ -147,6 +147,16 @@ public class TrackEditorPanel extends JPanel {
 
     public boolean isSelected() {
         return selected;
+    }
+
+    public void removeMeasureButton(int measureNum) {
+        pnMeasures.remove(measureNum);
+        for(int i = 0; i < this.pnMeasures.getComponentCount(); i++) {
+            MeasureButton mb = (MeasureButton) this.pnMeasures.getComponent(i);
+            mb.setTitle(this.track.getId() + "/" + i);
+        }
+        this.validate();
+        this.repaint();
     }
 
 

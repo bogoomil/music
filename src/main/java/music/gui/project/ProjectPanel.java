@@ -1,6 +1,8 @@
-package music.gui;
+package music.gui.project;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -20,7 +22,6 @@ import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
-import javax.swing.JSplitPane;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -29,39 +30,76 @@ import com.google.common.eventbus.Subscribe;
 
 import music.App;
 import music.event.AddMeasureToTrackEvent;
-import music.event.PlayEvent;
+import music.event.DelMeasureFromTrackEvent;
 import music.event.TrackSelectedEvent;
-import music.gui.measure.MeasureEditorPanel;
 import music.gui.trackeditor.TrackEditorPanel;
 import music.logic.MidiEngine;
-import music.model.Project;
 import music.theory.Measure;
 import music.theory.Track;
 
-public class ProjectEditorPanel extends JPanel {
+public class ProjectPanel extends JPanel {
 
-    private Project project;
+    private TrackEditorPanel currentTrackEditor;
+
     private JPanel pnTracks;
-
     private List<Track> tracks = new ArrayList<>();
-
-    JScrollPane spTop;
-    JScrollPane spBottom;
-
-    TrackEditorPanel currentTrackEditor;
     private JSlider slTempo;
     private JComboBox cbTempoFactor;
 
-    public ProjectEditorPanel() {
+    public ProjectPanel() {
         super();
         App.eventBus.register(this);
         setLayout(new BorderLayout(0, 0));
 
-        JPanel pnButtons = new JPanel();
-        add(pnButtons, BorderLayout.NORTH);
+        JPanel pnToolbar = new JPanel();
+        FlowLayout flowLayout = (FlowLayout) pnToolbar.getLayout();
+        flowLayout.setAlignment(FlowLayout.LEFT);
+        pnToolbar.setPreferredSize(new Dimension(210, 10));
+        add(pnToolbar, BorderLayout.WEST);
+
+        pnTracks = new JPanel();
+        pnTracks.setLayout(new BoxLayout(pnTracks, BoxLayout.Y_AXIS));
+
+        JScrollPane spTracks = new JScrollPane(pnTracks, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+        add(spTracks, BorderLayout.CENTER);
+
+
+        JButton btnPlay = new JButton("Play");
+        btnPlay.setPreferredSize(new Dimension(95, 25));
+        btnPlay.setBackground(App.GREEN);
+        pnToolbar.add(btnPlay);
+
+        btnPlay.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    play();
+                } catch (InvalidMidiDataException | IOException | MidiUnavailableException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+
+            }
+        });
+
+        JButton btnStop = new JButton("Stop");
+        btnStop.setPreferredSize(new Dimension(95, 25));
+        btnStop.setBackground(App.RED);
+        pnToolbar.add(btnStop);
+
+        btnStop.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                MidiEngine.getSequencer().stop();
+
+            }
+        });
 
         JButton btnAddTrack = new JButton("+");
-        pnButtons.add(btnAddTrack);
+        pnToolbar.add(btnAddTrack);
 
         btnAddTrack.addActionListener(new ActionListener() {
 
@@ -74,7 +112,7 @@ public class ProjectEditorPanel extends JPanel {
         });
 
         JButton btnDel = new JButton("-");
-        pnButtons.add(btnDel);
+        pnToolbar.add(btnDel);
 
         btnDel.addActionListener(new ActionListener() {
 
@@ -85,19 +123,6 @@ public class ProjectEditorPanel extends JPanel {
             }
         });
 
-        MeasureEditorPanel measureEditor = new MeasureEditorPanel();
-
-        pnTracks = new JPanel();
-        pnTracks.setLayout(new BoxLayout(pnTracks, BoxLayout.Y_AXIS));
-
-
-        spTop = new JScrollPane(pnTracks, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        spBottom = new JScrollPane(measureEditor, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-
-        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-                spTop, spBottom);
-
-        this.add(splitPane, BorderLayout.CENTER);
 
         slTempo = new JSlider();
 
@@ -124,23 +149,19 @@ public class ProjectEditorPanel extends JPanel {
 
             }
         });
-        pnButtons.add(slTempo);
+        pnToolbar.add(slTempo);
+
+        JPanel panel = new JPanel();
+        panel.setPreferredSize(new Dimension(180, 50));
+        panel.setBorder(new TitledBorder(null, "Tempo factor", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+        pnToolbar.add(panel);
 
         cbTempoFactor = new JComboBox();
+        panel.add(cbTempoFactor);
         cbTempoFactor.setModel(new DefaultComboBoxModel(new String[] {"0.1", "0.25", "0.5", "0.75", "1.0", "2.0", "3.0", "4.0"}));
         cbTempoFactor.setSelectedIndex(4);
-        pnButtons.add(cbTempoFactor);
-
 
     }
-
-    public void setProject(Project project) {
-        this.project = project;
-        project.getTracks().keySet().forEach(k -> {
-            pnTracks.add(new TrackEditorPanel(project.getTracks().get(k)));
-        });
-    }
-
     @Subscribe
     private void handleAddMeasureToTrackEvent(AddMeasureToTrackEvent e) {
         if(this.currentTrackEditor == null) {
@@ -149,6 +170,23 @@ public class ProjectEditorPanel extends JPanel {
 
         this.currentTrackEditor.getTrack().addMeasure(e.getMeasure().clone());
         this.currentTrackEditor.refresh();
+    }
+
+    @Subscribe
+    private void handleDelMeasureEvent(DelMeasureFromTrackEvent e) {
+        Track t = this.getTrackById(e.getTrackId());
+        if(t != null) {
+            t.removeMeasure(e.getMeasure().getNum());
+        }
+        TrackEditorPanel trep = (TrackEditorPanel) this.pnTracks.getComponent(e.getTrackId());
+        trep.removeMeasureButton(e.getMeasure().getNum());
+
+        for(int i = 0; i < t.getMeasures().size(); i++) {
+            t.getMeasures().get(i).setNum(i);
+        }
+
+        trep.validate();
+        trep.repaint();
     }
 
     @Subscribe
@@ -162,17 +200,11 @@ public class ProjectEditorPanel extends JPanel {
         }
     }
 
-    @Subscribe
-    private void handlePlayEvent(PlayEvent e) throws InvalidMidiDataException, IOException, MidiUnavailableException {
+    private void play() throws InvalidMidiDataException, IOException, MidiUnavailableException {
         Sequence seq = new Sequence(Sequence.PPQ, MidiEngine.RESOLUTION);
-
         Sequencer sequencer = MidiEngine.getSequencer();
-
-
         float f = Float.parseFloat(cbTempoFactor.getSelectedItem() + "");
-
         sequencer.setTempoFactor(f);
-
         for(Track t :this.tracks) {
             javax.sound.midi.Track track = MidiEngine.getInstrumentTrack(seq, t.getChannel(), t.getInstrument());
             for(Measure m : t.getMeasures()) {
@@ -181,22 +213,14 @@ public class ProjectEditorPanel extends JPanel {
 
         }
         sequencer.setSequence(seq);
-
         if(!sequencer.isOpen()) {
             sequencer.open();
         }
-
         //        sequencer.setLoopCount(3);
-
         sequencer.start();
         sequencer.setTempoInBPM(slTempo.getValue());
-
-
         File file = new File("piece.mid");
-
         MidiSystem.write(seq,1,file);
-
-        //sequencer.close();
 
     }
 
@@ -210,6 +234,9 @@ public class ProjectEditorPanel extends JPanel {
         tep.setSelected(true);
         pnTracks.add(tep);
         pnTracks.validate();
+        pnTracks.repaint();
+        this.repaint();
+        this.validate();
         return tep;
 
     }
@@ -232,8 +259,18 @@ public class ProjectEditorPanel extends JPanel {
             }
         }
         pnTracks.repaint();
+        pnTracks.validate();
         this.currentTrackEditor = null;
 
+    }
+
+    private Track getTrackById(int id) {
+        for(int i = 0; i < this.tracks.size(); i++) {
+            if(this.tracks.get(i).getId() == id) {
+                return this.tracks.get(i);
+            }
+        }
+        return null;
     }
 
 }
