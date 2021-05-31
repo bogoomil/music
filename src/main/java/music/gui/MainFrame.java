@@ -233,11 +233,19 @@ public class MainFrame extends JFrame implements EventListener {
         panel_6 = new JPanel();
         getContentPane().add(panel_6, BorderLayout.NORTH);
 
-        tglbtnRec = new JToggleButton("Rec");
-        panel_6.add(tglbtnRec);
-
         btnPlayRecorded = new JButton("Play");
+        btnPlayRecorded.setBackground(Color.GREEN);
         panel_6.add(btnPlayRecorded);
+
+
+
+        btnPlayRecorded.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                eventBus.post(new PlayEvent());
+            }
+        });
 
         btnStop = new JButton("Stop");
         panel_6.add(btnStop);
@@ -251,21 +259,14 @@ public class MainFrame extends JFrame implements EventListener {
             }
         });
 
+        tglbtnRec = new JToggleButton("Rec");
+        panel_6.add(tglbtnRec);
+
         pnProject = new JPanel();
         tabbedPane.addTab("Project", null, pnProject, null);
         pnProject.setLayout(new BorderLayout());
 
         pnProject.add(pep2, BorderLayout.CENTER);
-
-
-
-        btnPlayRecorded.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                eventBus.post(new PlayEvent());
-            }
-        });
 
         this.setVisible(true);
 

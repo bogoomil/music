@@ -1,5 +1,6 @@
 package music.gui.measure;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Insets;
@@ -64,6 +65,19 @@ public class MeasurePropertiesPanel extends JPanel{
         this.setPreferredSize(new Dimension(230, 600));
         this.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
         this.add(lblHangnem);
+        btnPlay.setPreferredSize(new Dimension(200, 25));
+        btnPlay.setBackground(Color.GREEN);
+
+        this.add(btnPlay);
+
+        btnPlay.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                play(cbInstr.getItemAt(cbInstr.getSelectedIndex()).getPatch().getProgram());
+            }
+        });
+        btnClear.setBackground(Color.RED);
 
         btnClear.setMargin(new Insets(0, 0, 0, 0));
         this.add(btnClear);
@@ -124,16 +138,6 @@ public class MeasurePropertiesPanel extends JPanel{
         });
 
         this.add(chckbxEnableAllPitches);
-
-        this.add(btnPlay);
-
-        btnPlay.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                play(cbInstr.getItemAt(cbInstr.getSelectedIndex()).getPatch().getProgram());
-            }
-        });
 
         slTempo.setValue(200);
         slTempo.setSnapToTicks(true);
