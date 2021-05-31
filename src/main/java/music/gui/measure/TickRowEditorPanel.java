@@ -105,6 +105,24 @@ public class TickRowEditorPanel extends JPanel {
 
             @Override
             public void mouseEntered(MouseEvent e) {
+                if(e.isControlDown()) {
+                    if(TickRowEditorPanel.this.isEnabled()) {
+                        Note note = new Note();
+                        note.setPitch(pitch);
+                        note.setStartTick(getCellIndexByX(e.getX()));
+                        note.setLength(NoteLength.HARMICKETTED);
+
+                        int cellIndex = getCellIndexByX(e.getX());
+                        NoteLabel l = new NoteLabel(TickRowEditorPanel.this, note);
+                        l.setBounds(getCellXByIndex(cellIndex), 0, getCellWidth(), TickRowEditorPanel.this.getHeight());
+                        add(l);
+                        validate();
+                        repaint();
+
+                        MainFrame.eventBus.post(new MeasureNotesUpdatedEvent());
+                    }
+
+                }
                 // TODO Auto-generated method stub
 
             }
@@ -123,7 +141,7 @@ public class TickRowEditorPanel extends JPanel {
                     add(l);
                     validate();
                     repaint();
-                    
+
                     MainFrame.eventBus.post(new MeasureNotesUpdatedEvent());
                 }
             }
@@ -155,7 +173,6 @@ public class TickRowEditorPanel extends JPanel {
         int incr = this.getWidth() / 32;
 
         int cellIndex = x / incr;
-        System.out.println("width: " + this.getWidth() + ", x: " + x + " cell: " + cellIndex);
 
         return cellIndex;
     }

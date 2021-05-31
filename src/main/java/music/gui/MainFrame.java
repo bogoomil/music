@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.sound.midi.Instrument;
+import javax.sound.midi.MidiChannel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -22,24 +23,24 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.border.TitledBorder;
 
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 
-import music.App;
 import music.event.ChordEvent;
 import music.event.EventListener;
+import music.event.PianoKeyEvent;
 import music.event.PlayEvent;
 import music.logic.MidiEngine;
 import music.theory.Chord;
 import music.theory.ChordDegree;
 import music.theory.ChordType;
+import music.theory.Note;
 import music.theory.NoteLength;
 import music.theory.NoteName;
 import music.theory.Pitch;
-import music.theory.Scale;
 
 public class MainFrame extends JFrame implements EventListener {
 
@@ -54,7 +55,6 @@ public class MainFrame extends JFrame implements EventListener {
     public static final EventBus eventBus = new EventBus();
 
     private JPanel panel;
-    private JTextField tfTempo;
     private JComboBox<NoteLength> cbArpeggio;
     private JPanel panel_1;
     private JComboBox<NoteLength> cbChordLength;
@@ -64,7 +64,6 @@ public class MainFrame extends JFrame implements EventListener {
     private List<ChordPanel> generatedChordPanels;
     private JButton btnPlayRecorded;
     private JPanel panel_6;
-    private JButton btnDel;
     private JCheckBox chckbxArp;
     private JButton btnStop;
     private JToggleButton tglbtnRec;
@@ -74,10 +73,8 @@ public class MainFrame extends JFrame implements EventListener {
 
     private Color defaultColor = this.getBackground();
 
-    ProjectEditorPanel2 pep2 = new ProjectEditorPanel2();
+    ProjectEditorPanel pep2 = new ProjectEditorPanel();
 
-
-    private Pitch[] scale;
 
     public MainFrame(String title) throws HeadlessException {
         super(title);
@@ -217,18 +214,6 @@ public class MainFrame extends JFrame implements EventListener {
         panel.setBorder(new TitledBorder(null, "Tempo", TitledBorder.LEADING, TitledBorder.TOP, null, null));
         northPanel.add(panel);
 
-        tfTempo = new JTextField();
-        tfTempo.setText("120");
-        panel.add(tfTempo);
-        tfTempo.setColumns(10);
-
-        tfTempo.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                App.setTEMPO(Integer.valueOf(tfTempo.getText()));
-            }
-        });
 
         panel_5 = new JPanel();
         panel_5.setBorder(new TitledBorder(null, "Instrument", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -265,13 +250,10 @@ public class MainFrame extends JFrame implements EventListener {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                // TODO Auto-generated method stub
+                MidiEngine.getSequencer().stop();
 
             }
         });
-
-        btnDel = new JButton("Del");
-        panel_6.add(btnDel);
 
         pnProject = new JPanel();
         tabbedPane.addTab("Project", null, pnProject, null);
@@ -289,15 +271,6 @@ public class MainFrame extends JFrame implements EventListener {
             }
         });
 
-        btnDel.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                panelRecord.removeAll();
-                panelRecord.repaint();
-
-            }
-        });
         this.setVisible(true);
 
         this.generateChords();
@@ -319,11 +292,6 @@ public class MainFrame extends JFrame implements EventListener {
 
         ChordType chordType = ChordType.valueOf(minMaj);
 
-        scale = chordType == ChordType.MAJ ? Scale.majorScale(getRootKey().getName()) : Scale.minorScale(getRootKey().getName()) ;
-
-        //        Arrays.asList(scale).forEach(s -> {
-        //            LOG.debug("pitch: {}", s);
-        //        });
 
         this.centerPanel.removeAll();
 
@@ -423,34 +391,19 @@ public class MainFrame extends JFrame implements EventListener {
         return rootKey;
     }
 
-    //    private void play() throws MidiUnavailableException, InvalidMidiDataException, InterruptedException, IOException {
-    //
-    //        Sequence seq = MidiEngine.getSequence();
-    //
-    //        Track chordTrack = MidiEngine.getInstrumentTrack(seq, MidiEngine.CHORD_CHANNEL, cbInstr.getItemAt(cbInstr.getSelectedIndex()).getPatch().getProgram());
-    //        Measure m = null;
-    //
-    //        //        LOG.debug("CHORD ==================================================");
-    //        for(int i = 0; i < this.panelRecord.getComponents().length; i++) {
-    //
-    //
-    //            ChordPanel cp = (ChordPanel) this.panelRecord.getComponent(i);
-    //            m = new Measure(i, App.getTEMPO(), getRootKey().getName(), ChordType.valueOf(cbMinMaj.getItemAt(cbMinMaj.getSelectedIndex())));
-    //
-    //
-    //            ChordDegree deg = cp.getDegree();
-    //            Chord c = cp.getChord();
-    //            //            LOG.debug("chord: {}, degree: {}", c, deg);
-    //
-    //            Measure measure = Measure.createMeasureFromChord(i, c, cp.getChordLength(), cp.getArpeggioOffset(), getRootKey().getName(), ChordType.valueOf(cbMinMaj.getItemAt(cbMinMaj.getSelectedIndex())));
-    //            MidiEngine.addNotesToTrack(chordTrack, MidiEngine.CHORD_CHANNEL, measure);
-    //
-    //        }
-    //
-    //        MidiEngine.getSequencer().start();
-    //        File f = new File("piece.mid");
-    //        //        LOG.debug("creating midi file: {}", f.getAbsolutePath());
-    //        MidiSystem.write(MidiEngine.getSequencer().getSequence(),1,f);
-    //    }
+    @Subscribe
+    private void handlePianoKeyEvent(PianoKeyEvent e) {
+        MidiChannel[] channels = MidiEngine.getSynth().getChannels();
+        channels[0].programChange(cbInstr.getItemAt(cbInstr.getSelectedIndex()).getPatch().getProgram());
+
+        Note n = new Note();
+        n.setPitch(e.getPitch());
+        n.setLength(NoteLength.NEGYED);
+        n.setStartTick(0);
+
+        MidiEngine.playNote(0, n, channels[0], 120);
+
+
+    }
 
 }

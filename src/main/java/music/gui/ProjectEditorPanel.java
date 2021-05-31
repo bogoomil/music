@@ -37,7 +37,7 @@ import music.model.Project;
 import music.theory.Measure;
 import music.theory.Track;
 
-public class ProjectEditorPanel2 extends JPanel {
+public class ProjectEditorPanel extends JPanel {
 
     private Project project;
     private JPanel pnTracks;
@@ -51,7 +51,7 @@ public class ProjectEditorPanel2 extends JPanel {
     private JSlider slTempo;
     private JComboBox cbTempoFactor;
 
-    public ProjectEditorPanel2() {
+    public ProjectEditorPanel() {
         super();
         MainFrame.eventBus.register(this);
         setLayout(new BorderLayout(0, 0));
@@ -74,6 +74,15 @@ public class ProjectEditorPanel2 extends JPanel {
 
         JButton btnDel = new JButton("-");
         pnButtons.add(btnDel);
+
+        btnDel.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                delTrack();
+
+            }
+        });
 
         MeasureEditorPanel measureEditor = new MeasureEditorPanel();
 
@@ -117,7 +126,7 @@ public class ProjectEditorPanel2 extends JPanel {
         pnButtons.add(slTempo);
 
         cbTempoFactor = new JComboBox();
-        cbTempoFactor.setModel(new DefaultComboBoxModel(new String[] {"0.1", "0.25", "0.5", "0.75", "1.0", "2", "3", "4"}));
+        cbTempoFactor.setModel(new DefaultComboBoxModel(new String[] {"0.1", "0.25", "0.5", "0.75", "1.0", "2.0", "3.0", "4.0"}));
         cbTempoFactor.setSelectedIndex(4);
         pnButtons.add(cbTempoFactor);
 
@@ -170,22 +179,19 @@ public class ProjectEditorPanel2 extends JPanel {
             }
 
         }
-        System.out.println("Seq tempo: " + sequencer.getTempoInBPM() + ", factor: " + sequencer.getTempoFactor());
         sequencer.setSequence(seq);
 
         if(!sequencer.isOpen()) {
             sequencer.open();
         }
 
+        //        sequencer.setLoopCount(3);
+
         sequencer.start();
         sequencer.setTempoInBPM(slTempo.getValue());
 
 
-        System.out.println("seq running: " + sequencer.isRunning());
-
         File file = new File("piece.mid");
-
-        System.out.println("creating midi file: " + file.getAbsolutePath());
 
         MidiSystem.write(seq,1,file);
 
@@ -212,6 +218,19 @@ public class ProjectEditorPanel2 extends JPanel {
             TrackEditorPanel tep = (TrackEditorPanel) this.pnTracks.getComponent(i);
             tep.setSelected(false);
         }
+        this.currentTrackEditor = null;
+
+    }
+
+    private void delTrack() {
+        for(int i = 0; i < this.pnTracks.getComponentCount(); i++) {
+            TrackEditorPanel tep = (TrackEditorPanel) this.pnTracks.getComponent(i);
+            if(tep.isSelected()) {
+                pnTracks.remove(i);
+                tracks.remove(i);
+            }
+        }
+        pnTracks.repaint();
         this.currentTrackEditor = null;
 
     }

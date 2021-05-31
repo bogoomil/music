@@ -73,7 +73,7 @@ public class MeasureEditorPanel extends JPanel {
     }
 
     @Subscribe
-    public void handleMeasureEvent(MeasureSelectedEvent ev) {
+    public void handleMeasureSelectedEvent(MeasureSelectedEvent ev) {
         this.measure = ev.getMeasure();
         refreshUI();
     }

@@ -14,6 +14,7 @@ import com.google.common.eventbus.Subscribe;
 
 import music.event.MeasureNotesUpdatedEvent;
 import music.event.NoteSelectionEvent;
+import music.event.PianoKeyEvent;
 import music.event.TickOffEvent;
 import music.event.TickOnEvent;
 import music.gui.MainFrame;
@@ -100,30 +101,29 @@ public class NoteLabel extends JLabel {
 
 
                 if(NoteLabel.this.isEnabled()) {
-
-                    if(e.getClickCount() == 2) {
-                        Container c = NoteLabel.this.getParent();
-                        c.remove(NoteLabel.this);
-                        c.repaint();
+                    NoteLength old = note.getLength();
+                    if(e.getX() > getWidth() - 10) {
+                        NoteLength uj =NoteLength.ofErtek(note.getLength().getErtek() * 2);
+                        note.setLength(uj);
+                        reCalculateSizeAndLocation();
                         MainFrame.eventBus.post(new MeasureNotesUpdatedEvent());
 
-                    }else {
-                        NoteLength old = note.getLength();
-                        if(e.getX() > getWidth() - 10) {
-                            NoteLength uj =NoteLength.ofErtek(note.getLength().getErtek() * 2);
+                    } else if (e.getX() < 10) {
+                        if(old.getErtek() > 1) {
+                            NoteLength uj = NoteLength.ofErtek(note.getLength().getErtek() / 2);
                             note.setLength(uj);
                             reCalculateSizeAndLocation();
+                        }
+                        MainFrame.eventBus.post(new MeasureNotesUpdatedEvent());
+
+                    } else {
+                        if(e.getClickCount() == 2) {
+                            Container c = NoteLabel.this.getParent();
+                            c.remove(NoteLabel.this);
+                            c.repaint();
                             MainFrame.eventBus.post(new MeasureNotesUpdatedEvent());
 
-                        } else if (e.getX() < 10) {
-                            if(old.getErtek() > 1) {
-                                NoteLength uj = NoteLength.ofErtek(note.getLength().getErtek() / 2);
-                                note.setLength(uj);
-                                reCalculateSizeAndLocation();
-                            }
-                            MainFrame.eventBus.post(new MeasureNotesUpdatedEvent());
-
-                        } else {
+                        }else {
                             selected = !selected;
                             setBackground(selected ? selectColor : origColor);
                             if(selected) {
@@ -133,6 +133,8 @@ public class NoteLabel extends JLabel {
                             }
                         }
                     }
+
+                    MainFrame.eventBus.post(new PianoKeyEvent(note.getPitch()));
                 }
             }
         });

@@ -205,11 +205,12 @@ public class MeasurePropertiesPanel extends JPanel{
     @Subscribe
     public void handleMeasureEvent(MeasureSelectedEvent ev) {
         this.measure = ev.getMeasure();
+        //play(cbInstr.getItemAt(cbInstr.getSelectedIndex()).getPatch().getProgram());
     }
 
     private void play(int instrument) {
         MidiChannel[] channels = MidiEngine.getSynth().getChannels();
-        channels[MidiEngine.CHORD_CHANNEL].programChange(instrument);
+        channels[cbChannel.getSelectedIndex()].programChange(instrument);
 
         Measure m = measure.clone();
         m.setNum(0);

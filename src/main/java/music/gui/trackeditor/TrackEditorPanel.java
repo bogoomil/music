@@ -3,6 +3,7 @@ package music.gui.trackeditor;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -28,6 +29,8 @@ public class TrackEditorPanel extends JPanel {
     private JComboBox cbChannel;
     private JLabel lbChannel;
 
+    private boolean selected;
+
     public TrackEditorPanel(Track track) {
         super();
         setTrack(track);
@@ -39,10 +42,12 @@ public class TrackEditorPanel extends JPanel {
         setLayout(new BorderLayout(0, 0));
 
         JPanel pnButtons = new JPanel();
+        FlowLayout flowLayout_1 = (FlowLayout) pnButtons.getLayout();
+        flowLayout_1.setAlignment(FlowLayout.LEFT);
         add(pnButtons, BorderLayout.WEST);
 
         lbId = new JLabel("lbId");
-        lbId.setPreferredSize(new Dimension(100, 15));
+        lbId.setPreferredSize(new Dimension(50, 15));
         lbId.setOpaque(true);
         pnButtons.add(lbId);
         origColor = lbId.getBackground();
@@ -90,11 +95,12 @@ public class TrackEditorPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 track.setInstrument(cbInstr.getItemAt(cbInstr.getSelectedIndex()).getPatch().getProgram());
-                System.out.println("instrument changed: track: " + track.getId() + " -> " + track.getInstrument());
             }
         });
 
         pnMeasures = new JPanel();
+        FlowLayout flowLayout = (FlowLayout) pnMeasures.getLayout();
+        flowLayout.setAlignment(FlowLayout.LEFT);
         add(pnMeasures, BorderLayout.CENTER);
 
         lbId.setText(track.getId() + "");
@@ -111,7 +117,6 @@ public class TrackEditorPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 track.setChannel(cbChannel.getSelectedIndex());
-                System.out.println("channel changed: track: " + track.getId() + " -> " + track.getChannel());
             }
         });
 
@@ -132,11 +137,18 @@ public class TrackEditorPanel extends JPanel {
     }
 
     public void setSelected(boolean s) {
+        this.selected = s;
         if(s) {
             lbId.setBackground(Color.RED);
         } else {
             lbId.setBackground(origColor);
         }
     }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+
 
 }

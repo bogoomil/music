@@ -2,6 +2,7 @@ package music.gui;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -25,15 +26,17 @@ public class PianoKey extends JButton{
 
     public PianoKey(Pitch pitch) {
         super();
+        setFont(new Font("Dialog", Font.PLAIN, 10));
+        this.setMargin(new Insets(5, 2, 5, 2));
         this.pitch = pitch;
         setHorizontalAlignment(SwingConstants.TRAILING);
-        setPreferredSize(new Dimension(114, 16));
+        setPreferredSize(new Dimension(80, 16));
         setMargin(new Insets(3, 0, 3, 0));
 
         NoteName nn = this.pitch.getName();
         int oct = this.pitch.getOctave();
 
-        this.setText(nn.name() + " (" + oct + "/ "+ ((oct * 12) +  nn.getMidiCode()) + ")");
+        this.setText(nn.name() + " (" + oct +  ")");
 
         if(nn == NoteName.Ab || nn == NoteName.Bb || nn == NoteName.Cs || nn == NoteName.Eb || nn == NoteName.Fs) {
             this.setBackground(Color.BLACK);

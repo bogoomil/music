@@ -66,6 +66,13 @@ public class MidiEngine {
             e.printStackTrace();
         }
         return sequencer;
+        //        try {
+        //            return MidiSystem.getSequencer();
+        //        } catch (MidiUnavailableException e) {
+        //            // TODO Auto-generated catch block
+        //            e.printStackTrace();
+        //        }
+        //        return null;
     }
 
     public static void addNotesToTrack(Track track, int channel, Measure measure) throws InvalidMidiDataException {
@@ -218,7 +225,7 @@ public class MidiEngine {
         Track track = seq.createTrack();
         ShortMessage instrumentChange = new ShortMessage();
         instrumentChange.setMessage(ShortMessage.PROGRAM_CHANGE, channel, program,0);
-        MidiEvent changeInstrument = new MidiEvent(instrumentChange, 1);
+        MidiEvent changeInstrument = new MidiEvent(instrumentChange, 0);
         track.add(changeInstrument);
         return track;
     }
