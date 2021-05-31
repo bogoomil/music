@@ -14,6 +14,9 @@ import com.google.common.eventbus.Subscribe;
 
 import music.App;
 import music.event.MeasureNotesUpdatedEvent;
+import music.event.NoteDragStartEvent;
+import music.event.NoteLabelDragEndEvent;
+import music.event.NoteLabelDraggedEvent;
 import music.event.NoteSelectionEvent;
 import music.event.PianoKeyEvent;
 import music.event.TickOffEvent;
@@ -23,9 +26,13 @@ import music.theory.NoteLength;
 
 public class NoteLabel extends JLabel {
 
+    private static int ID;
+
     private Note note;
     TickRowEditorPanel trep;
     int startDragX;
+
+    private int id;
 
     private Color origColor = App.DEFAULT_NOTE_LABEL_COLOR;
     private Color selectColor = App.SELECT_COLOR;
@@ -37,6 +44,8 @@ public class NoteLabel extends JLabel {
     public NoteLabel(TickRowEditorPanel trep, Note note) {
         super();
 
+        this.id = ID;
+        ID++;
         App.eventBus.register(this);
 
         setBorder(new LineBorder(new Color(0, 0, 0), 3, true));
@@ -60,6 +69,7 @@ public class NoteLabel extends JLabel {
                     int x = getX();
                     x += e.getX() - startDragX;
                     NoteLabel.this.setBounds(x, getY(), getWidth(), getHeight());
+                    App.eventBus.post(new NoteLabelDraggedEvent(id, e.getX() - startDragX));
                 }
             }
         });
@@ -73,6 +83,7 @@ public class NoteLabel extends JLabel {
                     int newCellIndex = trep.getCellIndexByX(x);
                     snap(newCellIndex);
                     App.eventBus.post(new MeasureNotesUpdatedEvent());
+                    App.eventBus.post(new NoteLabelDragEndEvent(id, x));
 
                 }
             }
@@ -81,6 +92,7 @@ public class NoteLabel extends JLabel {
             public void mousePressed(MouseEvent e) {
                 if(NoteLabel.this.isEnabled()) {
                     startDragX = e.getX();
+                    App.eventBus.post(new NoteDragStartEvent(id));
                 }
             }
 
@@ -166,6 +178,9 @@ public class NoteLabel extends JLabel {
         g.setColor(App.GREEN);
         g.fillRect(this.getWidth() -9, 0, this.getWidth(), this.getHeight());
 
+        g.setColor(Color.black);
+        g.drawString("" + id, 30, 10);
+
     }
 
     public void reCalculateSizeAndLocation() {
@@ -197,5 +212,35 @@ public class NoteLabel extends JLabel {
         }
     }
 
+    @Subscribe
+    void handleDragEvent(NoteLabelDraggedEvent e) {
+        if(this.id != e.getId() && this.selected && this.isEnabled()) {
+            this.setBounds(getX() + e.getX(), getY(), getWidth(), getHeight());
+            System.out.println("id: " + id + "x: " + getBounds().x);
+
+            this.note.setStartTick(trep.getCellIndexByX(this.getBounds().x));
+
+        }
+    }
+
+    @Subscribe
+    void handleDragEndEvent(NoteLabelDragEndEvent e) {
+        if(this.id != e.getId() && this.selected && this.isEnabled()) {
+            int x = getBounds().x;
+            System.out.println("id: " + id +"x (end): " + getBounds().x);
+            int newCellIndex = trep.getCellIndexByX(x);
+            snap(newCellIndex);
+        }
+
+    }
+
+    //    @Subscribe
+    //    void handleDragStartEvent(NoteDragStartEvent e) {
+    //        if(this.id != e.getId() && this.selected && this.isEnabled()) {
+    //            startDragX = getBounds().x;
+    //
+    //        }
+    //
+    //    }
 
 }
