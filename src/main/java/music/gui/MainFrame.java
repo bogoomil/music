@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.sound.midi.Instrument;
-import javax.sound.midi.MidiChannel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -27,17 +26,14 @@ import javax.swing.JToggleButton;
 import javax.swing.border.TitledBorder;
 
 import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
 
 import music.event.ChordEvent;
 import music.event.EventListener;
-import music.event.PianoKeyEvent;
 import music.event.PlayEvent;
 import music.logic.MidiEngine;
 import music.theory.Chord;
 import music.theory.ChordDegree;
 import music.theory.ChordType;
-import music.theory.Note;
 import music.theory.NoteLength;
 import music.theory.NoteName;
 import music.theory.Pitch;
@@ -389,21 +385,6 @@ public class MainFrame extends JFrame implements EventListener {
         Pitch rootKey = new Pitch(NoteName.valueOf(root).getMidiCode()).shift(Integer.valueOf(octave));
 
         return rootKey;
-    }
-
-    @Subscribe
-    private void handlePianoKeyEvent(PianoKeyEvent e) {
-        MidiChannel[] channels = MidiEngine.getSynth().getChannels();
-        channels[0].programChange(cbInstr.getItemAt(cbInstr.getSelectedIndex()).getPatch().getProgram());
-
-        Note n = new Note();
-        n.setPitch(e.getPitch());
-        n.setLength(NoteLength.NEGYED);
-        n.setStartTick(0);
-
-        MidiEngine.playNote(0, n, channels[0], 120);
-
-
     }
 
 }

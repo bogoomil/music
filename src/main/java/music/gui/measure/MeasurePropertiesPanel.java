@@ -26,9 +26,12 @@ import music.event.AddMeasureToTrackEvent;
 import music.event.EnablePitchesEvent;
 import music.event.MeasurePropertiesChangedEvent;
 import music.event.MeasureSelectedEvent;
+import music.event.PianoKeyEvent;
 import music.gui.MainFrame;
 import music.logic.MidiEngine;
 import music.theory.Measure;
+import music.theory.Note;
+import music.theory.NoteLength;
 
 public class MeasurePropertiesPanel extends JPanel{
     private final JPanel panel = new JPanel();
@@ -216,6 +219,18 @@ public class MeasurePropertiesPanel extends JPanel{
         m.setNum(0);
         MidiEngine.playMeasure(m, channels[cbChannel.getSelectedIndex()]);
     }
+    @Subscribe
+    private void handlePianoKeyEvent(PianoKeyEvent e) {
+        MidiChannel[] channels = MidiEngine.getSynth().getChannels();
+        channels[0].programChange(cbInstr.getItemAt(cbInstr.getSelectedIndex()).getPatch().getProgram());
+
+        Note n = new Note();
+        n.setPitch(e.getPitch());
+        n.setLength(NoteLength.NEGYED);
+        n.setStartTick(0);
+
+        MidiEngine.playNote(0, n, channels[cbChannel.getSelectedIndex()], 120);
 
 
+    }
 }
