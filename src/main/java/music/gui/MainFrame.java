@@ -26,9 +26,9 @@ import javax.swing.JToggleButton;
 import javax.swing.border.TitledBorder;
 
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 
 import music.event.ChordEvent;
-import music.event.EventListener;
 import music.event.PlayEvent;
 import music.logic.MidiEngine;
 import music.theory.Chord;
@@ -38,7 +38,7 @@ import music.theory.NoteLength;
 import music.theory.NoteName;
 import music.theory.Pitch;
 
-public class MainFrame extends JFrame implements EventListener {
+public class MainFrame extends JFrame{
 
     //private static final Logger LOG = LoggerFactory.getLogger(MainFrame.class);
 
@@ -49,8 +49,6 @@ public class MainFrame extends JFrame implements EventListener {
     private JPanel panelRecord;
 
     public static final EventBus eventBus = new EventBus();
-
-    private JPanel panel;
     private JComboBox<NoteLength> cbArpeggio;
     private JPanel panel_1;
     private JComboBox<NoteLength> cbChordLength;
@@ -206,10 +204,6 @@ public class MainFrame extends JFrame implements EventListener {
         });
         cbArpeggio.setEnabled(false);
 
-        panel = new JPanel();
-        panel.setBorder(new TitledBorder(null, "Tempo", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-        northPanel.add(panel);
-
 
         panel_5 = new JPanel();
         panel_5.setBorder(new TitledBorder(null, "Instrument", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -310,7 +304,7 @@ public class MainFrame extends JFrame implements EventListener {
 
             NoteLength arpOffset = chckbxArp.isSelected() ? cbArpeggio.getItemAt(cbArpeggio.getSelectedIndex()) : null;
 
-            ChordPanel cp = new ChordPanel(MidiEngine.getSynth(), c, deg, cbChordLength.getItemAt(cbChordLength.getSelectedIndex()), arpOffset, getRootKey().getName(), chordType, this);
+            ChordPanel cp = new ChordPanel(MidiEngine.getSynth(), c, deg, cbChordLength.getItemAt(cbChordLength.getSelectedIndex()), arpOffset, getRootKey().getName(), chordType);
             this.generatedChordPanels.add(cp);
             jp.add(cp);
 
@@ -321,7 +315,7 @@ public class MainFrame extends JFrame implements EventListener {
                     continue;
                 }
 
-                cp = new ChordPanel(MidiEngine.getSynth(), s, deg, cbChordLength.getItemAt(cbChordLength.getSelectedIndex()), arpOffset, getRootKey().getName(), chordType, this);
+                cp = new ChordPanel(MidiEngine.getSynth(), s, deg, cbChordLength.getItemAt(cbChordLength.getSelectedIndex()), arpOffset, getRootKey().getName(), chordType);
                 this.generatedChordPanels.add(cp);
                 jp.add(cp);
 
@@ -331,43 +325,41 @@ public class MainFrame extends JFrame implements EventListener {
         this.pack();
     }
 
-    @Override
+    @Subscribe
     public void chordEvent(ChordEvent event) {
-        //        LOG.debug("CHORD EVENT #################################");
-        //        LOG.debug("chord: {}", event.getChord());
-        //        LOG.debug("root key: {}", getRootKey());
 
         this.resetColor();
 
         String minMaj = this.cbMinMaj.getSelectedItem().toString();
         ChordDegree deg = event.getDegree();
 
-        List<ChordDegree> possibleDegrees = Chord.getPossibleDegrees(deg, ChordType.valueOf(minMaj));
+        if(deg != null) {
+            List<ChordDegree> possibleDegrees = Chord.getPossibleDegrees(deg, ChordType.valueOf(minMaj));
 
-        for (ChordDegree cd : possibleDegrees) {
-            List<Chord> progr = Chord.getChordProgressions(cd, getRootKey(), ChordType.valueOf(minMaj));
+            for (ChordDegree cd : possibleDegrees) {
+                List<Chord> progr = Chord.getChordProgressions(cd, getRootKey(), ChordType.valueOf(minMaj));
 
-            for (Chord pro : progr) {
-                for (ChordPanel pn : this.generatedChordPanels) {
+                for (Chord pro : progr) {
+                    for (ChordPanel pn : this.generatedChordPanels) {
 
-                    if(pn.getChord().equals(pro)) {
-                        pn.setColor(Color.GREEN);
+                        if(pn.getChord().equals(pro)) {
+                            pn.setColor(Color.GREEN);
+                        }
                     }
                 }
             }
-        }
 
-        if(tglbtnRec.isSelected()) {
-            if (panelRecord.getComponentCount() == 16) {
-                panelRecord.remove(0);
+            if(tglbtnRec.isSelected()) {
+                if (panelRecord.getComponentCount() == 16) {
+                    panelRecord.remove(0);
+                }
+                NoteLength arpOffset = chckbxArp.isSelected() ? cbArpeggio.getItemAt(cbArpeggio.getSelectedIndex()) : null;
+
+                panelRecord.add(new ChordPanel(MidiEngine.getSynth(), event.getChord(), null, cbChordLength.getItemAt(cbChordLength.getSelectedIndex()), arpOffset, getRootKey().getName(), ChordType.valueOf(minMaj)));
+                this.pack();
             }
-            NoteLength arpOffset = chckbxArp.isSelected() ? cbArpeggio.getItemAt(cbArpeggio.getSelectedIndex()) : null;
-
-            panelRecord.add(new ChordPanel(MidiEngine.getSynth(), event.getChord(), null, cbChordLength.getItemAt(cbChordLength.getSelectedIndex()), arpOffset, getRootKey().getName(), ChordType.valueOf(minMaj), null));
-            this.pack();
 
         }
-
 
     }
 

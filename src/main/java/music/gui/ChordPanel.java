@@ -18,7 +18,6 @@ import javax.swing.border.BevelBorder;
 import music.App;
 import music.event.AddMeasureToTrackEvent;
 import music.event.ChordEvent;
-import music.event.EventListener;
 import music.event.MeasureSelectedEvent;
 import music.logic.MidiEngine;
 import music.theory.Chord;
@@ -37,7 +36,6 @@ public class ChordPanel extends JPanel {
     private NoteLength chordLength;
     private NoteLength arpeggioOffset;
 
-    EventListener eventListener;
     private JButton btnPlay;
     private JButton btnPlayPlus;
     private JPanel pnOctaves;
@@ -59,9 +57,8 @@ public class ChordPanel extends JPanel {
      * @param hangnem
      * @param listener
      */
-    public ChordPanel(Synthesizer synth, Chord chord, ChordDegree deg, NoteLength chordLength, NoteLength arpeggioOffset, NoteName root, ChordType hangnem, EventListener listener) {
+    public ChordPanel(Synthesizer synth, Chord chord, ChordDegree deg, NoteLength chordLength, NoteLength arpeggioOffset, NoteName root, ChordType hangnem) {
         this.chord = chord;
-        this.eventListener = listener;
         this.degree = deg;
         this.chordLength = chordLength;
         this.arpeggioOffset = arpeggioOffset;
@@ -86,9 +83,9 @@ public class ChordPanel extends JPanel {
                     MeasureSelectedEvent ev = new MeasureSelectedEvent(measure);
 
                     playChord(synth, counter.get(), chordLength, arpeggioOffset, instrument);
-                    if(eventListener != null) {
-                        eventListener.chordEvent(new ChordEvent(counter.get(), degree));
-                    }
+
+                    MainFrame.eventBus.post(new ChordEvent(counter.get(), degree));
+
                 }
             });
 
@@ -108,9 +105,7 @@ public class ChordPanel extends JPanel {
 
                 MainFrame.eventBus.post(ev);
 
-                if(eventListener != null) {
-                    eventListener.chordEvent(new ChordEvent(chord, degree));
-                }
+                MainFrame.eventBus.post(new ChordEvent(chord, degree));
             }
         });
         btnAddToTrack = new JButton("ADD");
@@ -128,10 +123,8 @@ public class ChordPanel extends JPanel {
 
                 MainFrame.eventBus.post(ev);
                 MainFrame.eventBus.post(new AddMeasureToTrackEvent(measure));
+                MainFrame.eventBus.post(new ChordEvent(counter.get(), degree));
 
-                if(eventListener != null) {
-                    eventListener.chordEvent(new ChordEvent(chord, degree));
-                }
             }
         });
 
@@ -157,12 +150,10 @@ public class ChordPanel extends JPanel {
 
                 Measure measure = Measure.createMeasureFromChord(0, plusOctave, getChordLength(), getArpeggioOffset(), root, hangnem);
                 MainFrame.eventBus.post(new MeasureSelectedEvent(measure));
+                MainFrame.eventBus.post(new ChordEvent(plusOctave, degree));
 
 
                 playChord(synth, plusOctave, chordLength, arpeggioOffset, instrument);
-                if(eventListener != null) {
-                    eventListener.chordEvent(new ChordEvent(plusOctave, degree));
-                }
             }
         });
         btnPlayMinus.addActionListener(new ActionListener() {
@@ -173,11 +164,8 @@ public class ChordPanel extends JPanel {
 
                 Measure measure = Measure.createMeasureFromChord(0, minusOctave, getChordLength(), getArpeggioOffset(), root, hangnem);
                 MainFrame.eventBus.post(new MeasureSelectedEvent(measure));
-
+                MainFrame.eventBus.post(new ChordEvent(minusOctave, degree));
                 playChord(synth, minusOctave, chordLength, arpeggioOffset, instrument);
-                if(eventListener != null) {
-                    eventListener.chordEvent(new ChordEvent(chord, degree));
-                }
             }
         });
 
@@ -195,11 +183,9 @@ public class ChordPanel extends JPanel {
                 Chord inv = Chord.getChordInversion(chord);
                 Measure measure = Measure.createMeasureFromChord(0, inv, getChordLength(), getArpeggioOffset(), root, hangnem);
                 MainFrame.eventBus.post(new MeasureSelectedEvent(measure));
+                MainFrame.eventBus.post(new ChordEvent(inv, degree));
 
                 playChord(synth, inv, chordLength, arpeggioOffset, instrument);
-                if(eventListener != null) {
-                    eventListener.chordEvent(new ChordEvent(inv, degree));
-                }
 
             }
         });
