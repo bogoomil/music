@@ -179,7 +179,7 @@ public class NoteLabel extends JLabel {
         g.fillRect(this.getWidth() -9, 0, this.getWidth(), this.getHeight());
 
         g.setColor(Color.black);
-        g.drawString("" + id, 30, 10);
+        g.drawString("" + id, 30, 15);
 
     }
 

@@ -13,6 +13,7 @@ import javax.swing.JPanel;
 import music.App;
 import music.event.DelMeasureFromTrackEvent;
 import music.event.MeasureSelectedEvent;
+import music.event.PlayMeasureEvent;
 import music.event.TrackSelectedEvent;
 import music.theory.Measure;
 
@@ -56,6 +57,20 @@ public class MeasureButton extends JPanel {
         btnDel.setMargin(new Insets(1, 1, 1, 1));
         btnDel.setFont(new Font("Dialog", Font.BOLD, 9));
         pnCenter.add(btnDel);
+
+        JButton btnPlay = new JButton(">");
+        btnPlay.setFont(new Font("Dialog", Font.BOLD, 9));
+        pnCenter.add(btnPlay);
+        btnPlay.setBackground(App.GREEN);
+        btnPlay.setMargin(new Insets(1,1,1,1));
+        btnPlay.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                App.eventBus.post(new PlayMeasureEvent(measure));
+
+            }
+        });
 
         btnDel.addActionListener(new ActionListener() {
 

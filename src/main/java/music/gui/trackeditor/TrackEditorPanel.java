@@ -15,7 +15,10 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import com.google.common.eventbus.Subscribe;
+
 import music.App;
+import music.event.PlayMeasureEvent;
 import music.event.TrackSelectedEvent;
 import music.logic.MidiEngine;
 import music.theory.Track;
@@ -27,6 +30,7 @@ public class TrackEditorPanel extends JPanel {
     private JLabel lbId;
     private static Color origColor;
     private JComboBox cbChannel;
+    JComboBox<Instrument> cbInstr;
     private JLabel lbChannel;
 
     private boolean selected;
@@ -86,7 +90,7 @@ public class TrackEditorPanel extends JPanel {
         });
 
 
-        JComboBox<Instrument> cbInstr = new JComboBox();
+        cbInstr = new JComboBox();
         cbInstr.setModel(new DefaultComboBoxModel(MidiEngine.getSynth().getAvailableInstruments()));
         pnButtons.add(cbInstr);
 
@@ -159,6 +163,11 @@ public class TrackEditorPanel extends JPanel {
         this.repaint();
     }
 
+    @Subscribe
+    private void playMeasure(PlayMeasureEvent e) {
+        MidiEngine.getSynth().getChannels()[0].programChange(cbInstr.getItemAt(cbInstr.getSelectedIndex()).getPatch().getProgram());
+        MidiEngine.playMeasure(e.getMeasure(), MidiEngine.getSynth().getChannels()[cbChannel.getSelectedIndex()]);
+    }
 
 
 }

@@ -11,12 +11,15 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 
+import music.App;
 import music.gui.chords.ChordsPanel;
 import music.gui.measure.MeasureEditorPanel;
 import music.gui.project.ProjectPanel;
 
 public class AppFrame extends JFrame{
     public AppFrame() {
+
+        App.eventBus.register(this);
 
         ProjectPanel pnTop = new ProjectPanel();
 
@@ -65,5 +68,6 @@ public class AppFrame extends JFrame{
         return mb;
 
     }
+
 
 }
