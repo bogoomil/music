@@ -17,6 +17,9 @@ public class Measure implements Cloneable{
     ChordType hangnem;
 
 
+    public Measure() {
+
+    }
 
     public Measure(int num, int tempo, NoteName root, ChordType hangnem) {
         super();

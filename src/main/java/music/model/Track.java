@@ -1,8 +1,10 @@
-package music.theory;
+package music.model;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import music.theory.Measure;
 
 public class Track {
 
@@ -14,6 +16,10 @@ public class Track {
     public Track(int id) {
         super();
         this.id = id;
+    }
+
+    public Track() {
+        super();
     }
 
     private List<Measure> measures = new ArrayList<>();

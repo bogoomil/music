@@ -6,6 +6,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,20 +23,27 @@ import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
+import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.Subscribe;
 
 import music.App;
 import music.event.AddMeasureToTrackEvent;
 import music.event.DelMeasureFromTrackEvent;
+import music.event.FileOpenEvent;
+import music.event.FileSaveEvent;
 import music.event.TrackSelectedEvent;
 import music.gui.trackeditor.TrackEditorPanel;
 import music.logic.MidiEngine;
+import music.model.Project;
+import music.model.Track;
 import music.theory.Measure;
-import music.theory.Track;
 
 public class ProjectPanel extends JPanel {
 
@@ -45,6 +53,7 @@ public class ProjectPanel extends JPanel {
     private List<Track> tracks = new ArrayList<>();
     private JSlider slTempo;
     private JComboBox cbTempoFactor;
+    private JTextField txtTfprojcetname;
 
     public ProjectPanel() {
         super();
@@ -63,6 +72,12 @@ public class ProjectPanel extends JPanel {
         JScrollPane spTracks = new JScrollPane(pnTracks, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
         add(spTracks, BorderLayout.CENTER);
+
+        txtTfprojcetname = new JTextField();
+        txtTfprojcetname.setPreferredSize(new Dimension(190, 19));
+        txtTfprojcetname.setText("noname");
+        pnToolbar.add(txtTfprojcetname);
+        txtTfprojcetname.setColumns(10);
 
 
         JButton btnPlay = new JButton("Play");
@@ -223,11 +238,22 @@ public class ProjectPanel extends JPanel {
         MidiSystem.write(seq,1,file);
 
     }
+    private TrackEditorPanel createTrack(Track track) {
+        TrackEditorPanel tep = new TrackEditorPanel(track);
+        tep.setSelected(true);
+        tep.setTrack(track);
+        tep.refresh();
+        pnTracks.add(tep);
+        pnTracks.validate();
+        pnTracks.repaint();
+        this.repaint();
+        this.validate();
+        return tep;
+    }
+
 
     private TrackEditorPanel createTrack() {
-
         this.resetTrackSelection();
-
         Track track = new Track(this.tracks.size());
         tracks.add(track);
         TrackEditorPanel tep = new TrackEditorPanel(track);
@@ -238,7 +264,6 @@ public class ProjectPanel extends JPanel {
         this.repaint();
         this.validate();
         return tep;
-
     }
 
     private void resetTrackSelection() {
@@ -271,6 +296,36 @@ public class ProjectPanel extends JPanel {
             }
         }
         return null;
+    }
+
+    @Subscribe
+    private void handleFileSaveEvent(FileSaveEvent e) throws IOException {
+
+        Project project = new Project();
+        project.setName(txtTfprojcetname.getText());
+        project.setTracks(tracks);
+
+        ObjectMapper om = new ObjectMapper();
+        String json = om.writeValueAsString(project);
+        System.out.println(json);
+        FileWriter writer = new FileWriter(e.getFile());
+        writer.write(json);
+        writer.flush();
+        writer.close();
+    }
+
+    @Subscribe
+    private void handleFileOpenEvent(FileOpenEvent e) throws JsonParseException, JsonMappingException, IOException {
+        System.out.println("Opening: : " + e.getFile().getAbsolutePath());
+        ObjectMapper om = new ObjectMapper();
+        Project p = om.readValue(e.getFile(), Project.class);
+        this.tracks = p.getTracks();
+
+        pnTracks.removeAll();
+        this.tracks.forEach(t -> pnTracks.add(createTrack(t)));
+
+        this.repaint();
+        this.validate();
     }
 
 }

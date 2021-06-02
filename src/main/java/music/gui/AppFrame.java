@@ -2,7 +2,11 @@ package music.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
 
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -12,11 +16,16 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 
 import music.App;
+import music.event.FileOpenEvent;
+import music.event.FileSaveEvent;
 import music.gui.chords.ChordsPanel;
 import music.gui.measure.MeasureEditorPanel;
 import music.gui.project.ProjectPanel;
 
 public class AppFrame extends JFrame{
+
+    private JFileChooser fileChooser = new JFileChooser();
+
     public AppFrame() {
 
         App.eventBus.register(this);
@@ -55,8 +64,38 @@ public class AppFrame extends JFrame{
         JMenu mFile = new JMenu("File");
         mb.add(mFile);
 
-        JMenuItem mntmNewMenuItem = new JMenuItem("Save");
-        mFile.add(mntmNewMenuItem);
+        JMenuItem mSave = new JMenuItem("Save");
+        mFile.add(mSave);
+
+        mSave.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int returnVal = fileChooser.showSaveDialog(AppFrame.this);
+
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    File file = fileChooser.getSelectedFile();
+                    App.eventBus.post(new FileSaveEvent(file));
+                }
+            }
+        });
+
+        JMenuItem mOpen = new JMenuItem("Open...");
+        mFile.add(mOpen);
+
+        mOpen.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int returnVal = fileChooser.showOpenDialog(AppFrame.this);
+
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    File file = fileChooser.getSelectedFile();
+                    App.eventBus.post(new FileOpenEvent(file));
+                }
+            }
+        });
+
 
 
         JMenu mnEdit = new JMenu("Edit");

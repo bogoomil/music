@@ -201,7 +201,7 @@ public class MeasurePropertiesPanel extends JPanel{
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                App.eventBus.post(new AddMeasureToTrackEvent(measure));
+                App.eventBus.post(new AddMeasureToTrackEvent(measure.clone()));
 
             }
         });

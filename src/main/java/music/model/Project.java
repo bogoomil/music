@@ -1,13 +1,10 @@
 package music.model;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import music.theory.Track;
+import java.util.List;
 
 public class Project {
     private String name;
-    Map<String, Track> tracks = new HashMap<>();
+    List<Track> tracks;
 
     public String getName() {
         return name;
@@ -17,11 +14,11 @@ public class Project {
         this.name = name;
     }
 
-    public Map<String, Track> getTracks() {
+    public List<Track> getTracks() {
         return tracks;
     }
 
-    public void setTracks(Map<String, Track> tracks) {
+    public void setTracks(List<Track> tracks) {
         this.tracks = tracks;
     }
 

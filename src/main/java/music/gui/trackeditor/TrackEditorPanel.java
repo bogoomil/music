@@ -21,7 +21,7 @@ import music.App;
 import music.event.PlayMeasureEvent;
 import music.event.TrackSelectedEvent;
 import music.logic.MidiEngine;
-import music.theory.Track;
+import music.model.Track;
 
 public class TrackEditorPanel extends JPanel {
 

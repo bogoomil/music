@@ -1,9 +1,15 @@
 package music.theory;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class Pitch {
 
     private int midiCode;
     public static final int DEFAULT_OCTAVE = 4;
+
+    public Pitch() {
+
+    }
 
     public Pitch(int midiCode) {
         super();
@@ -11,6 +17,7 @@ public class Pitch {
     }
 
 
+    @JsonIgnore
     public NoteName getName() {
         try {
             return NoteName.byCode(this.midiCode);
@@ -22,6 +29,7 @@ public class Pitch {
     }
 
 
+    @JsonIgnore
     public int getOctave() {
         return Math.floorDiv(midiCode, 12);
     }
@@ -142,6 +150,7 @@ public class Pitch {
         }
         return true;
     }
+
 
 
 
