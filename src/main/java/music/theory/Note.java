@@ -1,5 +1,7 @@
 package music.theory;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class Note {
 
 
@@ -62,6 +64,7 @@ public class Note {
         return n;
     }
 
+    @JsonIgnore
     public int getMidiCode() {
         return this.pitch.getMidiCode();
     }

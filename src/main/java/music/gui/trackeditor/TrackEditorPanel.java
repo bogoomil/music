@@ -90,6 +90,8 @@ public class TrackEditorPanel extends JPanel {
         cbInstr.setModel(new DefaultComboBoxModel(MidiEngine.getSynth().getAvailableInstruments()));
         pnButtons.add(cbInstr);
 
+        cbInstr.setSelectedIndex(track.getInstrument());
+
         cbInstr.addActionListener(new ActionListener() {
 
             @Override
@@ -111,6 +113,8 @@ public class TrackEditorPanel extends JPanel {
         cbChannel = new JComboBox();
         cbChannel.setModel(new DefaultComboBoxModel(new String[] {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16"}));
         pnButtons.add(cbChannel);
+
+        cbChannel.setSelectedIndex(track.getChannel());
 
         cbChannel.addActionListener(new ActionListener() {
 

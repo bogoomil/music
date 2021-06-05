@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import music.theory.Note;
 import music.theory.Pitch;
 import music.theory.Tone;
@@ -97,6 +99,7 @@ public class Track {
         return this.measureNum;
     }
 
+    @JsonIgnore
     public int getMinOctave() {
         Note n = this.notes.stream().min(Comparator.comparing(Note::getMidiCode)).get();
         return n.getPitch().getOctave();

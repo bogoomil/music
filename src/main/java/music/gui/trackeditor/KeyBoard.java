@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.BoxLayout;
@@ -30,7 +31,7 @@ public class KeyBoard extends JPanel{
 
     int minOctave = 3;
 
-    List<Pitch> pitches;
+    private static List<Pitch> pitches;
 
     private JDialog dialog;
 
@@ -105,11 +106,19 @@ public class KeyBoard extends JPanel{
                 pn.add(btnFill);
             }
         }
+        Collections.sort(pitches, new Comparator<Pitch>() {
+
+            @Override
+            public int compare(Pitch o1, Pitch o2) {
+                // TODO Auto-generated method stub
+                return Integer.compare(o1.getMidiCode(), o2.getMidiCode());
+            }
+        });
         Collections.reverse(pitches);
     }
 
-    public List<Pitch> getPitches() {
-        return this.pitches;
+    public static List<Pitch> getPitches() {
+        return pitches;
     }
 
     public int getMinOctave() {

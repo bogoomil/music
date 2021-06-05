@@ -11,8 +11,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -38,7 +36,7 @@ public class TrackPanel extends JPanel {
 
     private Point selectedCell;
 
-    private List<Pitch> pitches;
+    //private List<Pitch> pitches;
 
     private Track track;
 
@@ -186,7 +184,7 @@ public class TrackPanel extends JPanel {
 
                 if(e.isControlDown()) {
                     Note note = new Note();
-                    note.setPitch(pitches.get(row));
+                    note.setPitch(KeyBoard.getPitches().get(row));
                     note.setStartTick(col);
                     note.setLength(NoteLength.HARMICKETTED);
                     NoteLabel l = new NoteLabel(TrackPanel.this, note);
@@ -362,21 +360,21 @@ public class TrackPanel extends JPanel {
     }
 
 
-    public void setPitches(List<Pitch> pitches) {
-
-        Collections.sort(pitches, new Comparator<Pitch>() {
-
-            @Override
-            public int compare(Pitch o1, Pitch o2) {
-                // TODO Auto-generated method stub
-                return Integer.compare(o1.getMidiCode(), o2.getMidiCode());
-            }
-        });
-        Collections.reverse(pitches);
-
-
-        this.pitches = pitches;
-    }
+    //    public void setPitches(List<Pitch> pitches) {
+    //
+    //        Collections.sort(pitches, new Comparator<Pitch>() {
+    //
+    //            @Override
+    //            public int compare(Pitch o1, Pitch o2) {
+    //                // TODO Auto-generated method stub
+    //                return Integer.compare(o1.getMidiCode(), o2.getMidiCode());
+    //            }
+    //        });
+    //        Collections.reverse(pitches);
+    //
+    //
+    //        this.pitches = pitches;
+    //    }
 
     public List<Note> getNotes(){
         List<Note> retVal = new ArrayList<>();
@@ -422,8 +420,8 @@ public class TrackPanel extends JPanel {
     }
 
     public int getRowByPitch(Pitch p) {
-        for(int i = 0; i < pitches.size(); i++) {
-            if(p.getMidiCode() == pitches.get(i).getMidiCode()) {
+        for(int i = 0; i < KeyBoard.getPitches().size(); i++) {
+            if(p.getMidiCode() == KeyBoard.getPitches().get(i).getMidiCode()) {
                 return i;
             }
         }
@@ -431,7 +429,7 @@ public class TrackPanel extends JPanel {
     }
 
     public Optional<Pitch> getPitchByRow(int row) {
-        return this.pitches != null ?  Optional.of(pitches.get(row)) : Optional.empty();
+        return KeyBoard.getPitches() != null ?  Optional.of(KeyBoard.getPitches().get(row)) : Optional.empty();
     }
 
     public int getSelectedMeasureNum() {
@@ -441,6 +439,10 @@ public class TrackPanel extends JPanel {
         }else {
             return 0;
         }
+    }
+
+    public void setSelectedMeasureNum(int mn) {
+        this.selectedCell = new Point(mn * 32, 0);
     }
 
 }

@@ -110,8 +110,9 @@ public class TrackEditor extends JPanel {
 
     @Subscribe
     private void handleTrackSelectionEvent(TrackSelectedEvent e) {
-
         this.track = e.getTrack();
+        keyBoard.setMinOctave(track.getMinOctave());
+        trackPanel.setSelectedMeasureNum(0);
         trackPanel.setTrack(e.getTrack());
         this.updateButtons();
 
@@ -141,8 +142,9 @@ public class TrackEditor extends JPanel {
         }
 
         this.track.getNotes().addAll(Arrays.asList(e.getNotes()));
+        this.trackPanel.setSelectedMeasureNum(trackPanel.getSelectedMeasureNum() + 1);
         keyBoard.setMinOctave(track.getMinOctave());
-        trackPanel.setPitches(keyBoard.getPitches());
+
         trackPanel.setTrack(track);
         this.updateButtons();
 
