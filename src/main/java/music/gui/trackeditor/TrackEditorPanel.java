@@ -35,7 +35,6 @@ public class TrackEditorPanel extends JPanel {
     public TrackEditorPanel(Track track) {
         super();
         setTrack(track);
-        App.eventBus.register(this);
     }
 
     public void setTrack(Track track) {

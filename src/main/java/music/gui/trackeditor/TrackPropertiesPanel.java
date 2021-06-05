@@ -14,13 +14,18 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import com.google.common.eventbus.Subscribe;
+
 import music.App;
+import music.event.PianoKeyEvent;
 import music.event.tracks.AddMeasureToTrackEvent;
 import music.event.tracks.DeleteNotesFromTrackEvent;
 import music.event.tracks.PlayTrackEvent;
 import music.event.tracks.TrackVolumeChangedEvent;
 import music.event.tracks.ZoomEvent;
 import music.logic.MidiEngine;
+import music.theory.Note;
+import music.theory.NoteLength;
 import music.theory.NoteName;
 import music.theory.Pitch;
 import music.theory.Scale;
@@ -43,6 +48,7 @@ public class TrackPropertiesPanel extends JPanel {
     private JButton btnClear;
 
     public TrackPropertiesPanel() {
+        App.eventBus.register(this);
         setPreferredSize(new Dimension(202, 493));
 
         btnPlay = new JButton("Play");
@@ -176,5 +182,22 @@ public class TrackPropertiesPanel extends JPanel {
     public static Pitch[] getScale() {
         return Scale.getScale(new Pitch(cbRoot.getItemAt(cbRoot.getSelectedIndex()).getMidiCode()), cbTone.getItemAt(cbTone.getSelectedIndex()));
     }
+
+    @Subscribe
+    private void handlePianoKeyEvent(PianoKeyEvent e) {
+
+
+
+        MidiEngine.getSynth().getChannels()[cbChannel.getSelectedIndex()].programChange(cbInstr.getItemAt(cbInstr.getSelectedIndex()).getPatch().getProgram());
+
+        Note n = new Note();
+        n.setLength(NoteLength.NEGYED);
+        n.setPitch(e.getPitch());
+        n.setStartTick(0);
+
+
+        MidiEngine.playNote(n, MidiEngine.getSynth().getChannels()[cbChannel.getSelectedIndex()], 120);
+    }
+
 
 }

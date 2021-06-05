@@ -66,7 +66,7 @@ public class PianoKey extends JButton{
 
             @Override
             public void mouseEntered(MouseEvent e) {
-                //App.eventBus.post(new PianoKeyEvent(pitch));
+                App.eventBus.post(new PianoKeyEvent(pitch));
 
             }
 

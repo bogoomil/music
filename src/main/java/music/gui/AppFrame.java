@@ -26,8 +26,6 @@ public class AppFrame extends JFrame{
 
     private JFileChooser fileChooser = new JFileChooser();
 
-    TrackEditor currentTrackEditor = new TrackEditor();
-
     public AppFrame() {
 
         App.eventBus.register(this);

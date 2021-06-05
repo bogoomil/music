@@ -36,10 +36,6 @@ public class App {
 
     public static void main(String[] args) {
 
-        //        printNotes();
-
-        //MainFrame f = new MainFrame("Music");
-
         AppFrame af = new AppFrame();
 
     }

@@ -24,7 +24,7 @@ public class Track {
 
     //TODO törölni
     public Track(int id) {
-        super();
+        this();
         this.id = id;
     }
 

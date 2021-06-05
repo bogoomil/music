@@ -9,14 +9,20 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.swing.BoxLayout;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import music.App;
+import music.event.FillNotesEvent;
 import music.event.tracks.KeyBoardClearButtonEvent;
 import music.event.tracks.KeyBoardFillButtonEvent;
 import music.event.tracks.KeyBoardSelectButtonEvent;
+import music.theory.NoteLength;
 import music.theory.NoteName;
 import music.theory.Pitch;
 
@@ -25,6 +31,8 @@ public class KeyBoard extends JPanel{
     int minOctave = 3;
 
     List<Pitch> pitches;
+
+    private JDialog dialog;
 
     public KeyBoard() {
         setLayout(new GridLayout(0, 2));
@@ -80,18 +88,21 @@ public class KeyBoard extends JPanel{
                 });
                 pn.add(btn);
 
-                btn = new JButton("f");
-                btn.setMargin(new Insets(2,2,2,2));
-                btn.setBackground(App.DEFAULT_NOTE_LABEL_COLOR);
-                btn.addActionListener(new ActionListener() {
+                final JButton btnFill = new JButton("f");
+                btnFill.setMargin(new Insets(2,2,2,2));
+                btnFill.setBackground(App.DEFAULT_NOTE_LABEL_COLOR);
+                btnFill.addActionListener(new ActionListener() {
 
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         App.eventBus.post(new KeyBoardFillButtonEvent(pitch));
+                        JDialog m = createDialog(pitch);
+                        m.setLocationRelativeTo(btnFill);
+                        m.setVisible(true);
 
                     }
                 });
-                pn.add(btn);
+                pn.add(btnFill);
             }
         }
         Collections.reverse(pitches);
@@ -109,6 +120,62 @@ public class KeyBoard extends JPanel{
         this.minOctave = minOctave;
         initGui();
     }
+    private JDialog createDialog(Pitch pitch){
+        dialog = new JDialog();
+        dialog.setTitle("Rythm");
+
+        JPanel pn = new JPanel();
+        pn.setLayout(new GridLayout(0,2));
+
+        JLabel l = new JLabel("Notes length:");
+        pn.add(l);
+
+
+        JComboBox<NoteLength> cbHossz = new JComboBox<>();
+        cbHossz.setModel(new DefaultComboBoxModel<>(NoteLength.values())) ;
+        cbHossz.setSelectedIndex(9);
+        pn.add(cbHossz);
+
+        l = new JLabel("Beats:");
+        pn.add(l);
+
+        JComboBox<NoteLength> cbBeat = new JComboBox<>();
+        cbBeat.setModel(new DefaultComboBoxModel<>(NoteLength.values())) ;
+        cbBeat.setSelectedIndex(9);
+        pn.add(cbBeat);
+
+        l = new JLabel("Measures:");
+        pn.add(l);
+
+        JComboBox<Integer> cbMeasureNum = new JComboBox<>();
+        cbMeasureNum.setModel(new DefaultComboBoxModel<>(new Integer[] {1,2,3,4})) ;
+        pn.add(cbMeasureNum);
+
+
+
+        JButton btnOk = new JButton("ok");
+        pn.add(btnOk);
+        btnOk.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                App.eventBus.post(new FillNotesEvent(pitch,
+                        cbHossz.getItemAt(cbHossz.getSelectedIndex()),
+                        cbBeat.getItemAt(cbBeat.getSelectedIndex()),
+                        cbMeasureNum.getItemAt(cbMeasureNum.getSelectedIndex())));
+                dialog.setVisible(false);
+            }
+        });
+
+        JButton btnCancel = new JButton("cancel");
+        pn.add(btnCancel);
+
+        dialog.add(pn);
+        dialog.pack();
+
+        return dialog;
+    }
+
 
 
 }

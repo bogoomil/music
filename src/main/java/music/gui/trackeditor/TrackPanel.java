@@ -2,7 +2,6 @@ package music.gui.trackeditor;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
@@ -15,6 +14,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.swing.JPanel;
@@ -82,14 +82,16 @@ public class TrackPanel extends JPanel {
                     for(Component c : getComponents()) {
                         if(c instanceof NoteLabel) {
                             NoteLabel nl = (NoteLabel) c;
-                            copyNotes.add(nl.getNote().clone());
+                            if(nl.getSelected()) {
+                                copyNotes.add(nl.getNote().clone());
+                            }
                         }
                     }
 
                 } else if(e.getKeyCode() == 86 && e.isControlDown()) {
                     //ctrl v
                     for(Note n : copyNotes) {
-                        n.setStartTick(n.getStartTick() + (getSelectedMeasureNum() * 32));
+                        n.setStartTick((n.getStartTick() % 32) + (getSelectedMeasureNum() * 32));
                     }
                     track.getNotes().addAll(copyNotes);
                     setTrack(track);
@@ -240,11 +242,11 @@ public class TrackPanel extends JPanel {
         List<NoteName> scale = Arrays.asList(TrackPropertiesPanel.getScale()).stream().map(p -> p.getName()).collect(Collectors.toList());
 
         super.paintComponent(g);
-        this.setPreferredSize(new Dimension(100, 400));
+        //this.setPreferredSize(new Dimension(100, 400));
         int incr = this.getTickWidth();
         if(this.track != null) {
 
-            for(int i = 0; i < track.getMeasureNum() * 32; i++) {
+            for(int i = 0; i < 1 + (track.getMeasureNum() * 32); i++) {
                 int x = i * incr;
                 if(i % 32 == 0) {
                     g.drawString("" + i / 32, x  + 5, 15);
@@ -267,18 +269,19 @@ public class TrackPanel extends JPanel {
 
         int rowHeight = this.getHeight() / 48;
         for(int i = 0; i < 48; i++) {
+            final int rowNum = i;
             int y = i * rowHeight;
             g.drawLine(0, y, this.getWidth(), y);
 
-            Pitch p = getPitchByRow(i);
+            getPitchByRow(i).ifPresent(p -> {
+                if(!isRowsEnabled && !scale.contains(p.getName())) {
+                    g.setColor(App.DISABLED_COLOR);
 
-            if(!isRowsEnabled && !scale.contains(p.getName())) {
-                g.setColor(App.DISABLED_COLOR);
+                    g.fillRect(0, getYByRow(rowNum), this.getWidth(), getRowHeight());
 
-                g.fillRect(0, getYByRow(i), this.getWidth(), getRowHeight());
+                }
+            });
 
-                System.out.println(i + " ::: y: " + getYByRow(i) + " - " + (getYByRow(i) +  getRowHeight()));
-            }
         }
 
         if(this.selectedCell != null) {
@@ -286,7 +289,7 @@ public class TrackPanel extends JPanel {
             g.fillRect(this.getXByCol(selectedCell.x), this.getYByRow(selectedCell.y), this.getTickWidth(), this.getRowHeight());
         }
 
-        if(track != null) {
+        if(track != null && track.getMeasureNum() !=  0) {
             int newWidth = incr * track.getMeasureNum() * 32;
             int x = this.currentMeasure * (getTickWidth() * 32);
             this.setBounds(-1 * x, this.getBounds().y, newWidth, this.getBounds().height);
@@ -427,8 +430,8 @@ public class TrackPanel extends JPanel {
         return 0;
     }
 
-    public Pitch getPitchByRow(int row) {
-        return this.pitches.get(row);
+    public Optional<Pitch> getPitchByRow(int row) {
+        return this.pitches != null ?  Optional.of(pitches.get(row)) : Optional.empty();
     }
 
     public int getSelectedMeasureNum() {

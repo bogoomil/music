@@ -36,6 +36,7 @@ import com.google.common.eventbus.Subscribe;
 import music.App;
 import music.event.FileOpenEvent;
 import music.event.FileSaveEvent;
+import music.event.tracks.TrackCreatedEvent;
 import music.gui.trackeditor.TrackEditorPanel;
 import music.logic.MidiEngine;
 import music.model.Project;
@@ -210,6 +211,7 @@ public class ProjectPanel extends JPanel {
         MidiSystem.write(seq,1,file);
 
     }
+
     private TrackEditorPanel createTrack(Track track) {
         TrackEditorPanel tep = new TrackEditorPanel(track);
         tep.setSelected(true);
@@ -297,6 +299,11 @@ public class ProjectPanel extends JPanel {
 
         this.repaint();
         this.validate();
+    }
+
+    @Subscribe
+    private void handleTrackCreatedEvent(TrackCreatedEvent e) {
+        this.createTrack(e.getTrack());
     }
 
 }

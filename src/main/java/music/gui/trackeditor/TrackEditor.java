@@ -19,6 +19,7 @@ import javax.swing.border.EtchedBorder;
 import com.google.common.eventbus.Subscribe;
 
 import music.App;
+import music.event.FillNotesEvent;
 import music.event.tracks.AddMeasureToTrackEvent;
 import music.event.tracks.AddNotesToTrackEvent;
 import music.event.tracks.DeleteNotesFromTrackEvent;
@@ -66,7 +67,6 @@ public class TrackEditor extends JPanel {
         keyBoard.setPreferredSize(new Dimension(100, 800));
 
         trackPanel = new TrackPanel();
-
         JPanel pnAbs = new JPanel();
         pnAbs.setLayout(null);
         pnAbs.add(trackPanel);
@@ -103,6 +103,8 @@ public class TrackEditor extends JPanel {
                 });
             }
         }
+        pnNorth.revalidate();
+        pnNorth.repaint();
     }
 
 
@@ -159,6 +161,7 @@ public class TrackEditor extends JPanel {
         MidiEngine.playTrack(track, MidiEngine.getSynth().getChannels()[e.getChannel()], e.getTempo());
     }
 
+
     @Subscribe
     private void handleTrackVolumeChangedEvent(TrackVolumeChangedEvent e) {
         track.getNotes().forEach(n -> n.setVol(e.getValue()));
@@ -167,6 +170,22 @@ public class TrackEditor extends JPanel {
     @Subscribe
     private void handleDeleteNotesFromTrackEvent(DeleteNotesFromTrackEvent e) {
         track.setNotes(new ArrayList<>());
+        trackPanel.setTrack(track);
+    }
+
+    @Subscribe
+    private void handleFillNotesEvent(FillNotesEvent e) {
+        System.out.println("filling notes: " + e.getLength() + " : " + e.getBeat());
+        int counter = 0;
+
+        while(counter < e.getMeasureNum() * 32) {
+            Note n = new Note();
+            n.setLength(e.getLength());
+            n.setStartTick(counter + trackPanel.getSelectedMeasureNum());
+            n.setPitch(e.getPitch());
+            counter += e.getBeat().getErtek();
+            track.getNotes().add(n);
+        }
         trackPanel.setTrack(track);
     }
 }
