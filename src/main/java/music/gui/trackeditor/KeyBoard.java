@@ -17,7 +17,6 @@ import music.App;
 import music.event.tracks.KeyBoardClearButtonEvent;
 import music.event.tracks.KeyBoardFillButtonEvent;
 import music.event.tracks.KeyBoardSelectButtonEvent;
-import music.gui.measure.PianoKey;
 import music.theory.NoteName;
 import music.theory.Pitch;
 

@@ -1,4 +1,4 @@
-package music.gui.measure;
+package music.gui.trackeditor;
 
 import java.awt.Color;
 import java.awt.Font;
