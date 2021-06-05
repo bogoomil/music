@@ -14,7 +14,6 @@ import music.App;
 import music.event.DelMeasureFromTrackEvent;
 import music.event.MeasureSelectedEvent;
 import music.event.PlayMeasureEvent;
-import music.event.TrackSelectedEvent;
 import music.theory.Measure;
 
 public class MeasureButton extends JPanel {
@@ -44,7 +43,7 @@ public class MeasureButton extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 App.eventBus.post(new MeasureSelectedEvent(measure));
-                App.eventBus.post(new TrackSelectedEvent(trackId));
+                //App.eventBus.post(new TrackSelectedEvent(trackId));
 
             }
         });

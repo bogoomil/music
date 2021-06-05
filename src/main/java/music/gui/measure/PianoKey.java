@@ -1,7 +1,6 @@
 package music.gui.measure;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -27,12 +26,11 @@ public class PianoKey extends JButton{
 
     public PianoKey(Pitch pitch) {
         super();
-        setFont(new Font("Dialog", Font.PLAIN, 10));
-        this.setMargin(new Insets(5, 2, 5, 2));
+        setFont(new Font("Dialog", Font.PLAIN, 9));
+
+        this.setMargin(new Insets(0, 0, 0, 0));
         this.pitch = pitch;
         setHorizontalAlignment(SwingConstants.TRAILING);
-        setPreferredSize(new Dimension(80, 16));
-        setMargin(new Insets(3, 0, 3, 0));
 
         NoteName nn = this.pitch.getName();
         int oct = this.pitch.getOctave();
@@ -68,7 +66,7 @@ public class PianoKey extends JButton{
 
             @Override
             public void mouseEntered(MouseEvent e) {
-                App.eventBus.post(new PianoKeyEvent(pitch));
+                //App.eventBus.post(new PianoKeyEvent(pitch));
 
             }
 

@@ -1,4 +1,4 @@
-package music.gui.measure;
+package music.gui.trackeditor;
 
 import java.awt.Color;
 import java.awt.Container;
@@ -13,14 +13,13 @@ import javax.swing.border.LineBorder;
 import com.google.common.eventbus.Subscribe;
 
 import music.App;
-import music.event.MeasureNotesUpdatedEvent;
 import music.event.NoteDragStartEvent;
 import music.event.NoteLabelDragEndEvent;
 import music.event.NoteLabelDraggedEvent;
 import music.event.NoteSelectionEvent;
-import music.event.PianoKeyEvent;
 import music.event.TickOffEvent;
 import music.event.TickOnEvent;
+import music.event.tracks.TrackNotesUpdatedEvent;
 import music.theory.Note;
 import music.theory.NoteLength;
 
@@ -29,8 +28,7 @@ public class NoteLabel extends JLabel {
     private static int ID;
 
     private Note note;
-    TickRowEditorPanel trep;
-    int startDragX;
+    int startDragX, startDragY;
 
     private int id;
 
@@ -40,8 +38,10 @@ public class NoteLabel extends JLabel {
 
     private boolean selected;
 
+    private TrackPanel trackPanel;
 
-    public NoteLabel(TickRowEditorPanel trep, Note note) {
+
+    public NoteLabel(TrackPanel trackPanel, Note note) {
         super();
 
         this.id = ID;
@@ -50,7 +50,7 @@ public class NoteLabel extends JLabel {
 
         setBorder(new LineBorder(new Color(0, 0, 0), 3, true));
         this.note = note;
-        this.trep = trep;
+        this.trackPanel = trackPanel;
 
         this.setOpaque(true);
         this.setBackground(App.DEFAULT_NOTE_LABEL_COLOR);
@@ -80,9 +80,9 @@ public class NoteLabel extends JLabel {
             public void mouseReleased(MouseEvent e) {
                 if(NoteLabel.this.isEnabled()) {
                     int x = getBounds().x;
-                    int newCellIndex = trep.getCellIndexByX(x);
+                    int newCellIndex = trackPanel.getColByX(x);
                     snap(newCellIndex);
-                    App.eventBus.post(new MeasureNotesUpdatedEvent());
+                    App.eventBus.post(new TrackNotesUpdatedEvent());
                     App.eventBus.post(new NoteLabelDragEndEvent(id, x));
 
                 }
@@ -92,6 +92,7 @@ public class NoteLabel extends JLabel {
             public void mousePressed(MouseEvent e) {
                 if(NoteLabel.this.isEnabled()) {
                     startDragX = e.getX();
+                    startDragY = e.getY();
                     App.eventBus.post(new NoteDragStartEvent(id));
                 }
             }
@@ -118,29 +119,28 @@ public class NoteLabel extends JLabel {
                         NoteLength uj =NoteLength.ofErtek(note.getLength().getErtek() * 2);
                         note.setLength(uj);
                         reCalculateSizeAndLocation();
-                        App.eventBus.post(new MeasureNotesUpdatedEvent());
+                        App.eventBus.post(new TrackNotesUpdatedEvent());
 
                     } else if (e.getX() < 15) {
                         if(old.getErtek() > 1) {
                             NoteLength uj = NoteLength.ofErtek(note.getLength().getErtek() / 2);
                             note.setLength(uj);
                             reCalculateSizeAndLocation();
+                            App.eventBus.post(new TrackNotesUpdatedEvent());
                         }
-                        App.eventBus.post(new MeasureNotesUpdatedEvent());
 
                     } else {
                         if(e.getClickCount() == 2) {
                             Container c = NoteLabel.this.getParent();
                             c.remove(NoteLabel.this);
                             c.repaint();
-                            App.eventBus.post(new MeasureNotesUpdatedEvent());
+                            App.eventBus.post(new TrackNotesUpdatedEvent());
 
                         }else {
                             setSelected(!selected);
                         }
                     }
 
-                    App.eventBus.post(new PianoKeyEvent(note.getPitch()));
                 }
             }
         });
@@ -190,9 +190,11 @@ public class NoteLabel extends JLabel {
     }
 
     public void reCalculateSizeAndLocation() {
-        int x = trep.getCellXByIndex(note.getStartTick());
-        int width = trep.getCellWidth() * note.getLength().getErtek();
-        this.setBounds(x, 0, width, trep.getHeight());
+        int x = trackPanel.getXByCol(note.getStartTick());
+        int width = trackPanel.getTickWidth() * note.getLength().getErtek();
+        int y = trackPanel.getYByRow(trackPanel.getRowByPitch(note.getPitch()));
+
+        this.setBounds(x, y, width, trackPanel.getRowHeight());
 
     }
 
@@ -223,9 +225,6 @@ public class NoteLabel extends JLabel {
         if(this.id != e.getId() && this.selected && this.isEnabled()) {
             this.setBounds(getX() + e.getX(), getY(), getWidth(), getHeight());
             System.out.println("id: " + id + "x: " + getBounds().x);
-
-            this.note.setStartTick(trep.getCellIndexByX(this.getBounds().x));
-
         }
     }
 
@@ -234,7 +233,7 @@ public class NoteLabel extends JLabel {
         if(this.id != e.getId() && this.selected && this.isEnabled()) {
             int x = getBounds().x;
             System.out.println("id: " + id +"x (end): " + getBounds().x);
-            int newCellIndex = trep.getCellIndexByX(x);
+            int newCellIndex = trackPanel.getColByX(x);
             snap(newCellIndex);
         }
 
@@ -244,13 +243,34 @@ public class NoteLabel extends JLabel {
         return selected;
     }
 
-    //    @Subscribe
-    //    void handleDragStartEvent(NoteDragStartEvent e) {
-    //        if(this.id != e.getId() && this.selected && this.isEnabled()) {
-    //            startDragX = getBounds().x;
-    //
-    //        }
-    //
-    //    }
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((note == null) ? 0 : note.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        NoteLabel other = (NoteLabel) obj;
+        if (note == null) {
+            if (other.note != null) {
+                return false;
+            }
+        } else if (!note.equals(other.note)) {
+            return false;
+        }
+        return true;
+    }
 
 }

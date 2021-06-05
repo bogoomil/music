@@ -19,12 +19,14 @@ import music.App;
 import music.event.FileOpenEvent;
 import music.event.FileSaveEvent;
 import music.gui.chords.ChordsPanel;
-import music.gui.measure.MeasureEditorPanel;
 import music.gui.project.ProjectPanel;
+import music.gui.trackeditor.TrackEditor;
 
 public class AppFrame extends JFrame{
 
     private JFileChooser fileChooser = new JFileChooser();
+
+    TrackEditor currentTrackEditor = new TrackEditor();
 
     public AppFrame() {
 
@@ -45,13 +47,15 @@ public class AppFrame extends JFrame{
 
         ChordsPanel pnChords = new ChordsPanel();
 
-        MeasureEditorPanel mep = new MeasureEditorPanel();
 
         JScrollPane spChords = new JScrollPane(pnChords, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         pnBottom.add(spChords, "Chords");
 
-        JScrollPane spMeasure = new JScrollPane(mep, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        pnBottom.add(spMeasure, "Measure");
+        TrackEditor te = new TrackEditor();
+        JScrollPane spTrackEditor = new JScrollPane(te, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        pnBottom.add(spTrackEditor, "Track");
+
+
 
 
         this.pack();

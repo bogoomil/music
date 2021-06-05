@@ -121,12 +121,11 @@ public class MeasureEditorPanel extends JPanel {
         for (Component comp : pnCenter.getComponents()) {
             NoteLinePanel nlp = (NoteLinePanel) comp;
             if (!scaleNotes.contains(nlp.getPitch().getName())) {
-                nlp.getTrep().setEnabled(e.isEnable());
+                nlp.setEnabled(e.isEnable());
             }
         }
         this.validate();
     }
-
 
     private List<Note> generateNotes() {
         List<Note> notes = new ArrayList<>();

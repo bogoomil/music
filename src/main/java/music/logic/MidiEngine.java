@@ -1,5 +1,7 @@
 package music.logic;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import music.App;
 import music.event.TickOffEvent;
 import music.event.TickOnEvent;
-import music.theory.Measure;
 import music.theory.Note;
 import music.theory.NoteLength;
 
@@ -75,32 +76,25 @@ public class MidiEngine {
         //        return null;
     }
 
-    public static void addNotesToTrack(Track track, int channel, Measure measure) throws InvalidMidiDataException {
+    public static void addNotesToTrack(Track track, int channel, Note note) throws InvalidMidiDataException {
 
 
-        for(int i = 0; i < measure.getNotes().size();i++) {
-            Note note = measure.getNotes().get(i);
+        int startInTick = note.getStartTick();
+        int endInTick = startInTick + note.getLength().getErtek();
 
-            int startInTick = note.getStartTick() + (measure.getNum() * MidiEngine.TICKS_IN_MEASURE);
-            int endInTick = startInTick + note.getLength().getErtek();
 
-            if(endInTick > (measure.getNum() + 1) * MidiEngine.TICKS_IN_MEASURE) {
-                endInTick = (measure.getNum() + 1) * MidiEngine.TICKS_IN_MEASURE;
-            }
+        ShortMessage a = new ShortMessage();
+        a.setMessage(ShortMessage.NOTE_ON, channel, note.getPitch().getMidiCode(), note.getVol());
+        MidiEvent noteOn = new MidiEvent(a, startInTick);
+        track.add(noteOn);
 
-            ShortMessage a = new ShortMessage();
-            a.setMessage(ShortMessage.NOTE_ON, channel, note.getPitch().getMidiCode(), note.getVol());
-            MidiEvent noteOn = new MidiEvent(a, startInTick);
-            track.add(noteOn);
+        ShortMessage b = new ShortMessage();
+        b.setMessage(ShortMessage.NOTE_OFF, channel, note.getPitch().getMidiCode(), 0);
 
-            ShortMessage b = new ShortMessage();
-            b.setMessage(ShortMessage.NOTE_OFF, channel, note.getPitch().getMidiCode(), 0);
+        LOG.debug("pitch: {}, start: {}, end {}", note.getPitch(), startInTick, endInTick);
 
-            LOG.debug("pitch: {}, start: {}, end {}", note.getPitch(), startInTick, endInTick);
-
-            MidiEvent noteOff = new MidiEvent(b, endInTick);
-            track.add(noteOff);
-        }
+        MidiEvent noteOff = new MidiEvent(b, endInTick);
+        track.add(noteOff);
     }
 
     public static int getNoteLenghtInMs(NoteLength length, int tempo) {
@@ -111,6 +105,14 @@ public class MidiEngine {
     public static Synthesizer getSynth() {
         if(synth == null) {
             initSynth();
+        }
+        if(!synth.isOpen()) {
+            try {
+                synth.open();
+            } catch (MidiUnavailableException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
         return synth;
     }
@@ -174,25 +176,25 @@ public class MidiEngine {
      * @param channel
      * @param tempo
      */
-    public static void playNote(int measureNum, Note note, MidiChannel channel, int tempo) {
+    public static void playNote(Note note, MidiChannel channel, int tempo) {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
 
                 try {
 
-                    int offset = getTickLengthInMeasureMs(note.getStartTick() + (32 * measureNum), tempo );
+                    int offset = getTickLengthInMeasureMs(note.getStartTick(), tempo );
                     int length = getNoteLenghtInMs(note.getLength(), tempo);
 
                     Thread.sleep(offset);
 
-                    App.eventBus.post(new TickOnEvent(note.getStartTick() + (32 * measureNum)));
+                    App.eventBus.post(new TickOnEvent(note.getStartTick() ));
 
                     channel.noteOn(note.getPitch().getMidiCode(), note.getVol());
 
 
                     Thread.sleep(length);
-                    App.eventBus.post(new TickOffEvent(note.getStartTick() + (32 * measureNum)));
+                    App.eventBus.post(new TickOffEvent(note.getStartTick() ));
                     channel.noteOff(note.getPitch().getMidiCode());
 
 
@@ -230,11 +232,20 @@ public class MidiEngine {
         return track;
     }
 
-    public static void playMeasure(Measure measure, MidiChannel channel) {
-        measure.getNotes().forEach(n -> {
-            playNote(measure.getNum(), n, channel, measure.getTempo());
+
+    public static void playTrack(music.model.Track t, MidiChannel ch, int tempo) {
+        Collections.sort(t.getNotes(), new Comparator<Note>() {
+
+            @Override
+            public int compare(Note o1, Note o2) {
+
+                return Integer.compare(o1.getStartTick(), o2.getStartTick());
+            }
+        });
+
+        t.getNotes().forEach(n -> {
+            playNote(n, ch, tempo);
         });
     }
-
 
 }

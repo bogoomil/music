@@ -15,11 +15,8 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import com.google.common.eventbus.Subscribe;
-
 import music.App;
-import music.event.PlayMeasureEvent;
-import music.event.TrackSelectedEvent;
+import music.event.tracks.TrackSelectedEvent;
 import music.logic.MidiEngine;
 import music.model.Track;
 
@@ -84,7 +81,7 @@ public class TrackEditorPanel extends JPanel {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                App.eventBus.post(new TrackSelectedEvent(track.getId()));
+                App.eventBus.post(new TrackSelectedEvent(track));
 
             }
         });
@@ -127,14 +124,6 @@ public class TrackEditorPanel extends JPanel {
 
     }
 
-    public void refresh() {
-        pnMeasures.removeAll();
-        this.track.getMeasures().forEach(m -> {
-            MeasureButton btn = new MeasureButton(m, track.getId());
-            pnMeasures.add(btn);
-        });
-        this.validate();
-    }
 
     public Track getTrack() {
         return this.track;
@@ -144,6 +133,7 @@ public class TrackEditorPanel extends JPanel {
         this.selected = s;
         if(s) {
             lbId.setBackground(App.RED);
+            // App.eventBus.post(new TrackSelectedEvent(track));
         } else {
             lbId.setBackground(origColor);
         }
@@ -161,12 +151,6 @@ public class TrackEditorPanel extends JPanel {
         }
         this.validate();
         this.repaint();
-    }
-
-    @Subscribe
-    private void playMeasure(PlayMeasureEvent e) {
-        MidiEngine.getSynth().getChannels()[0].programChange(cbInstr.getItemAt(cbInstr.getSelectedIndex()).getPatch().getProgram());
-        MidiEngine.playMeasure(e.getMeasure(), MidiEngine.getSynth().getChannels()[cbChannel.getSelectedIndex()]);
     }
 
 

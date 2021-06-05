@@ -2,6 +2,16 @@ package music.theory;
 
 public class Scale {
 
+    public static Pitch[] getScale(Pitch root, Tone hangnem) {
+        Pitch[] retVal = hangnem == Tone.MAJ ? majorScale(root.getName()) : minorScale(root.getName());
+
+        for(int i = 0; i < retVal.length; i++) {
+            retVal[i] = retVal[i].shift(root.getOctave());
+        }
+
+        return retVal;
+    }
+
     public static Pitch[] majorScale(NoteName root) {
         int[] codes = getMajorCodes(root);
         Pitch[] retVal = new Pitch[7];

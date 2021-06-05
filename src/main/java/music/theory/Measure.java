@@ -2,13 +2,15 @@ package music.theory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import music.App;
+import music.interfaces.NoteProducer;
 
-public class Measure implements Cloneable{
+public class Measure implements Cloneable, NoteProducer{
     private int tempo;
     private static final Logger LOG = LoggerFactory.getLogger(Measure.class);
     private List<Note> notes = new ArrayList<>();
@@ -28,12 +30,6 @@ public class Measure implements Cloneable{
         this.root = root;
         this.hangnem = hangnem;
     }
-
-    //    public int getTickLengthInMs(int tickNum) {
-    //        int msInTick = 60000 / this.tempo;
-    //        return msInTick * tickNum;
-    //
-    //    }
 
     public int getTempo() {
         return tempo;
@@ -113,6 +109,12 @@ public class Measure implements Cloneable{
         this.notes.forEach(n -> {
             n.setPitch(n.getPitch().shift(o));
         });
+    }
+
+    @Override
+    public List<Note> getNotes(int midiCode) {
+        List<Note> retVal = notes.stream().filter(n -> n.getPitch().getMidiCode() == midiCode).collect(Collectors.toList());
+        return retVal;
     }
 
 }

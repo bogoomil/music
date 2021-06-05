@@ -284,7 +284,6 @@ public class Chord {
             case i: {
                 retVal.add(ChordDegree.iv);
                 retVal.add(ChordDegree.v);
-
                 retVal.add(ChordDegree.i);
                 retVal.add(ChordDegree.ii);
                 retVal.add(ChordDegree.iii);

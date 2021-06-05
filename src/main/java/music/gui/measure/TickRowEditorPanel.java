@@ -196,4 +196,13 @@ public class TickRowEditorPanel extends JPanel {
         }
 
     }
+
+    public void setToggleSelectionAll() {
+        for(int i = 0; i < TickRowEditorPanel.this.getComponents().length; i++) {
+            NoteLabel l = (NoteLabel) getComponent(i);
+            boolean currentSelection = l.getSelected();
+            l.setSelected(!currentSelection);
+        }
+
+    }
 }

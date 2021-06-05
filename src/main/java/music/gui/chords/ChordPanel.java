@@ -16,9 +16,9 @@ import javax.swing.JPanel;
 import javax.swing.border.BevelBorder;
 
 import music.App;
-import music.event.AddMeasureToTrackEvent;
 import music.event.ChordEvent;
 import music.event.MeasureSelectedEvent;
+import music.event.tracks.AddNotesToTrackEvent;
 import music.logic.MidiEngine;
 import music.theory.Chord;
 import music.theory.ChordDegree;
@@ -118,12 +118,14 @@ public class ChordPanel extends JPanel {
             public void actionPerformed(ActionEvent arg0) {
                 playChord(synth, chord, instrument);
 
-                Measure measure = Measure.createMeasureFromChord(0, chord, getChordLength(), getArpeggioOffset(), root, hangnem);
-                MeasureSelectedEvent ev = new MeasureSelectedEvent(measure);
-
-                App.eventBus.post(ev);
-                App.eventBus.post(new AddMeasureToTrackEvent(measure));
-                App.eventBus.post(new ChordEvent(chord, degree));
+                Note[] notes = new Note[chord.getPitches().length];
+                for(int i = 0; i < chord.getPitches().length; i++) {
+                    notes[i] = new Note();
+                    notes[i].setLength(NoteLength.EGESZ);
+                    notes[i].setPitch(chord.getPitches()[i]);
+                    notes[i].setStartTick(0);
+                }
+                App.eventBus.post(new AddNotesToTrackEvent(notes));
 
             }
         });
@@ -237,7 +239,7 @@ public class ChordPanel extends JPanel {
             Note n = new Note();
             n.setPitch(p);
             n.setLength(NoteLength.EGESZ);
-            MidiEngine.playNote(0, n, channels[0], App.getTEMPO());
+            MidiEngine.playNote(n, channels[0], App.getTEMPO());
             counter++;
         }
     }

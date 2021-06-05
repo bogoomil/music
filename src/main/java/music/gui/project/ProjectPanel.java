@@ -34,16 +34,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.Subscribe;
 
 import music.App;
-import music.event.AddMeasureToTrackEvent;
-import music.event.DelMeasureFromTrackEvent;
 import music.event.FileOpenEvent;
 import music.event.FileSaveEvent;
-import music.event.TrackSelectedEvent;
 import music.gui.trackeditor.TrackEditorPanel;
 import music.logic.MidiEngine;
 import music.model.Project;
 import music.model.Track;
-import music.theory.Measure;
+import music.theory.Note;
 
 public class ProjectPanel extends JPanel {
 
@@ -177,43 +174,18 @@ public class ProjectPanel extends JPanel {
         cbTempoFactor.setSelectedIndex(4);
 
     }
-    @Subscribe
-    private void handleAddMeasureToTrackEvent(AddMeasureToTrackEvent e) {
-        if(this.currentTrackEditor == null) {
-            this.currentTrackEditor = this.createTrack();
-        }
 
-        this.currentTrackEditor.getTrack().addMeasure(e.getMeasure().clone());
-        this.currentTrackEditor.refresh();
-    }
 
-    @Subscribe
-    private void handleDelMeasureEvent(DelMeasureFromTrackEvent e) {
-        Track t = this.getTrackById(e.getTrackId());
-        if(t != null) {
-            t.removeMeasure(e.getMeasure().getNum());
-        }
-        TrackEditorPanel trep = (TrackEditorPanel) this.pnTracks.getComponent(e.getTrackId());
-        trep.removeMeasureButton(e.getMeasure().getNum());
-
-        for(int i = 0; i < t.getMeasures().size(); i++) {
-            t.getMeasures().get(i).setNum(i);
-        }
-
-        trep.validate();
-        trep.repaint();
-    }
-
-    @Subscribe
-    private void handleTrackSelectedEvent(TrackSelectedEvent e) {
-        for(int i = 0; i < this.pnTracks.getComponentCount(); i++) {
-            TrackEditorPanel tep = (TrackEditorPanel) this.pnTracks.getComponent(i);
-            if(tep.getTrack().getId() == e.getTrackId()) {
-                this.currentTrackEditor = tep;
-            }
-            tep.setSelected(tep.getTrack().getId() == e.getTrackId());
-        }
-    }
+    //    @Subscribe
+    //    private void handleTrackSelectedEvent(TrackSelectedEvent e) {
+    //        for(int i = 0; i < this.pnTracks.getComponentCount(); i++) {
+    //            TrackEditorPanel tep = (TrackEditorPanel) this.pnTracks.getComponent(i);
+    //            if(tep.getTrack().getId() == e.getTrack().getId()) {
+    //                this.currentTrackEditor = tep;
+    //            }
+    //            tep.setSelected(tep.getTrack().getId() == e.getTrack().getId());
+    //        }
+    //    }
 
     private void play() throws InvalidMidiDataException, IOException, MidiUnavailableException {
         Sequence seq = new Sequence(Sequence.PPQ, MidiEngine.RESOLUTION);
@@ -222,8 +194,8 @@ public class ProjectPanel extends JPanel {
         sequencer.setTempoFactor(f);
         for(Track t :this.tracks) {
             javax.sound.midi.Track track = MidiEngine.getInstrumentTrack(seq, t.getChannel(), t.getInstrument());
-            for(Measure m : t.getMeasures()) {
-                MidiEngine.addNotesToTrack(track, t.getChannel(), m);
+            for(Note n : t.getNotes()) {
+                MidiEngine.addNotesToTrack(track, t.getChannel(), n);
             }
 
         }
@@ -242,7 +214,6 @@ public class ProjectPanel extends JPanel {
         TrackEditorPanel tep = new TrackEditorPanel(track);
         tep.setSelected(true);
         tep.setTrack(track);
-        tep.refresh();
         pnTracks.add(tep);
         pnTracks.validate();
         pnTracks.repaint();

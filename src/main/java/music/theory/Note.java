@@ -13,7 +13,6 @@ public class Note {
     }
 
 
-
     public void setPitch(Pitch pitch) {
         this.pitch = pitch;
     }
@@ -62,5 +61,55 @@ public class Note {
 
         return n;
     }
+
+    public int getMidiCode() {
+        return this.pitch.getMidiCode();
+    }
+
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((length == null) ? 0 : length.hashCode());
+        result = prime * result + ((pitch == null) ? 0 : pitch.hashCode());
+        result = prime * result + startTick;
+        result = prime * result + vol;
+        return result;
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        Note other = (Note) obj;
+        if (length != other.length) {
+            return false;
+        }
+        if (pitch == null) {
+            if (other.pitch != null) {
+                return false;
+            }
+        } else if (!pitch.equals(other.pitch)) {
+            return false;
+        }
+        if (startTick != other.startTick) {
+            return false;
+        }
+        if (vol != other.vol) {
+            return false;
+        }
+        return true;
+    }
+
+
 
 }

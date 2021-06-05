@@ -23,7 +23,6 @@ import javax.swing.event.ChangeListener;
 import com.google.common.eventbus.Subscribe;
 
 import music.App;
-import music.event.AddMeasureToTrackEvent;
 import music.event.EnablePitchesEvent;
 import music.event.MeasurePropertiesChangedEvent;
 import music.event.MeasureSelectedEvent;
@@ -201,7 +200,7 @@ public class MeasurePropertiesPanel extends JPanel{
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                App.eventBus.post(new AddMeasureToTrackEvent(measure.clone()));
+                //                App.eventBus.post(new AddMeasureToTrackEvent(measure.clone()));
 
             }
         });
@@ -211,29 +210,23 @@ public class MeasurePropertiesPanel extends JPanel{
     @Subscribe
     public void handleMeasureEvent(MeasureSelectedEvent ev) {
         this.measure = ev.getMeasure();
-        //play(cbInstr.getItemAt(cbInstr.getSelectedIndex()).getPatch().getProgram());
     }
 
     private void play(int instrument) {
         MidiChannel[] channels = MidiEngine.getSynth().getChannels();
         channels[cbChannel.getSelectedIndex()].programChange(instrument);
-
         Measure m = measure.clone();
         m.setNum(0);
-        MidiEngine.playMeasure(m, channels[cbChannel.getSelectedIndex()]);
     }
+
     @Subscribe
     private void handlePianoKeyEvent(PianoKeyEvent e) {
         MidiChannel[] channels = MidiEngine.getSynth().getChannels();
         channels[0].programChange(cbInstr.getItemAt(cbInstr.getSelectedIndex()).getPatch().getProgram());
-
         Note n = new Note();
         n.setPitch(e.getPitch());
         n.setLength(NoteLength.NEGYED);
         n.setStartTick(0);
-
-        MidiEngine.playNote(0, n, channels[cbChannel.getSelectedIndex()], 120);
-
 
     }
 }
