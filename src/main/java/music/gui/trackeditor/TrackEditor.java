@@ -1,6 +1,7 @@
 package music.gui.trackeditor;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Insets;
@@ -10,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
@@ -85,11 +85,17 @@ public class TrackEditor extends JPanel {
     }
 
     private void updateButtons() {
+        for(Component c : pnNorth.getComponents()) {
+            MeasureButton mb = (MeasureButton) c;
+            App.eventBus.unregister(mb);
+        }
+
         pnNorth.removeAll();
+
         if(track != null) {
 
             for(int i = 0; i < track.getMeasureNum(); i++) {
-                JButton btnMeasure = new JButton("" + i);
+                MeasureButton btnMeasure = new MeasureButton(i);
                 btnMeasure.setMargin(new Insets(2,2,2,2));
                 btnMeasure.setFont(new Font("Dialog", Font.PLAIN, 9));
                 pnNorth.add(btnMeasure);
@@ -177,7 +183,6 @@ public class TrackEditor extends JPanel {
 
     @Subscribe
     private void handleFillNotesEvent(FillNotesEvent e) {
-        System.out.println("filling notes: " + e.getLength() + " : " + e.getBeat());
         int counter = 0;
 
         while(counter < e.getMeasureNum() * 32) {

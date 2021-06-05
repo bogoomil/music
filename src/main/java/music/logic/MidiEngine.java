@@ -1,11 +1,16 @@
 package music.logic;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.sound.midi.InvalidMidiDataException;
+import javax.sound.midi.MetaEventListener;
+import javax.sound.midi.MetaMessage;
 import javax.sound.midi.MidiChannel;
 import javax.sound.midi.MidiEvent;
 import javax.sound.midi.MidiSystem;
@@ -20,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import music.App;
+import music.event.MeasureStartedEvent;
 import music.event.TickOffEvent;
 import music.event.TickOnEvent;
 import music.theory.Note;
@@ -34,6 +40,8 @@ import music.theory.NoteLength;
 public class MidiEngine {
 
     public static final int CHORD_CHANNEL = 0;
+
+    public static final int MEASURE_START_MESSAGE_TYPE = 39;
 
     private static final Logger LOG = LoggerFactory.getLogger(MidiEngine.class);
 
@@ -60,20 +68,7 @@ public class MidiEngine {
             }
         }
 
-        try {
-            sequencer.getTransmitter().setReceiver(getSynth().getReceiver());
-        } catch (MidiUnavailableException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
         return sequencer;
-        //        try {
-        //            return MidiSystem.getSequencer();
-        //        } catch (MidiUnavailableException e) {
-        //            // TODO Auto-generated catch block
-        //            e.printStackTrace();
-        //        }
-        //        return null;
     }
 
     public static void addNotesToTrack(Track track, int channel, Note note) throws InvalidMidiDataException {
@@ -95,6 +90,14 @@ public class MidiEngine {
 
         MidiEvent noteOff = new MidiEvent(b, endInTick);
         track.add(noteOff);
+
+
+        if(note.getStartTick() % 32 == 0) {
+            byte[] m = String.valueOf(note.getStartTick() / 32).getBytes();
+            final MetaMessage metaMessage = new MetaMessage(MEASURE_START_MESSAGE_TYPE, m, m.length);
+            final MidiEvent me2 = new MidiEvent(metaMessage, note.getStartTick());
+            track.add(me2);
+        }
     }
 
     public static int getNoteLenghtInMs(NoteLength length, int tempo) {
@@ -116,6 +119,7 @@ public class MidiEngine {
         }
         return synth;
     }
+
     public static int getTickLengthInMeasureMs(int tick, int tempo) {
         int msInNegyed = 60000 / tempo; // 120-as tempo esetén 500 ms egy negyed hang hossza
         int measureLengthInMs = msInNegyed * 4; // ütem hossza 120-as temponál 2000 ms
@@ -166,6 +170,17 @@ public class MidiEngine {
 
     private static void initSequencer() throws MidiUnavailableException, InvalidMidiDataException {
         sequencer = MidiSystem.getSequencer();
+        sequencer.addMetaEventListener(new MetaEventListener() {
+
+            @Override
+            public void meta(MetaMessage meta) {
+                if(meta.getType() == MEASURE_START_MESSAGE_TYPE) {
+                    String s = new String(meta.getData());
+                    int mn = Integer.parseInt(s);
+                    App.eventBus.post(new MeasureStartedEvent(mn));
+                }
+            }
+        });
     }
 
 
@@ -196,6 +211,10 @@ public class MidiEngine {
                     Thread.sleep(length);
                     App.eventBus.post(new TickOffEvent(note.getStartTick() ));
                     channel.noteOff(note.getPitch().getMidiCode());
+
+                    if(note.getStartTick() % 32 == 0) {
+                        App.eventBus.post(new MeasureStartedEvent(note.getStartTick() / 32));
+                    }
 
 
                 } catch (Exception e) {
@@ -247,5 +266,38 @@ public class MidiEngine {
             playNote(n, ch, tempo);
         });
     }
+
+    public static void play(List<music.model.Track> tracks) throws InvalidMidiDataException, IOException, MidiUnavailableException {
+        play(tracks, 120, 1);
+    }
+
+    public static void play(List<music.model.Track> tracks, int tempo, float tempoFactor) throws InvalidMidiDataException, IOException, MidiUnavailableException {
+        Sequence seq = new Sequence(Sequence.PPQ, MidiEngine.RESOLUTION);
+
+
+
+        Sequencer sequencer = MidiEngine.getSequencer();
+
+
+        sequencer.setTempoFactor(tempoFactor);
+        for(music.model.Track t :tracks) {
+            javax.sound.midi.Track track = MidiEngine.getInstrumentTrack(seq, t.getChannel(), t.getInstrument());
+            for(Note n : t.getNotes()) {
+                MidiEngine.addNotesToTrack(track, t.getChannel(), n);
+            }
+
+
+        }
+        if(!sequencer.isOpen()) {
+            sequencer.open();
+        }
+        sequencer.setSequence(seq);
+        sequencer.start();
+        sequencer.setTempoInBPM(tempo);
+        File file = new File("piece.mid");
+        MidiSystem.write(seq,1,file);
+
+    }
+
 
 }

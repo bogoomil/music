@@ -224,7 +224,6 @@ public class NoteLabel extends JLabel {
     void handleDragEvent(NoteLabelDraggedEvent e) {
         if(this.id != e.getId() && this.selected && this.isEnabled()) {
             this.setBounds(getX() + e.getX(), getY(), getWidth(), getHeight());
-            System.out.println("id: " + id + "x: " + getBounds().x);
         }
     }
 
@@ -232,7 +231,6 @@ public class NoteLabel extends JLabel {
     void handleDragEndEvent(NoteLabelDragEndEvent e) {
         if(this.id != e.getId() && this.selected && this.isEnabled()) {
             int x = getBounds().x;
-            System.out.println("id: " + id +"x (end): " + getBounds().x);
             int newCellIndex = trackPanel.getColByX(x);
             snap(newCellIndex);
         }

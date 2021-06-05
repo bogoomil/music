@@ -101,8 +101,11 @@ public class Track {
 
     @JsonIgnore
     public int getMinOctave() {
-        Note n = this.notes.stream().min(Comparator.comparing(Note::getMidiCode)).get();
-        return n.getPitch().getOctave();
+        if(this.notes != null && this.notes.size() > 0) {
+            Note n = this.notes.stream().min(Comparator.comparing(Note::getMidiCode)).get();
+            return n.getPitch().getOctave();
+        }
+        return 3;
     }
 
     public void setMeasureNum(int measureNum) {

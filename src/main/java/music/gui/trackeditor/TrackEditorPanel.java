@@ -15,6 +15,8 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import com.google.common.eventbus.Subscribe;
+
 import music.App;
 import music.event.tracks.TrackSelectedEvent;
 import music.logic.MidiEngine;
@@ -29,17 +31,23 @@ public class TrackEditorPanel extends JPanel {
     private JComboBox cbChannel;
     JComboBox<Instrument> cbInstr;
     private JLabel lbChannel;
+    private int id;
+
+    private static int counter;
 
     private boolean selected;
 
     public TrackEditorPanel(Track track) {
         super();
+        this.id = counter;
+        counter++;
         setTrack(track);
     }
 
     public void setTrack(Track track) {
         this.track = track;
         setLayout(new BorderLayout(0, 0));
+        App.eventBus.register(this);
 
         JPanel pnButtons = new JPanel();
         FlowLayout flowLayout_1 = (FlowLayout) pnButtons.getLayout();
@@ -146,14 +154,9 @@ public class TrackEditorPanel extends JPanel {
         return selected;
     }
 
-    public void removeMeasureButton(int measureNum) {
-        pnMeasures.remove(measureNum);
-        for(int i = 0; i < this.pnMeasures.getComponentCount(); i++) {
-            MeasureButton mb = (MeasureButton) this.pnMeasures.getComponent(i);
-            mb.setTitle(this.track.getId() + "/" + i);
-        }
-        this.validate();
-        this.repaint();
+    @Subscribe
+    private void handleTrackSelectionEvent(TrackSelectedEvent e) {
+        this.setSelected(e.getTrack().getId() == this.track.getId());
     }
 
 

@@ -73,7 +73,6 @@ public class TrackPanel extends JPanel {
 
             @Override
             public void keyPressed(KeyEvent e) {
-                System.out.println(e.isControlDown() + " " + e.getKeyCode());
                 if(e.getKeyCode() == 67 && e.isControlDown()) {
                     //ctrl c
                     copyNotes  = new ArrayList<>();
@@ -200,9 +199,6 @@ public class TrackPanel extends JPanel {
                 } else {
                     selectedCell = new Point(getColByX(e.getX()), getRowByY(e.getY() ));
                 }
-
-                System.out.println("row: " + getRowByY(e.getY() ) + ", col: " + getColByX(e.getX()));
-
                 repaint();
                 revalidate();
             }
@@ -221,7 +217,6 @@ public class TrackPanel extends JPanel {
                 Component c = TrackPanel.this.getComponentAt(currentPos);
                 if(c instanceof NoteLabel) {
                     if(! selectingComponents.contains(c)) {
-                        System.out.println("Adding comp: " + c);
                         selectingComponents.add(c);
                     }
                 }

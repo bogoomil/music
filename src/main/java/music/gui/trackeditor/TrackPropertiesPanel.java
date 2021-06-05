@@ -104,8 +104,17 @@ public class TrackPropertiesPanel extends JPanel {
         slTempo.setMinimum(60);
         slTempo.setMaximum(300);
         slTempo.setMajorTickSpacing(60);
-        slTempo.setBorder(new TitledBorder(null, "Tempo", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+        TitledBorder tbTempo = new TitledBorder(null, "Tempo", TitledBorder.LEADING, TitledBorder.TOP, null, null);
+        slTempo.setBorder(tbTempo);
         add(slTempo);
+        slTempo.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                tbTempo.setTitle("Tempo: " + slTempo.getValue());
+
+            }
+        });
 
         slVolume = new JSlider();
         slVolume.setMaximum(127);

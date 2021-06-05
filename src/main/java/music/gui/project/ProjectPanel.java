@@ -5,17 +5,13 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.sound.midi.InvalidMidiDataException;
-import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
-import javax.sound.midi.Sequence;
-import javax.sound.midi.Sequencer;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -41,7 +37,6 @@ import music.gui.trackeditor.TrackEditorPanel;
 import music.logic.MidiEngine;
 import music.model.Project;
 import music.model.Track;
-import music.theory.Note;
 
 public class ProjectPanel extends JPanel {
 
@@ -88,7 +83,7 @@ public class ProjectPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    play();
+                    MidiEngine.play(tracks, slTempo.getValue(), Float.parseFloat("" + cbTempoFactor.getItemAt(cbTempoFactor.getSelectedIndex())));
                 } catch (InvalidMidiDataException | IOException | MidiUnavailableException e1) {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();
@@ -107,6 +102,7 @@ public class ProjectPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 MidiEngine.getSequencer().stop();
+                MidiEngine.getSynth().close();
 
             }
         });
@@ -188,29 +184,29 @@ public class ProjectPanel extends JPanel {
     //        }
     //    }
 
-    private void play() throws InvalidMidiDataException, IOException, MidiUnavailableException {
-        Sequence seq = new Sequence(Sequence.PPQ, MidiEngine.RESOLUTION);
-        Sequencer sequencer = MidiEngine.getSequencer();
-        float f = Float.parseFloat(cbTempoFactor.getSelectedItem() + "");
-        sequencer.setTempoFactor(f);
-        for(Track t :this.tracks) {
-            javax.sound.midi.Track track = MidiEngine.getInstrumentTrack(seq, t.getChannel(), t.getInstrument());
-            for(Note n : t.getNotes()) {
-                MidiEngine.addNotesToTrack(track, t.getChannel(), n);
-            }
-
-        }
-        sequencer.setSequence(seq);
-        if(!sequencer.isOpen()) {
-            sequencer.open();
-        }
-        //        sequencer.setLoopCount(3);
-        sequencer.start();
-        sequencer.setTempoInBPM(slTempo.getValue());
-        File file = new File("piece.mid");
-        MidiSystem.write(seq,1,file);
-
-    }
+    //    private void play() throws InvalidMidiDataException, IOException, MidiUnavailableException {
+    //        Sequence seq = new Sequence(Sequence.PPQ, MidiEngine.RESOLUTION);
+    //        Sequencer sequencer = MidiEngine.getSequencer();
+    //        float f = Float.parseFloat(cbTempoFactor.getSelectedItem() + "");
+    //        sequencer.setTempoFactor(f);
+    //        for(Track t :this.tracks) {
+    //            javax.sound.midi.Track track = MidiEngine.getInstrumentTrack(seq, t.getChannel(), t.getInstrument());
+    //            for(Note n : t.getNotes()) {
+    //                MidiEngine.addNotesToTrack(track, t.getChannel(), n);
+    //            }
+    //
+    //        }
+    //        sequencer.setSequence(seq);
+    //        if(!sequencer.isOpen()) {
+    //            sequencer.open();
+    //        }
+    //        //        sequencer.setLoopCount(3);
+    //        sequencer.start();
+    //        sequencer.setTempoInBPM(slTempo.getValue());
+    //        File file = new File("piece.mid");
+    //        MidiSystem.write(seq,1,file);
+    //
+    //    }
 
     private TrackEditorPanel createTrack(Track track) {
         TrackEditorPanel tep = new TrackEditorPanel(track);
@@ -289,7 +285,6 @@ public class ProjectPanel extends JPanel {
 
     @Subscribe
     private void handleFileOpenEvent(FileOpenEvent e) throws JsonParseException, JsonMappingException, IOException {
-        System.out.println("Opening: : " + e.getFile().getAbsolutePath());
         ObjectMapper om = new ObjectMapper();
         Project p = om.readValue(e.getFile(), Project.class);
         this.tracks = p.getTracks();
