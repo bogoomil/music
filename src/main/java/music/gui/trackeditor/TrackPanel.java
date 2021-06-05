@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.swing.JPanel;
 import javax.swing.border.EtchedBorder;
@@ -30,6 +31,7 @@ import music.event.tracks.ZoomEvent;
 import music.model.Track;
 import music.theory.Note;
 import music.theory.NoteLength;
+import music.theory.NoteName;
 import music.theory.Pitch;
 
 public class TrackPanel extends JPanel {
@@ -137,6 +139,7 @@ public class TrackPanel extends JPanel {
                     }
                 }else if(e.getKeyCode() == 68 && e.isControlDown()) {//ctrl d enable / disable rows
                     isRowsEnabled = !isRowsEnabled;
+                    repaint();
 
                 }
             }
@@ -234,6 +237,7 @@ public class TrackPanel extends JPanel {
 
     @Override
     public void paintComponent(Graphics g) {
+        List<NoteName> scale = Arrays.asList(TrackPropertiesPanel.getScale()).stream().map(p -> p.getName()).collect(Collectors.toList());
 
         super.paintComponent(g);
         this.setPreferredSize(new Dimension(100, 400));
@@ -266,18 +270,26 @@ public class TrackPanel extends JPanel {
             int y = i * rowHeight;
             g.drawLine(0, y, this.getWidth(), y);
 
+            Pitch p = getPitchByRow(i);
+
+            if(!isRowsEnabled && !scale.contains(p.getName())) {
+                g.setColor(App.DISABLED_COLOR);
+
+                g.fillRect(0, getYByRow(i), this.getWidth(), getRowHeight());
+
+                System.out.println(i + " ::: y: " + getYByRow(i) + " - " + (getYByRow(i) +  getRowHeight()));
+            }
         }
+
         if(this.selectedCell != null) {
             g.setColor(App.SELECT_COLOR);
             g.fillRect(this.getXByCol(selectedCell.x), this.getYByRow(selectedCell.y), this.getTickWidth(), this.getRowHeight());
         }
 
-
         if(track != null) {
             int newWidth = incr * track.getMeasureNum() * 32;
             int x = this.currentMeasure * (getTickWidth() * 32);
             this.setBounds(-1 * x, this.getBounds().y, newWidth, this.getBounds().height);
-
         }
     }
 
@@ -347,11 +359,19 @@ public class TrackPanel extends JPanel {
     }
 
 
-    //    public List<Pitch> getPitches(){
-    //        return this.pitches;
-    //    }
-    //
     public void setPitches(List<Pitch> pitches) {
+
+        Collections.sort(pitches, new Comparator<Pitch>() {
+
+            @Override
+            public int compare(Pitch o1, Pitch o2) {
+                // TODO Auto-generated method stub
+                return Integer.compare(o1.getMidiCode(), o2.getMidiCode());
+            }
+        });
+        Collections.reverse(pitches);
+
+
         this.pitches = pitches;
     }
 
@@ -399,21 +419,16 @@ public class TrackPanel extends JPanel {
     }
 
     public int getRowByPitch(Pitch p) {
-        Collections.sort(pitches, new Comparator<Pitch>() {
-
-            @Override
-            public int compare(Pitch o1, Pitch o2) {
-                // TODO Auto-generated method stub
-                return Integer.compare(o1.getMidiCode(), o2.getMidiCode());
-            }
-        });
-        Collections.reverse(pitches);
         for(int i = 0; i < pitches.size(); i++) {
             if(p.getMidiCode() == pitches.get(i).getMidiCode()) {
                 return i;
             }
         }
         return 0;
+    }
+
+    public Pitch getPitchByRow(int row) {
+        return this.pitches.get(row);
     }
 
     public int getSelectedMeasureNum() {

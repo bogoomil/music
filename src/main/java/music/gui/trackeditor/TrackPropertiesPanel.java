@@ -22,11 +22,13 @@ import music.event.tracks.TrackVolumeChangedEvent;
 import music.event.tracks.ZoomEvent;
 import music.logic.MidiEngine;
 import music.theory.NoteName;
+import music.theory.Pitch;
+import music.theory.Scale;
 import music.theory.Tone;
 
 public class TrackPropertiesPanel extends JPanel {
-    private JComboBox cbRoot;
-    private JComboBox cbTone;
+    private static JComboBox<NoteName> cbRoot;
+    private static JComboBox<Tone> cbTone;
     private JComboBox<Instrument> cbInstr;
     private JComboBox cbChannel;
     private JSlider slTempo;
@@ -169,6 +171,10 @@ public class TrackPropertiesPanel extends JPanel {
         });
 
 
+    }
+
+    public static Pitch[] getScale() {
+        return Scale.getScale(new Pitch(cbRoot.getItemAt(cbRoot.getSelectedIndex()).getMidiCode()), cbTone.getItemAt(cbTone.getSelectedIndex()));
     }
 
 }
