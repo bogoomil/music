@@ -2,8 +2,10 @@ package music.gui.trackeditor;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -49,6 +51,8 @@ public class TrackPanel extends JPanel {
     private boolean isSelectedAll;
 
     private boolean isRowsEnabled = true;
+
+    private Point startDrag, endDrag;
 
     public TrackPanel() {
         super();
@@ -150,16 +154,28 @@ public class TrackPanel extends JPanel {
             public void mouseReleased(MouseEvent e) {
                 requestFocusInWindow();
 
-                for(Component c : selectingComponents) {
-                    NoteLabel nl = (NoteLabel) c;
-                    nl.setSelected(!nl.getSelected());
+                if(endDrag != null) {
+                    List<NoteLabel> nls = findAllBetween(startDrag, endDrag);
+                    System.out.println("selecting notelabels: " + nls);
+
+                    nls.forEach(n -> n.setSelected(!n.getSelected()));
                 }
+
+
+
+                //                for(Component c : selectingComponents) {
+                //                    NoteLabel nl = (NoteLabel) c;
+                //                    nl.setSelected(!nl.getSelected());
+                //                }
 
             }
 
             @Override
             public void mousePressed(MouseEvent e) {
-                selectingComponents = new ArrayList<>();
+                startDrag = e.getPoint();
+                endDrag = null;
+
+                //                selectingComponents = new ArrayList<>();
             }
 
             @Override
@@ -213,13 +229,16 @@ public class TrackPanel extends JPanel {
 
             @Override
             public void mouseDragged(MouseEvent e) {
-                Point currentPos = new Point(e.getX(), e.getY());
-                Component c = TrackPanel.this.getComponentAt(currentPos);
-                if(c instanceof NoteLabel) {
-                    if(! selectingComponents.contains(c)) {
-                        selectingComponents.add(c);
-                    }
-                }
+
+                endDrag = e.getPoint();
+
+                //                Point currentPos = new Point(e.getX(), e.getY());
+                //                Component c = TrackPanel.this.getComponentAt(currentPos);
+                //                if(c instanceof NoteLabel) {
+                //                    if(! selectingComponents.contains(c)) {
+                //                        selectingComponents.add(c);
+                //                    }
+                //                }
             }
         });
     }
@@ -435,6 +454,23 @@ public class TrackPanel extends JPanel {
 
     public void setSelectedMeasureNum(int mn) {
         this.selectedCell = new Point(mn * 32, 0);
+    }
+
+    private List<NoteLabel> findAllBetween(Point start, Point end){
+        List<NoteLabel> retVal = new ArrayList<>();
+
+        for(Component c : getComponents()) {
+            if(c instanceof NoteLabel) {
+                NoteLabel nl = (NoteLabel) c;
+                int width = endDrag.x - startDrag.x;
+                int height = endDrag.y - startDrag.y;
+                if(nl.getBounds().intersects(new Rectangle(startDrag, new Dimension(width, height)))) {
+                    retVal.add(nl);
+                }
+            }
+        }
+
+        return retVal;
     }
 
 }

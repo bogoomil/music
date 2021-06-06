@@ -157,8 +157,15 @@ public class KeyBoard extends JPanel{
         pn.add(l);
 
         JComboBox<Integer> cbMeasureNum = new JComboBox<>();
-        cbMeasureNum.setModel(new DefaultComboBoxModel<>(new Integer[] {1,2,3,4})) ;
+        cbMeasureNum.setModel(new DefaultComboBoxModel<>(new Integer[] {1,2,3,4,5,6,7,8,9,10,11})) ;
         pn.add(cbMeasureNum);
+
+        l = new JLabel("From meas:");
+        pn.add(l);
+
+        JComboBox<Integer> cbFromMeasure= new JComboBox<>();
+        cbFromMeasure.setModel(new DefaultComboBoxModel<>(new Integer[] {0,1,2,3,4,5,6,7,8,9,10,11})) ;
+        pn.add(cbFromMeasure);
 
 
 
@@ -171,7 +178,8 @@ public class KeyBoard extends JPanel{
                 App.eventBus.post(new FillNotesEvent(pitch,
                         cbHossz.getItemAt(cbHossz.getSelectedIndex()),
                         cbBeat.getItemAt(cbBeat.getSelectedIndex()),
-                        cbMeasureNum.getItemAt(cbMeasureNum.getSelectedIndex())));
+                        cbMeasureNum.getItemAt(cbMeasureNum.getSelectedIndex()),
+                        cbFromMeasure.getItemAt(cbFromMeasure.getSelectedIndex())));
                 dialog.setVisible(false);
             }
         });

@@ -8,12 +8,14 @@ public class FillNotesEvent {
     private NoteLength length;
     private NoteLength beat;
     private int measureNum;
-    public FillNotesEvent(Pitch pitch, NoteLength length, NoteLength beat, int measureNum) {
+    private int fromMeasure;
+    public FillNotesEvent(Pitch pitch, NoteLength length, NoteLength beat, int measureNum, int fromMeasure) {
         super();
         this.pitch = pitch;
         this.length = length;
         this.beat = beat;
         this.measureNum = measureNum;
+        this.fromMeasure = fromMeasure;
     }
     public Pitch getPitch() {
         return pitch;
@@ -39,6 +41,10 @@ public class FillNotesEvent {
     public void setMeasureNum(int measureNum) {
         this.measureNum = measureNum;
     }
-
-
+    public int getFromMeasure() {
+        return fromMeasure;
+    }
+    public void setFromMeasure(int fromMeasure) {
+        this.fromMeasure = fromMeasure;
+    }
 }

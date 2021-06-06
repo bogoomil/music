@@ -186,10 +186,10 @@ public class TrackEditor extends JPanel {
     private void handleFillNotesEvent(FillNotesEvent e) {
         int counter = 0;
 
-        while(counter < e.getMeasureNum() * 32) {
+        while(counter < e.getMeasureNum()  * 32) {
             Note n = new Note();
             n.setLength(e.getLength());
-            n.setStartTick(counter + trackPanel.getSelectedMeasureNum());
+            n.setStartTick(counter + 32 * e.getFromMeasure());
             n.setPitch(e.getPitch());
             counter += e.getBeat().getErtek();
             track.getNotes().add(n);
