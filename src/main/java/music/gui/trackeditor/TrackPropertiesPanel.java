@@ -96,13 +96,13 @@ public class TrackPropertiesPanel extends JPanel {
         add(cbTone);
 
         slTempo = new JSlider();
-        slTempo.setValue(200);
         slTempo.setSnapToTicks(true);
         slTempo.setPaintTicks(true);
         slTempo.setPaintLabels(true);
         slTempo.setMinorTickSpacing(10);
         slTempo.setMinimum(60);
         slTempo.setMaximum(300);
+        slTempo.setValue(140);
         slTempo.setMajorTickSpacing(60);
         TitledBorder tbTempo = new TitledBorder(null, "Tempo", TitledBorder.LEADING, TitledBorder.TOP, null, null);
         slTempo.setBorder(tbTempo);
@@ -155,7 +155,7 @@ public class TrackPropertiesPanel extends JPanel {
         cbChannel.setModel(new DefaultComboBoxModel(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15" }));
 
         slZoom = new JSlider();
-        slZoom.setValue(100);
+        slZoom.setValue(20);
         slZoom.setSnapToTicks(true);
         slZoom.setPaintTicks(true);
         slZoom.setPaintLabels(true);
@@ -184,6 +184,17 @@ public class TrackPropertiesPanel extends JPanel {
 
             }
         });
+
+        //        JButton btnAddAsNewTrack = new JButton("Add to tracks");
+        //        add(btnAddAsNewTrack);
+        //        btnAddAsNewTrack.addActionListener(new ActionListener() {
+        //
+        //            @Override
+        //            public void actionPerformed(ActionEvent e) {
+        //                App.eventBus.post(new AddAsNewTrackEvent());
+        //
+        //            }
+        //        });
 
 
     }

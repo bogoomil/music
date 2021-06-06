@@ -185,7 +185,7 @@ public class NoteLabel extends JLabel {
         g.fillRect(this.getWidth() -14, 0, this.getWidth(), this.getHeight());
 
         g.setColor(Color.black);
-        g.drawString("" + id, 30, 15);
+        //g.drawString("" + id, 30, 15);
 
     }
 

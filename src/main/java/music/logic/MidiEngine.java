@@ -207,14 +207,17 @@ public class MidiEngine {
 
                     channel.noteOn(note.getPitch().getMidiCode(), note.getVol());
 
+                    if(note.getStartTick() % 32 == 0) {
+                        int mn = note.getStartTick() / 32;
+                        App.eventBus.post(new MeasureStartedEvent(mn));
+
+                    }
+
 
                     Thread.sleep(length);
                     App.eventBus.post(new TickOffEvent(note.getStartTick() ));
                     channel.noteOff(note.getPitch().getMidiCode());
 
-                    if(note.getStartTick() % 32 == 0) {
-                        App.eventBus.post(new MeasureStartedEvent(note.getStartTick() / 32));
-                    }
 
 
                 } catch (Exception e) {

@@ -55,6 +55,7 @@ public class AppFrame extends JFrame{
 
 
 
+        setTitle("Music composer 1.0");
 
         this.pack();
         this.setVisible(true);

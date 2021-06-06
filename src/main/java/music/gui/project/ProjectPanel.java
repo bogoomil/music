@@ -43,7 +43,7 @@ public class ProjectPanel extends JPanel {
     private TrackEditorPanel currentTrackEditor;
 
     private JPanel pnTracks;
-    private List<Track> tracks = new ArrayList<>();
+    private static List<Track> tracks = new ArrayList<>();
     private JSlider slTempo;
     private JComboBox cbTempoFactor;
     private JTextField txtTfprojcetname;
@@ -170,43 +170,11 @@ public class ProjectPanel extends JPanel {
         cbTempoFactor.setModel(new DefaultComboBoxModel(new String[] {"0.1", "0.25", "0.5", "0.75", "1.0", "2.0", "3.0", "4.0"}));
         cbTempoFactor.setSelectedIndex(4);
 
+        this.createTrack();
+
     }
 
 
-    //    @Subscribe
-    //    private void handleTrackSelectedEvent(TrackSelectedEvent e) {
-    //        for(int i = 0; i < this.pnTracks.getComponentCount(); i++) {
-    //            TrackEditorPanel tep = (TrackEditorPanel) this.pnTracks.getComponent(i);
-    //            if(tep.getTrack().getId() == e.getTrack().getId()) {
-    //                this.currentTrackEditor = tep;
-    //            }
-    //            tep.setSelected(tep.getTrack().getId() == e.getTrack().getId());
-    //        }
-    //    }
-
-    //    private void play() throws InvalidMidiDataException, IOException, MidiUnavailableException {
-    //        Sequence seq = new Sequence(Sequence.PPQ, MidiEngine.RESOLUTION);
-    //        Sequencer sequencer = MidiEngine.getSequencer();
-    //        float f = Float.parseFloat(cbTempoFactor.getSelectedItem() + "");
-    //        sequencer.setTempoFactor(f);
-    //        for(Track t :this.tracks) {
-    //            javax.sound.midi.Track track = MidiEngine.getInstrumentTrack(seq, t.getChannel(), t.getInstrument());
-    //            for(Note n : t.getNotes()) {
-    //                MidiEngine.addNotesToTrack(track, t.getChannel(), n);
-    //            }
-    //
-    //        }
-    //        sequencer.setSequence(seq);
-    //        if(!sequencer.isOpen()) {
-    //            sequencer.open();
-    //        }
-    //        //        sequencer.setLoopCount(3);
-    //        sequencer.start();
-    //        sequencer.setTempoInBPM(slTempo.getValue());
-    //        File file = new File("piece.mid");
-    //        MidiSystem.write(seq,1,file);
-    //
-    //    }
 
     private TrackEditorPanel createTrack(Track track) {
         TrackEditorPanel tep = new TrackEditorPanel(track);
@@ -299,6 +267,10 @@ public class ProjectPanel extends JPanel {
     @Subscribe
     private void handleTrackCreatedEvent(TrackCreatedEvent e) {
         this.createTrack(e.getTrack());
+    }
+
+    public static List<Track> getTracks(){
+        return tracks;
     }
 
 }

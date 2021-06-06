@@ -28,6 +28,7 @@ import music.event.tracks.TrackNotesUpdatedEvent;
 import music.event.tracks.TrackScrollEvent;
 import music.event.tracks.TrackSelectedEvent;
 import music.event.tracks.TrackVolumeChangedEvent;
+import music.gui.project.ProjectPanel;
 import music.logic.MidiEngine;
 import music.model.Track;
 import music.theory.Note;
@@ -127,7 +128,7 @@ public class TrackEditor extends JPanel {
     @Subscribe
     private void handleAddMeasureToTrackEvent(AddMeasureToTrackEvent e) {
         if(this.track == null) {
-            this.track = new Track();
+            this.track = ProjectPanel.getTracks().get(0);
 
         }
         this.track.setMeasureNum(this.track.getMeasureNum() + 1);
@@ -140,7 +141,7 @@ public class TrackEditor extends JPanel {
     @Subscribe
     private void handleAddNotesToTrackEvent(AddNotesToTrackEvent e) {
         if(this.track == null) {
-            this.track = new Track();
+            this.track = ProjectPanel.getTracks().get(0);
         }
 
         for(int i = 0; i < e.getNotes().length; i++) {

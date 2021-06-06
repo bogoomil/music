@@ -24,6 +24,8 @@ public class Track {
 
     private int measureNum;
 
+    private int volume = 100;
+
     //TODO törölni
     public Track(int id) {
         this();
@@ -92,11 +94,12 @@ public class Track {
     }
 
     public int getMeasureNum() {
-        if(this.measureNum == 0 && this.notes.size() != 0) {
+        int calculatedNum = 0;
+        if(this.notes.size() != 0) {
             Note n = this.notes.stream().max(Comparator.comparing(Note::getStartTick)).get();
-            this.measureNum = n.getStartTick() / 32 + 1;
+            calculatedNum = n.getStartTick() / 32 + 1;
         }
-        return this.measureNum;
+        return calculatedNum > this.measureNum ? calculatedNum : this.measureNum;
     }
 
     @JsonIgnore
@@ -119,4 +122,15 @@ public class Track {
             }
         }
     }
+
+    public void setVolume(int value) {
+        this.volume = value;
+        this.notes.stream().forEach(n -> n.setVol(value));
+    }
+
+    public int getVolume() {
+        return volume;
+    }
+
+
 }

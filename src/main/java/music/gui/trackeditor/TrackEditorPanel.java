@@ -14,6 +14,10 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -132,6 +136,29 @@ public class TrackEditorPanel extends JPanel {
             }
         });
 
+        JSlider slVolume = new JSlider();
+        slVolume.setMaximum(127);
+        slVolume.setMinimum(0);
+        slVolume.setSnapToTicks(true);
+        slVolume.setPaintTicks(true);
+        slVolume.setPaintLabels(true);
+        slVolume.setMajorTickSpacing(50);
+        slVolume.setMinorTickSpacing(5);
+        slVolume.setBorder(new TitledBorder(null, "Volume", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+        pnButtons.add(slVolume);
+
+        slVolume.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                track.setVolume(slVolume.getValue());
+
+            }
+        });
+
+        slVolume.setValue(track.getVolume());
+
+        App.eventBus.post(new TrackSelectedEvent(track));
 
     }
 

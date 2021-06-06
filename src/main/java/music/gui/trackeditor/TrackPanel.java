@@ -36,7 +36,7 @@ public class TrackPanel extends JPanel {
 
     private Point selectedCell;
 
-    //private List<Pitch> pitches;
+    private double zoomFactor = 20;
 
     private Track track;
 
@@ -223,9 +223,6 @@ public class TrackPanel extends JPanel {
             }
         });
     }
-
-    private double zoomFactor = 100;
-
     public Track getTrack() {
         return track;
     }

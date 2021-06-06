@@ -126,6 +126,7 @@ public class ChordPanel extends JPanel {
                     notes[i].setStartTick(0);
                 }
                 App.eventBus.post(new AddNotesToTrackEvent(notes));
+                App.eventBus.post(new ChordEvent(chord, degree));
 
             }
         });
