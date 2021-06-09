@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EtchedBorder;
 
@@ -192,32 +193,38 @@ public class TrackPanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
 
-                int row = getRowByY(e.getY());
-                int col = getColByX(e.getX());
+                if(track != null) {
+                    int row = getRowByY(e.getY());
+                    int col = getColByX(e.getX());
 
 
-                if(e.getClickCount() == 2) {
-                    Note note = new Note();
-                    note.setPitch(KeyBoard.getPitches().get(row));
-                    note.setStartTick(col);
-                    note.setLength(NoteLength.HARMICKETTED);
-                    NoteLabel l = new NoteLabel(TrackPanel.this, note);
+                    if(e.getClickCount() == 2) {
+                        Note note = new Note();
+                        note.setPitch(KeyBoard.getPitches().get(row));
+                        note.setStartTick(col);
+                        note.setLength(NoteLength.HARMICKETTED);
+                        NoteLabel l = new NoteLabel(TrackPanel.this, note);
 
-                    int x = getXByCol(col);
-                    int y = getYByRow(row);
-                    int w = getTickWidth();
-                    int h = getRowHeight();
-                    l.setBounds(x, y, w, h);
-                    add(l);
+                        int x = getXByCol(col);
+                        int y = getYByRow(row);
+                        int w = getTickWidth();
+                        int h = getRowHeight();
+                        l.setBounds(x, y, w, h);
+                        add(l);
 
-                    track.getNotes().add(note);
+                        track.getNotes().add(note);
 
 
-                } else {
-                    selectedCell = new Point(getColByX(e.getX()), getRowByY(e.getY() ));
+                    } else {
+                        selectedCell = new Point(getColByX(e.getX()), getRowByY(e.getY() ));
+                    }
+                    repaint();
+                    revalidate();
+
+                }else {
+                    JOptionPane.showMessageDialog(TrackPanel.this, "Nincs kiválasztott track!");
                 }
-                repaint();
-                revalidate();
+
             }
         });
         this.addMouseMotionListener(new MouseMotionListener() {
