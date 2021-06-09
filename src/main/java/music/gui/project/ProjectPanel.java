@@ -276,10 +276,10 @@ public class ProjectPanel extends JPanel {
     private void handleFileOpenEvent(FileOpenEvent e) throws JsonParseException, JsonMappingException, IOException {
         ObjectMapper om = new ObjectMapper();
         Project p = om.readValue(e.getFile(), Project.class);
-        ProjectPanel.tracks = p.getTracks();
-
+        ProjectPanel.tracks = new ArrayList<>();
         pnTracks.removeAll();
-        ProjectPanel.tracks.forEach(t -> pnTracks.add(createTrack(t)));
+
+        p.getTracks().forEach(t -> createTrack(t));
 
         txtTfprojcetname.setText(p.getName());
 
