@@ -2,13 +2,22 @@ package music.theory;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public class Note {
+public class Note implements Cloneable{
 
 
     Pitch pitch;
     NoteLength length;
     int startTick;
     int vol = 100;
+
+    static int ID;
+
+    private int id;
+
+    public Note() {
+        this.id = ID;
+        ID++;
+    }
 
     public Pitch getPitch() {
         return pitch;
@@ -74,13 +83,9 @@ public class Note {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((length == null) ? 0 : length.hashCode());
-        result = prime * result + ((pitch == null) ? 0 : pitch.hashCode());
-        result = prime * result + startTick;
-        result = prime * result + vol;
+        result = prime * result + id;
         return result;
     }
-
 
     @Override
     public boolean equals(Object obj) {
@@ -94,24 +99,21 @@ public class Note {
             return false;
         }
         Note other = (Note) obj;
-        if (length != other.length) {
-            return false;
-        }
-        if (pitch == null) {
-            if (other.pitch != null) {
-                return false;
-            }
-        } else if (!pitch.equals(other.pitch)) {
-            return false;
-        }
-        if (startTick != other.startTick) {
-            return false;
-        }
-        if (vol != other.vol) {
+        if (id != other.id) {
             return false;
         }
         return true;
     }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+
 
 
 

@@ -132,5 +132,27 @@ public class Track {
         return volume;
     }
 
+    @Override
+    public Track clone() {
+        Track t = new Track();
+        t.setMeasureNum(this.getMeasureNum());
+        List<Note> nots = new ArrayList<>() ;
+        //        for(int i = 0; i < this.notes.size(); i++) {
+        //            Note newNote = new Note();
+        //            newNote.setLength(notes.get(i).getLength());
+        //            newNote.setPitch(notes.get(i).getPitch());
+        //            newNote.setStartTick(notes.get(i).getStartTick());
+        //            newNote.setVol(notes.get(i).getVol());
+        //            System.out.println("Cloning: n.id: " + notes.get(i) + " new: " + newNote);
+        //            nots.add(newNote);
+        //        }
+        //
+        this.notes.stream().forEach(n -> {
+            nots.add(n.clone());
+        });
+
+        t.setNotes(nots);
+        return t;
+    }
 
 }

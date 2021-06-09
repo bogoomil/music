@@ -13,13 +13,13 @@ import javax.swing.border.LineBorder;
 import com.google.common.eventbus.Subscribe;
 
 import music.App;
+import music.event.NoteDeletedEvent;
 import music.event.NoteDragStartEvent;
 import music.event.NoteLabelDragEndEvent;
-import music.event.NoteLabelDraggedEvent;
+import music.event.NoteLabelDragEvent;
 import music.event.NoteSelectionEvent;
 import music.event.TickOffEvent;
 import music.event.TickOnEvent;
-import music.event.tracks.TrackNotesUpdatedEvent;
 import music.theory.Note;
 import music.theory.NoteLength;
 
@@ -69,7 +69,7 @@ public class NoteLabel extends JLabel {
                     int x = getX();
                     x += e.getX() - startDragX;
                     NoteLabel.this.setBounds(x, getY(), getWidth(), getHeight());
-                    App.eventBus.post(new NoteLabelDraggedEvent(id, e.getX() - startDragX));
+                    App.eventBus.post(new NoteLabelDragEvent(id, e.getX() - startDragX));
                 }
             }
         });
@@ -81,8 +81,9 @@ public class NoteLabel extends JLabel {
                 if(NoteLabel.this.isEnabled()) {
                     int x = getBounds().x;
                     int newCellIndex = trackPanel.getColByX(x);
+                    note.setStartTick(newCellIndex);
                     snap(newCellIndex);
-                    App.eventBus.post(new TrackNotesUpdatedEvent());
+                    //App.eventBus.post(new TrackNotesUpdatedEvent());
                     App.eventBus.post(new NoteLabelDragEndEvent(id, x));
 
                 }
@@ -116,17 +117,17 @@ public class NoteLabel extends JLabel {
                 if(NoteLabel.this.isEnabled()) {
                     NoteLength old = note.getLength();
                     if(e.getX() > getWidth() - 15) {
-                        NoteLength uj =NoteLength.ofErtek(note.getLength().getErtek() * 2);
+                        NoteLength uj = NoteLength.ofErtek(note.getLength().getErtek() * 2);
                         note.setLength(uj);
                         reCalculateSizeAndLocation();
-                        App.eventBus.post(new TrackNotesUpdatedEvent());
+                        //App.eventBus.post(new TrackNotesUpdatedEvent());
 
                     } else if (e.getX() < 15) {
                         if(old.getErtek() > 1) {
                             NoteLength uj = NoteLength.ofErtek(note.getLength().getErtek() / 2);
                             note.setLength(uj);
                             reCalculateSizeAndLocation();
-                            App.eventBus.post(new TrackNotesUpdatedEvent());
+                            //App.eventBus.post(new TrackNotesUpdatedEvent());
                         }
 
                     } else {
@@ -134,13 +135,12 @@ public class NoteLabel extends JLabel {
                             Container c = NoteLabel.this.getParent();
                             c.remove(NoteLabel.this);
                             c.repaint();
-                            App.eventBus.post(new TrackNotesUpdatedEvent());
+                            App.eventBus.post(new NoteDeletedEvent(note));
 
                         }else {
                             setSelected(!selected);
                         }
                     }
-
                 }
             }
         });
@@ -221,7 +221,7 @@ public class NoteLabel extends JLabel {
     }
 
     @Subscribe
-    void handleDragEvent(NoteLabelDraggedEvent e) {
+    void handleDragEvent(NoteLabelDragEvent e) {
         if(this.id != e.getId() && this.selected && this.isEnabled()) {
             this.setBounds(getX() + e.getX(), getY(), getWidth(), getHeight());
         }
@@ -232,6 +232,7 @@ public class NoteLabel extends JLabel {
         if(this.id != e.getId() && this.selected && this.isEnabled()) {
             int x = getBounds().x;
             int newCellIndex = trackPanel.getColByX(x);
+            note.setStartTick(newCellIndex);
             snap(newCellIndex);
         }
 

@@ -1,6 +1,7 @@
 package music.gui.project;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -32,7 +33,9 @@ import com.google.common.eventbus.Subscribe;
 import music.App;
 import music.event.FileOpenEvent;
 import music.event.FileSaveEvent;
+import music.event.NoteDeletedEvent;
 import music.event.tracks.TrackCreatedEvent;
+import music.event.tracks.TrackSelectedEvent;
 import music.gui.trackeditor.TrackEditorPanel;
 import music.logic.MidiEngine;
 import music.model.Project;
@@ -120,6 +123,19 @@ public class ProjectPanel extends JPanel {
             }
         });
 
+        JButton btnDuplicateTrack = new JButton("x2");
+        pnToolbar.add(btnDuplicateTrack);
+
+        btnDuplicateTrack.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                currentTrackEditor = duplicateTrack();
+
+            }
+        });
+
         JButton btnDel = new JButton("-");
         pnToolbar.add(btnDel);
 
@@ -170,13 +186,25 @@ public class ProjectPanel extends JPanel {
         cbTempoFactor.setModel(new DefaultComboBoxModel(new String[] {"0.1", "0.25", "0.5", "0.75", "1.0", "2.0", "3.0", "4.0"}));
         cbTempoFactor.setSelectedIndex(4);
 
-        this.createTrack();
+        currentTrackEditor = this.createTrack();
 
     }
 
+    private TrackEditorPanel duplicateTrack() {
+        Track newTrack = this.currentTrackEditor.getTrack().clone();
+        newTrack.setId(tracks.size());
+
+        System.out.println("id1: " + this.currentTrackEditor.getTrack().getId() + ", notes: " + this.currentTrackEditor.getTrack().getNotes());
+        System.out.println("id2: " + newTrack.getId() + ", notes: " + newTrack.getNotes());
+
+        return createTrack(newTrack);
+    }
 
 
     private TrackEditorPanel createTrack(Track track) {
+        this.resetTrackSelection();
+
+        tracks.add(track);
         TrackEditorPanel tep = new TrackEditorPanel(track);
         tep.setSelected(true);
         tep.setTrack(track);
@@ -190,17 +218,8 @@ public class ProjectPanel extends JPanel {
 
 
     private TrackEditorPanel createTrack() {
-        this.resetTrackSelection();
         Track track = new Track(this.tracks.size());
-        tracks.add(track);
-        TrackEditorPanel tep = new TrackEditorPanel(track);
-        tep.setSelected(true);
-        pnTracks.add(tep);
-        pnTracks.validate();
-        pnTracks.repaint();
-        this.repaint();
-        this.validate();
-        return tep;
+        return createTrack(track);
     }
 
     private void resetTrackSelection() {
@@ -222,7 +241,9 @@ public class ProjectPanel extends JPanel {
         }
         pnTracks.repaint();
         pnTracks.validate();
-        this.currentTrackEditor = null;
+        if(pnTracks.getComponentCount() > 0) {
+            this.currentTrackEditor = (TrackEditorPanel) pnTracks.getComponent(0) ;
+        }
 
     }
 
@@ -275,4 +296,20 @@ public class ProjectPanel extends JPanel {
         return tracks;
     }
 
+    @Subscribe
+    private void handleNoteDeletedEvent(NoteDeletedEvent e) {
+        tracks.forEach(t -> {
+            t.getNotes().remove(e.getNote());
+        });
+    }
+
+    @Subscribe
+    private void handleTrackSelectedEvent(TrackSelectedEvent e) {
+        for(Component c : pnTracks.getComponents()) {
+            TrackEditorPanel tep = (TrackEditorPanel) c;
+            if(tep.getTrack().equals(e.getTrack())) {
+                this.currentTrackEditor = tep;
+            }
+        }
+    }
 }

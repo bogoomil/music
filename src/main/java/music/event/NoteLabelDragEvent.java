@@ -1,10 +1,10 @@
 package music.event;
 
-public class NoteLabelDraggedEvent {
+public class NoteLabelDragEvent {
     private int id;
     private int x;
 
-    public NoteLabelDraggedEvent(int id, int x) {
+    public NoteLabelDragEvent(int id, int x) {
         super();
         this.id = id;
         this.x = x;

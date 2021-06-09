@@ -25,7 +25,6 @@ import com.google.common.eventbus.Subscribe;
 import music.App;
 import music.event.tracks.KeyBoardClearButtonEvent;
 import music.event.tracks.KeyBoardSelectButtonEvent;
-import music.event.tracks.TrackNotesUpdatedEvent;
 import music.event.tracks.TrackScrollEvent;
 import music.event.tracks.ZoomEvent;
 import music.model.Track;
@@ -197,7 +196,7 @@ public class TrackPanel extends JPanel {
                 int col = getColByX(e.getX());
 
 
-                if(e.isControlDown()) {
+                if(e.getClickCount() == 2) {
                     Note note = new Note();
                     note.setPitch(KeyBoard.getPitches().get(row));
                     note.setStartTick(col);
@@ -210,7 +209,9 @@ public class TrackPanel extends JPanel {
                     int h = getRowHeight();
                     l.setBounds(x, y, w, h);
                     add(l);
-                    App.eventBus.post(new TrackNotesUpdatedEvent());
+
+                    track.getNotes().add(note);
+
 
                 } else {
                     selectedCell = new Point(getColByX(e.getX()), getRowByY(e.getY() ));
@@ -469,8 +470,6 @@ public class TrackPanel extends JPanel {
                 }
             }
         }
-
         return retVal;
     }
-
 }

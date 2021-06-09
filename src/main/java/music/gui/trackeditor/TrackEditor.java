@@ -9,7 +9,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -24,7 +23,6 @@ import music.event.tracks.AddMeasureToTrackEvent;
 import music.event.tracks.AddNotesToTrackEvent;
 import music.event.tracks.DeleteNotesFromTrackEvent;
 import music.event.tracks.PlayTrackEvent;
-import music.event.tracks.TrackNotesUpdatedEvent;
 import music.event.tracks.TrackScrollEvent;
 import music.event.tracks.TrackSelectedEvent;
 import music.event.tracks.TrackVolumeChangedEvent;
@@ -157,12 +155,15 @@ public class TrackEditor extends JPanel {
 
     }
 
-    @Subscribe
-    private void handleTrackNotesUpdatedEvent(TrackNotesUpdatedEvent e) {
-
-        List<Note> notes = trackPanel.getNotes();
-        this.track.setNotes(notes);
-    }
+    //    @Subscribe
+    //    private void handleTrackNotesUpdatedEvent(TrackNotesUpdatedEvent e) {
+    //
+    //        System.out.println("TrackNotesUpdatedEvent: " + trackPanel.getTrack().getId() + ", notes: " + trackPanel.getNotes());
+    //
+    //
+    //        List<Note> notes = trackPanel.getNotes();
+    //        this.track.setNotes(notes);
+    //    }
 
     @Subscribe
     private void handlePlayTrackEvent(PlayTrackEvent e) {
