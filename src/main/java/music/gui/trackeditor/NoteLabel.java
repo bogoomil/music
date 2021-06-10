@@ -14,10 +14,8 @@ import com.google.common.eventbus.Subscribe;
 
 import music.App;
 import music.event.NoteDeletedEvent;
-import music.event.NoteDragStartEvent;
 import music.event.NoteLabelDragEndEvent;
 import music.event.NoteLabelDragEvent;
-import music.event.NoteSelectionEvent;
 import music.event.TickOffEvent;
 import music.event.TickOnEvent;
 import music.theory.Note;
@@ -94,7 +92,7 @@ public class NoteLabel extends JLabel {
                 if(NoteLabel.this.isEnabled()) {
                     startDragX = e.getX();
                     startDragY = e.getY();
-                    App.eventBus.post(new NoteDragStartEvent(id));
+                    //                    App.eventBus.post(new NoteDragStartEvent(id));
                 }
             }
 
@@ -149,11 +147,11 @@ public class NoteLabel extends JLabel {
     public void setSelected(boolean selected) {
         this.selected = selected;
         setBackground(selected ? selectColor : origColor);
-        if(selected) {
-            App.eventBus.post(new NoteSelectionEvent(note));
-        }else {
-            App.eventBus.post(new NoteSelectionEvent(null));
-        }
+        //        if(selected) {
+        //            App.eventBus.post(new NoteSelectionEvent(note));
+        //        }else {
+        //            App.eventBus.post(new NoteSelectionEvent(null));
+        //        }
 
     }
 

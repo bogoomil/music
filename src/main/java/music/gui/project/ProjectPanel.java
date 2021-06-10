@@ -34,7 +34,6 @@ import music.App;
 import music.event.FileOpenEvent;
 import music.event.FileSaveEvent;
 import music.event.NoteDeletedEvent;
-import music.event.tracks.TrackCreatedEvent;
 import music.event.tracks.TrackSelectedEvent;
 import music.gui.trackeditor.TrackEditorPanel;
 import music.logic.MidiEngine;
@@ -287,10 +286,6 @@ public class ProjectPanel extends JPanel {
         this.validate();
     }
 
-    @Subscribe
-    private void handleTrackCreatedEvent(TrackCreatedEvent e) {
-        this.createTrack(e.getTrack());
-    }
 
     public static List<Track> getTracks(){
         return tracks;
