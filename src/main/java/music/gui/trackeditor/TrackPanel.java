@@ -24,10 +24,10 @@ import javax.swing.border.EtchedBorder;
 import com.google.common.eventbus.Subscribe;
 
 import music.App;
-import music.event.tracks.KeyBoardClearButtonEvent;
-import music.event.tracks.KeyBoardSelectButtonEvent;
-import music.event.tracks.TrackScrollEvent;
-import music.event.tracks.ZoomEvent;
+import music.event.KeyBoardClearButtonEvent;
+import music.event.KeyBoardSelectButtonEvent;
+import music.event.TrackScrollEvent;
+import music.event.ZoomEvent;
 import music.model.Track;
 import music.theory.Note;
 import music.theory.NoteLength;

@@ -20,9 +20,9 @@ import javax.swing.border.EmptyBorder;
 
 import music.App;
 import music.event.FillNotesEvent;
-import music.event.tracks.KeyBoardClearButtonEvent;
-import music.event.tracks.KeyBoardFillButtonEvent;
-import music.event.tracks.KeyBoardSelectButtonEvent;
+import music.event.KeyBoardClearButtonEvent;
+import music.event.KeyBoardFillButtonEvent;
+import music.event.KeyBoardSelectButtonEvent;
 import music.theory.NoteLength;
 import music.theory.NoteName;
 import music.theory.Pitch;

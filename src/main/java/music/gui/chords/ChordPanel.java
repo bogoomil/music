@@ -16,9 +16,9 @@ import javax.swing.JPanel;
 import javax.swing.border.BevelBorder;
 
 import music.App;
+import music.event.AddNotesToTrackEvent;
 import music.event.ChordEvent;
 import music.event.MeasureSelectedEvent;
-import music.event.tracks.AddNotesToTrackEvent;
 import music.logic.MidiEngine;
 import music.theory.Chord;
 import music.theory.ChordDegree;

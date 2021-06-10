@@ -22,7 +22,7 @@ import javax.swing.event.ChangeListener;
 import com.google.common.eventbus.Subscribe;
 
 import music.App;
-import music.event.tracks.TrackSelectedEvent;
+import music.event.TrackSelectedEvent;
 import music.logic.MidiEngine;
 import music.model.Track;
 

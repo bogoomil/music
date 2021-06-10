@@ -34,7 +34,7 @@ import music.App;
 import music.event.FileOpenEvent;
 import music.event.FileSaveEvent;
 import music.event.NoteDeletedEvent;
-import music.event.tracks.TrackSelectedEvent;
+import music.event.TrackSelectedEvent;
 import music.gui.trackeditor.TrackEditorPanel;
 import music.logic.MidiEngine;
 import music.model.Project;

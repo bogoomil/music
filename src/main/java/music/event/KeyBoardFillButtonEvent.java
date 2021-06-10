@@ -1,12 +1,12 @@
-package music.event.tracks;
+package music.event;
 
 import music.theory.Pitch;
 
-public class KeyBoardSelectButtonEvent{
+public class KeyBoardFillButtonEvent{
 
     private Pitch pitch;
 
-    public KeyBoardSelectButtonEvent(Pitch pitch) {
+    public KeyBoardFillButtonEvent(Pitch pitch) {
         super();
         this.pitch = pitch;
     }

@@ -1,9 +1,10 @@
-package music.event.tracks;
+package music.event;
 
-public class TrackVolumeChangedEvent {
-    int value;
+public class ZoomEvent {
 
-    public TrackVolumeChangedEvent(int value) {
+    private int value;
+
+    public ZoomEvent(int value) {
         super();
         this.value = value;
     }
@@ -15,6 +16,7 @@ public class TrackVolumeChangedEvent {
     public void setValue(int value) {
         this.value = value;
     }
+
 
 
 }

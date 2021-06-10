@@ -17,12 +17,12 @@ import javax.swing.event.ChangeListener;
 import com.google.common.eventbus.Subscribe;
 
 import music.App;
+import music.event.AddMeasureToTrackEvent;
+import music.event.DeleteNotesFromTrackEvent;
 import music.event.PianoKeyEvent;
-import music.event.tracks.AddMeasureToTrackEvent;
-import music.event.tracks.DeleteNotesFromTrackEvent;
-import music.event.tracks.PlayTrackEvent;
-import music.event.tracks.TrackVolumeChangedEvent;
-import music.event.tracks.ZoomEvent;
+import music.event.PlayTrackEvent;
+import music.event.TrackVolumeChangedEvent;
+import music.event.ZoomEvent;
 import music.logic.MidiEngine;
 import music.theory.Note;
 import music.theory.NoteLength;

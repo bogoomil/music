@@ -1,4 +1,4 @@
-package music.event.tracks;
+package music.event;
 
 import music.model.Track;
 
