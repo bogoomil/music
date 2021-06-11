@@ -4,7 +4,6 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.sound.midi.Instrument;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -21,8 +20,10 @@ import music.event.AddMeasureToTrackEvent;
 import music.event.DeleteNotesFromTrackEvent;
 import music.event.PianoKeyEvent;
 import music.event.PlayTrackEvent;
+import music.event.TrackSelectedEvent;
 import music.event.TrackVolumeChangedEvent;
 import music.event.ZoomEvent;
+import music.gui.InstrumentCombo;
 import music.logic.MidiEngine;
 import music.theory.Note;
 import music.theory.NoteLength;
@@ -34,7 +35,8 @@ import music.theory.Tone;
 public class TrackPropertiesPanel extends JPanel {
     private static JComboBox<NoteName> cbRoot;
     private static JComboBox<Tone> cbTone;
-    private JComboBox<Instrument> cbInstr;
+    //private JComboBox<Instrument> cbInstr;
+    InstrumentCombo cbInstr = new InstrumentCombo();
     private JComboBox cbChannel;
     private JSlider slTempo;
     private JPanel panel;
@@ -59,7 +61,7 @@ public class TrackPropertiesPanel extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                App.eventBus.post(new PlayTrackEvent(cbChannel.getSelectedIndex(),cbInstr.getItemAt(cbInstr.getSelectedIndex()).getPatch().getProgram(), slTempo.getValue()));
+                App.eventBus.post(new PlayTrackEvent(cbChannel.getSelectedIndex(),cbInstr.getProgram(), slTempo.getValue()));
 
             }
         });
@@ -140,9 +142,8 @@ public class TrackPropertiesPanel extends JPanel {
         panel_1.setBorder(new TitledBorder(null, "Instrument", TitledBorder.LEADING, TitledBorder.TOP, null, null));
         add(panel_1);
 
-        cbInstr = new JComboBox<>();
+        //cbInstr = new JComboBox<>();
         panel_1.add(cbInstr);
-        cbInstr.setModel(new DefaultComboBoxModel(MidiEngine.getSynth().getAvailableInstruments()));
         cbInstr.setPreferredSize(new Dimension(180, 24));
 
         panel = new JPanel();
@@ -208,7 +209,7 @@ public class TrackPropertiesPanel extends JPanel {
 
 
 
-        MidiEngine.getSynth().getChannels()[cbChannel.getSelectedIndex()].programChange(cbInstr.getItemAt(cbInstr.getSelectedIndex()).getPatch().getProgram());
+        MidiEngine.getSynth().getChannels()[cbChannel.getSelectedIndex()].programChange(cbInstr.getProgram());
 
         Note n = new Note();
         n.setLength(NoteLength.NEGYED);
@@ -218,6 +219,16 @@ public class TrackPropertiesPanel extends JPanel {
 
         MidiEngine.playNote(n, MidiEngine.getSynth().getChannels()[cbChannel.getSelectedIndex()], 120);
     }
+
+    @Subscribe
+    private void handleTrackSelectionEvent(TrackSelectedEvent e) {
+        cbInstr.setSelectedIndex(e.getTrack().getInstrument());
+        slVolume.setValue(e.getTrack().getVolume());
+        cbChannel.setSelectedIndex(e.getTrack().getChannel());
+
+
+    }
+
 
 
 }

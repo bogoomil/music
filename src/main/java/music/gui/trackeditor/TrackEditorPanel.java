@@ -9,7 +9,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-import javax.sound.midi.Instrument;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -23,7 +22,7 @@ import com.google.common.eventbus.Subscribe;
 
 import music.App;
 import music.event.TrackSelectedEvent;
-import music.logic.MidiEngine;
+import music.gui.InstrumentCombo;
 import music.model.Track;
 
 public class TrackEditorPanel extends JPanel {
@@ -33,7 +32,7 @@ public class TrackEditorPanel extends JPanel {
     private JLabel lbId;
     private static Color origColor;
     private JComboBox cbChannel;
-    JComboBox<Instrument> cbInstr;
+    InstrumentCombo cbInstr = new InstrumentCombo();
     private JLabel lbChannel;
     private int id;
 
@@ -97,18 +96,19 @@ public class TrackEditorPanel extends JPanel {
             }
         });
 
-
-        cbInstr = new JComboBox();
-        cbInstr.setModel(new DefaultComboBoxModel(MidiEngine.getSynth().getAvailableInstruments()));
         pnButtons.add(cbInstr);
 
-        cbInstr.setSelectedIndex(track.getInstrument());
+        try {
+            cbInstr.setSelectedIndex(track.getInstrument());
+        }catch(Exception ex) {
+            ex.printStackTrace();
+        }
 
         cbInstr.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                track.setInstrument(cbInstr.getItemAt(cbInstr.getSelectedIndex()).getPatch().getProgram());
+                track.setInstrument(cbInstr.getProgram());
             }
         });
 

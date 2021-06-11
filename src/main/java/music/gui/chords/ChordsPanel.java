@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.sound.midi.Instrument;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -23,6 +22,7 @@ import com.google.common.eventbus.Subscribe;
 
 import music.App;
 import music.event.ChordEvent;
+import music.gui.InstrumentCombo;
 import music.logic.MidiEngine;
 import music.theory.Chord;
 import music.theory.ChordDegree;
@@ -37,7 +37,7 @@ public class ChordsPanel extends JPanel{
     private JPanel centerPanel;
 
     private JPanel panel_5;
-    private JComboBox<Instrument> cbInstr;
+    private InstrumentCombo cbInstr = new InstrumentCombo();
 
     private List<ChordPanel> generatedChordPanels;
     private JPanel pnChords;
@@ -118,15 +118,12 @@ public class ChordsPanel extends JPanel{
         panel_5.setBorder(new TitledBorder(null, "Instrument", TitledBorder.LEADING, TitledBorder.TOP, null, null));
         northPanel.add(panel_5);
 
-        cbInstr = new JComboBox();
-        Instrument[] instrs = MidiEngine.getSynth().getAvailableInstruments();
-        cbInstr.setModel(new DefaultComboBoxModel(instrs));
         cbInstr.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
 
-                ChordPanel.setInstrument(cbInstr.getItemAt(cbInstr.getSelectedIndex()).getPatch().getProgram());
+                ChordPanel.setInstrument(cbInstr.getProgram());
                 // TODO Auto-generated method stub
 
             }

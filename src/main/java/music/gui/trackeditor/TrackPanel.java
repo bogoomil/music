@@ -92,10 +92,12 @@ public class TrackPanel extends JPanel {
                 } else if(e.getKeyCode() == 86 && e.isControlDown()) {
                     //ctrl v
                     for(Note n : copyNotes) {
-                        n.setStartTick((n.getStartTick() % 32) + (getSelectedMeasureNum() * 32));
+                        n.setStartTick(n.getStartTick() + (getSelectedMeasureNum() * 32));
                     }
                     track.getNotes().addAll(copyNotes);
                     setTrack(track);
+                    copyNotes  = new ArrayList<>();
+
 
                 }else if(e.getKeyCode() == 65 && e.isControlDown()) {
                     // ctrl A
