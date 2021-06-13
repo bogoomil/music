@@ -6,6 +6,8 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -13,19 +15,26 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.border.EtchedBorder;
 
 import com.google.common.eventbus.Subscribe;
 
 import music.App;
+import music.event.DeleteMeasureEvent;
+import music.event.DuplicateMeasureEvent;
 import music.event.KeyBoardClearButtonEvent;
 import music.event.KeyBoardSelectButtonEvent;
+import music.event.ShiftNotesEvent;
 import music.event.TrackScrollEvent;
 import music.event.ZoomEvent;
 import music.model.Track;
@@ -79,15 +88,7 @@ public class TrackPanel extends JPanel {
             public void keyPressed(KeyEvent e) {
                 if(e.getKeyCode() == 67 && e.isControlDown()) {
                     //ctrl c
-                    copyNotes  = new ArrayList<>();
-                    for(Component c : getComponents()) {
-                        if(c instanceof NoteLabel) {
-                            NoteLabel nl = (NoteLabel) c;
-                            if(nl.getSelected()) {
-                                copyNotes.add(nl.getNote().clone());
-                            }
-                        }
-                    }
+                    copyNotes  = getCopyNotes();
 
                 } else if(e.getKeyCode() == 86 && e.isControlDown()) {
                     //ctrl v
@@ -95,7 +96,7 @@ public class TrackPanel extends JPanel {
                         n.setStartTick(n.getStartTick() + (getSelectedMeasureNum() * 32));
                     }
                     track.getNotes().addAll(copyNotes);
-                    setTrack(track);
+                    refreshNoteLabels(track);
                     copyNotes  = new ArrayList<>();
 
 
@@ -117,7 +118,7 @@ public class TrackPanel extends JPanel {
                             }
                         }
                     }
-                    setTrack(track);
+                    refreshNoteLabels(track);
                 }else if(e.getKeyCode() == 38) {//up
                     int add = e.isControlDown() ? 12 : 1;
                     for(Component c : getComponents()) {
@@ -148,6 +149,7 @@ public class TrackPanel extends JPanel {
 
                 }
             }
+
         });
 
         this.addMouseListener(new MouseListener() {
@@ -195,38 +197,40 @@ public class TrackPanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
 
-                if(track != null) {
-                    int row = getRowByY(e.getY());
-                    int col = getColByX(e.getX());
+                selectedCell = new Point(getColByX(e.getX()), getRowByY(e.getY() ));
+
+                if(e.getButton() == MouseEvent.BUTTON1) {
+                    if(track != null) {
+                        int row = getRowByY(e.getY());
+                        int col = getColByX(e.getX());
 
 
-                    if(e.getClickCount() == 2) {
-                        Note note = new Note();
-                        note.setPitch(KeyBoard.getPitches().get(row));
-                        note.setStartTick(col);
-                        note.setLength(NoteLength.HARMICKETTED);
-                        NoteLabel l = new NoteLabel(TrackPanel.this, note);
+                        if(e.getClickCount() == 2) {
+                            Note note = new Note();
+                            note.setPitch(KeyBoard.getPitches().get(row));
+                            note.setStartTick(col);
+                            note.setLength(NoteLength.HARMICKETTED);
+                            NoteLabel l = new NoteLabel(TrackPanel.this, note);
 
-                        int x = getXByCol(col);
-                        int y = getYByRow(row);
-                        int w = getTickWidth();
-                        int h = getRowHeight();
-                        l.setBounds(x, y, w, h);
-                        add(l);
+                            int x = getXByCol(col);
+                            int y = getYByRow(row);
+                            int w = getTickWidth();
+                            int h = getRowHeight();
+                            l.setBounds(x, y, w, h);
+                            add(l);
 
-                        track.getNotes().add(note);
+                            track.getNotes().add(note);
 
+                        }
 
-                    } else {
-                        selectedCell = new Point(getColByX(e.getX()), getRowByY(e.getY() ));
+                    }else {
+                        JOptionPane.showMessageDialog(TrackPanel.this, "Nincs kiválasztott track!");
                     }
-                    repaint();
-                    revalidate();
-
-                }else {
-                    JOptionPane.showMessageDialog(TrackPanel.this, "Nincs kiválasztott track!");
+                } else if (e.getButton() == MouseEvent.BUTTON3) {
+                    showPopup(e.getPoint());
                 }
-
+                repaint();
+                revalidate();
             }
         });
         this.addMouseMotionListener(new MouseMotionListener() {
@@ -381,22 +385,6 @@ public class TrackPanel extends JPanel {
     }
 
 
-    //    public void setPitches(List<Pitch> pitches) {
-    //
-    //        Collections.sort(pitches, new Comparator<Pitch>() {
-    //
-    //            @Override
-    //            public int compare(Pitch o1, Pitch o2) {
-    //                // TODO Auto-generated method stub
-    //                return Integer.compare(o1.getMidiCode(), o2.getMidiCode());
-    //            }
-    //        });
-    //        Collections.reverse(pitches);
-    //
-    //
-    //        this.pitches = pitches;
-    //    }
-
     public List<Note> getNotes(){
         List<Note> retVal = new ArrayList<>();
         for(int i= 0; i < this.getComponentCount(); i++) {
@@ -407,7 +395,7 @@ public class TrackPanel extends JPanel {
         return retVal;
     }
 
-    public void setTrack(Track track) {
+    public void refreshNoteLabels(Track track) {
         this.track = track;
         removeAll();
         for(Note n : track.getNotes()) {
@@ -427,7 +415,7 @@ public class TrackPanel extends JPanel {
     @Subscribe
     void handleClearEvent(KeyBoardClearButtonEvent e) {
         track.removePitches(e.getPitch());
-        setTrack(track);
+        refreshNoteLabels(track);
     }
 
     @Subscribe
@@ -481,4 +469,118 @@ public class TrackPanel extends JPanel {
         }
         return retVal;
     }
+
+    private void showPopup(Point pos) {
+        System.out.println("measure: " + this.getSelectedMeasureNum());
+        JPopupMenu menu = new JPopupMenu();
+        JMenuItem item = new JMenuItem("Duplicate measure");
+        item.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                App.eventBus.post(new DuplicateMeasureEvent(getSelectedMeasureNum()));
+                //                track.duplicateMeasure(getSelectedMeasureNum());
+                refreshNoteLabels(track);
+            }
+        });
+        menu.add(item);
+
+
+        item = new JMenuItem("Insert left");
+        item.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                App.eventBus.post(new ShiftNotesEvent(getSelectedMeasureNum(), 1));
+                //                track.shiftNotesFromMeasureBy(getSelectedMeasureNum(), 1);
+                refreshNoteLabels(track);
+            }
+        });
+        menu.add(item);
+
+        item = new JMenuItem("Insert right");
+        item.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                App.eventBus.post(new ShiftNotesEvent((getSelectedMeasureNum() + 1), 1));
+                //                track.shiftNotesFromMeasureBy(getSelectedMeasureNum() - 1, 1);
+                refreshNoteLabels(track);
+            }
+        });
+        menu.add(item);
+
+        item = new JMenuItem("Invert measure notes selection");
+        item.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                getNoteLabelsByMeasureNum(getSelectedMeasureNum()).forEach(nl -> nl.setSelected(!nl.getSelected()));
+                revalidate();
+                repaint();
+            }
+        });
+        menu.add(item);
+
+
+        item = new JMenuItem("Delete measure");
+        menu.add(item);
+
+        item.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                App.eventBus.post(new DeleteMeasureEvent(getSelectedMeasureNum()));
+                //                track.deleteMeasure(getSelectedMeasureNum());
+                refreshNoteLabels(track);
+            }
+        });
+
+        menu.show(this, pos.x, pos.y);
+    }
+
+    private List<NoteLabel> getNoteLabelsByMeasureNum(int measureNum){
+        List<NoteLabel> retVal = new ArrayList<>();
+        for(Component c : getComponents()) {
+            NoteLabel nl = (NoteLabel) c;
+            if(nl.getNote().getStartTick() >= measureNum * 32 && nl.getNote().getStartTick() < (measureNum + 1) * 32) {
+                retVal.add(nl);
+            }
+        }
+        return retVal;
+    }
+
+    private List<Note> getCopyNotes() {
+        List<Note> retVal = new ArrayList<>();
+        for(Component c : getComponents()) {
+            if(c instanceof NoteLabel) {
+                NoteLabel nl = (NoteLabel) c;
+                if(nl.getSelected()) {
+                    Note copy = nl.getNote().clone();
+                    retVal.add(copy);
+                }
+            }
+        }
+        Collections.sort(retVal, new Comparator<Note>() {
+
+            @Override
+            public int compare(Note o1, Note o2) {
+                // TODO Auto-generated method stub
+                return Integer.compare(o1.getStartTick(), o2.getStartTick());
+            }
+        });
+
+        int offset = retVal.get(0).getStartTick() / 32;
+
+        System.out.println("min: " + offset);
+
+        retVal.forEach(n -> {
+            int modStartTick = n.getStartTick() - (offset * 32);
+            System.out.println("curr: " + modStartTick);
+            n.setStartTick(modStartTick);
+        });
+
+        return retVal;
+    }
+
 }

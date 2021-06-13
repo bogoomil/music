@@ -159,13 +159,12 @@ public class MidiEngine {
             //            });
             //
 
-            LOG.debug("synthy initialized...");
+            LOG.debug("synth initialized...");
 
         } catch (MidiUnavailableException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-
     }
 
     private static void initSequencer() throws MidiUnavailableException, InvalidMidiDataException {

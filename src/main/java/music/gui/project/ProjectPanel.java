@@ -31,9 +31,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.Subscribe;
 
 import music.App;
+import music.event.DeleteMeasureEvent;
+import music.event.DuplicateMeasureEvent;
 import music.event.FileOpenEvent;
 import music.event.FileSaveEvent;
 import music.event.NoteDeletedEvent;
+import music.event.ShiftNotesEvent;
 import music.event.TrackSelectedEvent;
 import music.gui.trackeditor.TrackEditorPanel;
 import music.logic.MidiEngine;
@@ -306,5 +309,20 @@ public class ProjectPanel extends JPanel {
                 this.currentTrackEditor = tep;
             }
         }
+    }
+
+    @Subscribe
+    private void handleDuplicateMeasureEvent(DuplicateMeasureEvent e) {
+        tracks.forEach(t -> t.duplicateMeasure(e.getMeasureNum()));
+    }
+
+    @Subscribe
+    private void handleShiftNotesEvent(ShiftNotesEvent e) {
+        tracks.forEach(t -> t.shiftNotesFromMeasureBy(e.getMeasureNum(), e.getBy()));
+    }
+
+    @Subscribe
+    private void handleDeleteMeasureEvent(DeleteMeasureEvent e) {
+        tracks.forEach(t -> t.deleteMeasure(e.getMeasureNum()));
     }
 }

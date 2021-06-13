@@ -118,7 +118,7 @@ public class TrackEditor extends JPanel {
         this.track = e.getTrack();
         keyBoard.setMinOctave(track.getMinOctave());
         trackPanel.setSelectedMeasureNum(0);
-        trackPanel.setTrack(e.getTrack());
+        trackPanel.refreshNoteLabels(e.getTrack());
         this.updateButtons();
 
     }
@@ -150,7 +150,7 @@ public class TrackEditor extends JPanel {
         this.trackPanel.setSelectedMeasureNum(trackPanel.getSelectedMeasureNum() + 1);
         keyBoard.setMinOctave(track.getMinOctave());
 
-        trackPanel.setTrack(track);
+        trackPanel.refreshNoteLabels(track);
         this.updateButtons();
 
     }
@@ -180,7 +180,7 @@ public class TrackEditor extends JPanel {
     @Subscribe
     private void handleDeleteNotesFromTrackEvent(DeleteNotesFromTrackEvent e) {
         track.setNotes(new ArrayList<>());
-        trackPanel.setTrack(track);
+        trackPanel.refreshNoteLabels(track);
     }
 
     @Subscribe
@@ -195,6 +195,6 @@ public class TrackEditor extends JPanel {
             counter += e.getBeat().getErtek();
             track.getNotes().add(n);
         }
-        trackPanel.setTrack(track);
+        trackPanel.refreshNoteLabels(track);
     }
 }

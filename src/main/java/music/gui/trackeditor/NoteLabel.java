@@ -147,6 +147,8 @@ public class NoteLabel extends JLabel {
     public void setSelected(boolean selected) {
         this.selected = selected;
         setBackground(selected ? selectColor : origColor);
+        setBorder(selected ? new LineBorder(selectColor, 3, true) : new LineBorder(new Color(0, 0, 0), 3, true));
+
         //        if(selected) {
         //            App.eventBus.post(new NoteSelectionEvent(note));
         //        }else {

@@ -157,18 +157,20 @@ public class TrackPropertiesPanel extends JPanel {
 
         slZoom = new JSlider();
         slZoom.setValue(20);
-        slZoom.setSnapToTicks(true);
+        slZoom.setSnapToTicks(false);
         slZoom.setPaintTicks(true);
         slZoom.setPaintLabels(true);
-        slZoom.setMinimum(10);
+        slZoom.setMinimum(5);
         slZoom.setMaximum(100);
         slZoom.setMajorTickSpacing(10);
-        slZoom.setBorder(new TitledBorder(null, "Zoom", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+        TitledBorder zoomBorder = new TitledBorder(null, "Zoom", TitledBorder.LEADING, TitledBorder.TOP, null, null);
+        slZoom.setBorder(zoomBorder);
 
         slZoom.addChangeListener(new ChangeListener() {
 
             @Override
             public void stateChanged(ChangeEvent e) {
+                zoomBorder.setTitle("Zoom: " + slZoom.getValue());
                 App.eventBus.post(new ZoomEvent(slZoom.getValue()));
 
             }

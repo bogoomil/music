@@ -3,6 +3,7 @@ package music.model;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -137,22 +138,51 @@ public class Track {
         Track t = new Track();
         t.setMeasureNum(this.getMeasureNum());
         List<Note> nots = new ArrayList<>() ;
-        //        for(int i = 0; i < this.notes.size(); i++) {
-        //            Note newNote = new Note();
-        //            newNote.setLength(notes.get(i).getLength());
-        //            newNote.setPitch(notes.get(i).getPitch());
-        //            newNote.setStartTick(notes.get(i).getStartTick());
-        //            newNote.setVol(notes.get(i).getVol());
-        //            System.out.println("Cloning: n.id: " + notes.get(i) + " new: " + newNote);
-        //            nots.add(newNote);
-        //        }
-        //
         this.notes.stream().forEach(n -> {
             nots.add(n.clone());
         });
 
         t.setNotes(nots);
         return t;
+    }
+
+    public void shiftNotesFromMeasureBy(int measureNum, int by) {
+        int firstTickToShift = measureNum * 32;
+        notes.forEach(n -> {
+            if(n.getStartTick() >= firstTickToShift) {
+                n.setStartTick(n.getStartTick() + 32 * by);
+            }
+        });
+    }
+
+    public void duplicateMeasure(int measureNum) {
+
+        System.out.println("duplicating measure: " + notes.size());
+
+        List<Note> origNotes = this.getNotesOfMeasure(measureNum);
+
+        this.shiftNotesFromMeasureBy(measureNum + 1, 1);
+
+        this.getNotesOfMeasure(measureNum).forEach(n -> {
+            Note duplicate = n.clone();
+            duplicate.setStartTick(n.getStartTick() + 32);
+            this.notes.add(duplicate);
+        });
+        System.out.println("duplicating measure: " + notes.size());
+    }
+
+    /**
+     * visszaadja egy measure note-jainak a klónját
+     * @param measureNum
+     * @return
+     */
+    public List<Note> getNotesOfMeasure(int measureNum){
+        return notes.stream().filter(n -> n.getStartTick() >= measureNum * 32 && n.getStartTick() < (measureNum + 1) * 32).map(n -> n.clone()).collect(Collectors.toList());
+    }
+
+    public void deleteMeasure(int measureNum) {
+        notes.removeAll(notes.stream().filter(n -> n.getStartTick() >= measureNum * 32 && n.getStartTick() < (measureNum + 1) * 32).collect(Collectors.toList()));
+        this.shiftNotesFromMeasureBy(measureNum + 1, -1);
     }
 
 }
