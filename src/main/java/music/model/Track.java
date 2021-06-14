@@ -159,8 +159,6 @@ public class Track {
 
     public void duplicateMeasure(int measureNum) {
 
-        System.out.println("duplicating measure: " + notes.size());
-
         List<Note> origNotes = this.getNotesOfMeasure(measureNum);
 
         this.shiftNotesFromMeasureBy(measureNum + 1, 1);
@@ -170,7 +168,6 @@ public class Track {
             duplicate.setStartTick(n.getStartTick() + 32);
             this.notes.add(duplicate);
         });
-        System.out.println("duplicating measure: " + notes.size());
     }
 
     /**

@@ -16,20 +16,12 @@ public class InstrumentCombo extends JComboBox {
     public InstrumentCombo(){
         super();
         DefaultComboBoxModel model = new DefaultComboBoxModel();
-
         instruments.forEach(i -> {
-            System.out.println(i.getName());
             model.addElement(i.getName());
         });
-
         this.setModel(model);
-
-
     }
-
     public int getProgram() {
         return instruments.get(this.getSelectedIndex()).getPatch().getProgram();
     }
-
-
 }

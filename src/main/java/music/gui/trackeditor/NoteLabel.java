@@ -3,14 +3,25 @@ package music.gui.trackeditor;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Graphics;
+import java.awt.GridLayout;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JPopupMenu;
+import javax.swing.JPanel;
+import javax.swing.JSlider;
 import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -275,17 +286,94 @@ public class NoteLabel extends JLabel {
         }
         return true;
     }
-    private void showPopup(Point pos) {
-        JPopupMenu menu = new JPopupMenu();
-        JLabel l = new JLabel("Pitch: " + note.getPitch().getName());
-        menu.add(l);
-        l = new JLabel("start: " + note.getStartTick());
-        menu.add(l);
-        l = new JLabel("length: " + note.getLength());
-        menu.add(l);
-        l = new JLabel("vol: " + note.getVol());
-        menu.add(l);
-        menu.show(this, pos.x, pos.y);
+    //    private void showPopup(Point pos) {
+    //        JPopupMenu menu = new JPopupMenu();
+    //        JLabel l = new JLabel("Pitch: " + note.getPitch().getName());
+    //        menu.add(l);
+    //        l = new JLabel("start: " + note.getStartTick());
+    //        menu.add(l);
+    //        l = new JLabel("length: " + note.getLength());
+    //        menu.add(l);
+    //        l = new JLabel("vol: " + note.getVol());
+    //        menu.add(l);
+    //        menu.show(this, pos.x, pos.y);
+    //    }
+
+    private void showPopup(Point pos){
+        JDialog dialog = new JDialog();
+        dialog.setTitle("Note props");
+
+        JPanel pn = new JPanel();
+        pn.setLayout(new GridLayout(0,2));
+
+        JLabel l = new JLabel("Note length:");
+        pn.add(l);
+
+
+        JComboBox<NoteLength> cbHossz = new JComboBox<>();
+        cbHossz.setModel(new DefaultComboBoxModel<>(NoteLength.values())) ;
+        cbHossz.setSelectedItem(note.getLength());
+        cbHossz.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                note.setLength(cbHossz.getItemAt(cbHossz.getSelectedIndex()));
+                reCalculateSizeAndLocation();
+
+            }
+        });
+        pn.add(cbHossz);
+
+        l = new JLabel("Volume");
+        pn.add(l);
+
+        JSlider slVolume = new JSlider();
+        slVolume.setMaximum(127);
+        slVolume.setMinimum(0);
+        slVolume.setSnapToTicks(true);
+        slVolume.setPaintTicks(true);
+        slVolume.setPaintLabels(true);
+        slVolume.setMajorTickSpacing(50);
+        slVolume.setMinorTickSpacing(5);
+
+        slVolume.setValue(note.getVol());
+
+        TitledBorder border = new TitledBorder(null, "Volume", TitledBorder.LEADING, TitledBorder.TOP, null, null);
+        slVolume.setBorder(border);
+        pn.add(slVolume);
+
+        slVolume.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                border.setTitle("Volume: " + slVolume.getValue());
+                note.setVol(slVolume.getValue());
+            }
+        });
+
+        l = new JLabel("Starttick:");
+        pn.add(l);
+
+        l = new JLabel("" + note.getStartTick());
+        pn.add(l);
+
+        JButton btnOk = new JButton("Close");
+        pn.add(btnOk);
+        btnOk.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dialog.setVisible(false);
+            }
+        });
+
+
+        dialog.add(pn);
+        dialog.pack();
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
+
     }
+
 
 }

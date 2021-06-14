@@ -132,10 +132,33 @@ public class MidiEngine {
 
 
             //            File file = new File("/home/kunb/Java/workspace/music/src/main/resources/roland_sc_8820_1.sf2");
-            //            Soundbank rolandSB = MidiSystem.getSoundbank(file);
-            //            LOG.debug("ROLAND SB LENGTH: {}", rolandSB.getInstruments().length);
+            //            Soundbank rolandSB;
+            //            try {
+            //                rolandSB = MidiSystem.getSoundbank(file);
+            //                LOG.debug("ROLAND SB LENGTH: {}", rolandSB.getInstruments().length);
+            //
+            //                MidiSystem.getSynthesizer().loadAllInstruments(rolandSB);
+            //
+            //            } catch (InvalidMidiDataException | IOException e) {
+            //                // TODO Auto-generated catch block
+            //                e.printStackTrace();
+            //            }
 
             synth = MidiSystem.getSynthesizer();
+
+            //            Soundbank sb = synth.getDefaultSoundbank();
+            //
+            //            SF2Soundbank sf2sb = (SF2Soundbank) sb;
+            //
+            //
+            //            Arrays.asList(sf2sb.getSamples()).forEach(s -> {
+            //                System.out.println(s.getName());
+            //            });
+            //
+            //            LOG.debug("soundbank: ", sb.getName());
+
+
+
             synth.open();
 
             //            Soundbank defaultSB = synth.getDefaultSoundbank();
@@ -196,28 +219,19 @@ public class MidiEngine {
             public void run() {
 
                 try {
-
                     int offset = getTickLengthInMeasureMs(note.getStartTick(), tempo );
                     int length = getNoteLenghtInMs(note.getLength(), tempo);
-
                     Thread.sleep(offset);
-
                     App.eventBus.post(new TickOnEvent(note.getStartTick() ));
-
                     channel.noteOn(note.getPitch().getMidiCode(), note.getVol());
-
                     if(note.getStartTick() % 32 == 0) {
                         int mn = note.getStartTick() / 32;
                         App.eventBus.post(new MeasureStartedEvent(mn));
 
                     }
-
-
                     Thread.sleep(length);
                     App.eventBus.post(new TickOffEvent(note.getStartTick() ));
                     channel.noteOff(note.getPitch().getMidiCode());
-
-
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -275,11 +289,7 @@ public class MidiEngine {
 
     public static void play(List<music.model.Track> tracks, int tempo, float tempoFactor) throws InvalidMidiDataException, IOException, MidiUnavailableException {
         Sequence seq = new Sequence(Sequence.PPQ, MidiEngine.RESOLUTION);
-
-
-
         Sequencer sequencer = MidiEngine.getSequencer();
-
 
         sequencer.setTempoFactor(tempoFactor);
         for(music.model.Track t :tracks) {
@@ -287,8 +297,6 @@ public class MidiEngine {
             for(Note n : t.getNotes()) {
                 MidiEngine.addNotesToTrack(track, t.getChannel(), n);
             }
-
-
         }
         if(!sequencer.isOpen()) {
             sequencer.open();
@@ -300,6 +308,4 @@ public class MidiEngine {
         MidiSystem.write(seq,1,file);
 
     }
-
-
 }

@@ -196,9 +196,6 @@ public class ProjectPanel extends JPanel {
         Track newTrack = this.currentTrackEditor.getTrack().clone();
         newTrack.setId(tracks.size());
 
-        System.out.println("id1: " + this.currentTrackEditor.getTrack().getId() + ", notes: " + this.currentTrackEditor.getTrack().getNotes());
-        System.out.println("id2: " + newTrack.getId() + ", notes: " + newTrack.getNotes());
-
         return createTrack(newTrack);
     }
 
@@ -267,7 +264,6 @@ public class ProjectPanel extends JPanel {
 
         ObjectMapper om = new ObjectMapper();
         String json = om.writeValueAsString(project);
-        System.out.println(json);
         FileWriter writer = new FileWriter(e.getFile());
         writer.write(json);
         writer.flush();

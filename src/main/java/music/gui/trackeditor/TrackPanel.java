@@ -25,6 +25,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JSeparator;
 import javax.swing.border.EtchedBorder;
 
 import com.google.common.eventbus.Subscribe;
@@ -87,17 +88,13 @@ public class TrackPanel extends JPanel {
             @Override
             public void keyPressed(KeyEvent e) {
                 if(e.getKeyCode() == 67 && e.isControlDown()) {
+
                     //ctrl c
-                    copyNotes  = getCopyNotes();
+                    copy();
 
                 } else if(e.getKeyCode() == 86 && e.isControlDown()) {
                     //ctrl v
-                    for(Note n : copyNotes) {
-                        n.setStartTick(n.getStartTick() + (getSelectedMeasureNum() * 32));
-                    }
-                    track.getNotes().addAll(copyNotes);
-                    refreshNoteLabels(track);
-                    copyNotes  = new ArrayList<>();
+                    paste();
 
 
                 }else if(e.getKeyCode() == 65 && e.isControlDown()) {
@@ -150,6 +147,7 @@ public class TrackPanel extends JPanel {
                 }
             }
 
+
         });
 
         this.addMouseListener(new MouseListener() {
@@ -160,7 +158,6 @@ public class TrackPanel extends JPanel {
 
                 if(endDrag != null) {
                     List<NoteLabel> nls = findAllBetween(startDrag, endDrag);
-                    System.out.println("selecting notelabels: " + nls);
 
                     nls.forEach(n -> n.setSelected(!n.getSelected()));
                 }
@@ -476,9 +473,30 @@ public class TrackPanel extends JPanel {
     }
 
     private void showPopup(Point pos) {
-        System.out.println("measure: " + this.getSelectedMeasureNum());
         JPopupMenu menu = new JPopupMenu();
-        JMenuItem item = new JMenuItem("Duplicate measure");
+        JMenuItem item = new JMenuItem("Copy");
+        item.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                copy();
+            }
+        });
+        menu.add(item);
+
+        item = new JMenuItem("Paste");
+        item.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                paste();
+            }
+        });
+        menu.add(item);
+
+        menu.add(new JSeparator());
+
+        item = new JMenuItem("Duplicate measure");
         item.addActionListener(new ActionListener() {
 
             @Override
@@ -577,15 +595,29 @@ public class TrackPanel extends JPanel {
 
         int offset = retVal.get(0).getStartTick() / 32;
 
-        System.out.println("min: " + offset);
 
         retVal.forEach(n -> {
             int modStartTick = n.getStartTick() - (offset * 32);
-            System.out.println("curr: " + modStartTick);
             n.setStartTick(modStartTick);
         });
 
         return retVal;
     }
+    private void copy() {
+        copyNotes  = getCopyNotes();
 
+    }
+    private void paste() {
+        if(copyNotes != null && copyNotes.size() > 0) {
+            for(Note n : copyNotes) {
+                n.setStartTick(n.getStartTick() + (getSelectedMeasureNum() * 32));
+            }
+            track.getNotes().addAll(copyNotes);
+            refreshNoteLabels(track);
+            copyNotes = null;
+        } else {
+            JOptionPane.showMessageDialog(this, "Nincs adat", "Hiba", JOptionPane.ERROR_MESSAGE);
+        }
+
+    }
 }

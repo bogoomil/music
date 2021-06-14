@@ -154,16 +154,6 @@ public class TrackEditor extends JPanel {
 
     }
 
-    //    @Subscribe
-    //    private void handleTrackNotesUpdatedEvent(TrackNotesUpdatedEvent e) {
-    //
-    //        System.out.println("TrackNotesUpdatedEvent: " + trackPanel.getTrack().getId() + ", notes: " + trackPanel.getNotes());
-    //
-    //
-    //        List<Note> notes = trackPanel.getNotes();
-    //        this.track.setNotes(notes);
-    //    }
-
     @Subscribe
     private void handlePlayTrackEvent(PlayTrackEvent e) {
         MidiEngine.getSynth().getChannels()[e.getChannel()].programChange(e.getInstrument());

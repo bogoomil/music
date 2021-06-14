@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.File;
 
 import javax.swing.JFileChooser;
@@ -21,6 +23,7 @@ import music.event.FileSaveEvent;
 import music.gui.chords.ChordsPanel;
 import music.gui.project.ProjectPanel;
 import music.gui.trackeditor.TrackEditor;
+import music.logic.MidiEngine;
 
 public class AppFrame extends JFrame{
 
@@ -59,6 +62,51 @@ public class AppFrame extends JFrame{
 
         this.pack();
         this.setVisible(true);
+
+        this.addWindowListener(new WindowListener() {
+
+            @Override
+            public void windowOpened(WindowEvent e) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void windowIconified(WindowEvent e) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void windowDeiconified(WindowEvent e) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void windowDeactivated(WindowEvent e) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void windowClosing(WindowEvent e) {
+                MidiEngine.getSynth().close();
+                System.exit(0);
+
+            }
+
+            @Override
+            public void windowClosed(WindowEvent e) {
+
+            }
+
+            @Override
+            public void windowActivated(WindowEvent e) {
+                // TODO Auto-generated method stub
+
+            }
+        });
 
     }
 
