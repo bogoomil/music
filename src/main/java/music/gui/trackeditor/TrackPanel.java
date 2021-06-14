@@ -221,7 +221,7 @@ public class TrackPanel extends JPanel {
                         }
 
                     }else {
-                        JOptionPane.showMessageDialog(TrackPanel.this, "Nincs kiválasztott track!");
+                        JOptionPane.showMessageDialog(TrackPanel.this, "Nincs kiválasztott track!", "Hiba", JOptionPane.ERROR_MESSAGE);
                     }
                 } else if (e.getButton() == MouseEvent.BUTTON3) {
                     showPopup(e.getPoint());

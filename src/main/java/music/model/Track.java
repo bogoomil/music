@@ -23,11 +23,8 @@ public class Track {
 
     private List<Note> notes = new ArrayList<>();
 
-    //    private int measureNum;
-
     private int volume = 100;
 
-    //TODO törölni
     public Track(int id) {
         this();
         this.id = id;
@@ -114,16 +111,9 @@ public class Track {
         return 3;
     }
 
-    //    public void setMeasureNum(int measureNum) {
-    //        this.measureNum = measureNum;
-    //    }
-
     public void removePitches(Pitch p) {
-        for(int i = 0; i < this.notes.size(); i++) {
-            if(notes.get(i).getPitch().getMidiCode() == p.getMidiCode()) {
-                notes.remove(i);
-            }
-        }
+
+        notes.removeIf(n -> n.getPitch().getMidiCode() == p.getMidiCode());
     }
 
     public void setVolume(int value) {

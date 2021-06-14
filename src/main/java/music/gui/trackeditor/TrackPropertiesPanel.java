@@ -16,7 +16,6 @@ import javax.swing.event.ChangeListener;
 import com.google.common.eventbus.Subscribe;
 
 import music.App;
-import music.event.AddMeasureToTrackEvent;
 import music.event.DeleteNotesFromTrackEvent;
 import music.event.PianoKeyEvent;
 import music.event.PlayTrackEvent;
@@ -46,7 +45,6 @@ public class TrackPropertiesPanel extends JPanel {
     private JButton btnStop;
 
     private JSlider slZoom;
-    private JButton btnAddMeasure;
     private JButton btnClear;
 
     public TrackPropertiesPanel() {
@@ -176,29 +174,6 @@ public class TrackPropertiesPanel extends JPanel {
             }
         });
         add(slZoom);
-
-        btnAddMeasure = new JButton("Add measure");
-        add(btnAddMeasure);
-        btnAddMeasure.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                App.eventBus.post(new AddMeasureToTrackEvent());
-
-            }
-        });
-
-        //        JButton btnAddAsNewTrack = new JButton("Add to tracks");
-        //        add(btnAddAsNewTrack);
-        //        btnAddAsNewTrack.addActionListener(new ActionListener() {
-        //
-        //            @Override
-        //            public void actionPerformed(ActionEvent e) {
-        //                App.eventBus.post(new AddAsNewTrackEvent());
-        //
-        //            }
-        //        });
-
 
     }
 
