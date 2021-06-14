@@ -18,7 +18,6 @@ import javax.swing.border.EtchedBorder;
 import com.google.common.eventbus.Subscribe;
 
 import music.App;
-import music.event.AddMeasureToTrackEvent;
 import music.event.AddNotesToTrackEvent;
 import music.event.DeleteNotesFromTrackEvent;
 import music.event.FillNotesEvent;
@@ -123,18 +122,18 @@ public class TrackEditor extends JPanel {
 
     }
 
-    @Subscribe
-    private void handleAddMeasureToTrackEvent(AddMeasureToTrackEvent e) {
-        if(this.track == null) {
-            this.track = ProjectPanel.getTracks().get(0);
-
-        }
-        this.track.setMeasureNum(this.track.getMeasureNum() + 1);
-        trackPanel.revalidate();
-        trackPanel.repaint();
-        this.updateButtons();
-
-    }
+    //    @Subscribe
+    //    private void handleAddMeasureToTrackEvent(AddMeasureToTrackEvent e) {
+    //        if(this.track == null) {
+    //            this.track = ProjectPanel.getTracks().get(0);
+    //
+    //        }
+    //        this.track.setMeasureNum(this.track.getMeasureNum() + 1);
+    //        trackPanel.revalidate();
+    //        trackPanel.repaint();
+    //        this.updateButtons();
+    //
+    //    }
 
     @Subscribe
     private void handleAddNotesToTrackEvent(AddNotesToTrackEvent e) {

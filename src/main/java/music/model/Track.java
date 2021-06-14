@@ -23,7 +23,7 @@ public class Track {
 
     private List<Note> notes = new ArrayList<>();
 
-    private int measureNum;
+    //    private int measureNum;
 
     private int volume = 100;
 
@@ -94,13 +94,15 @@ public class Track {
         this.notes = notes;
     }
 
+
+    @JsonIgnore
     public int getMeasureNum() {
         int calculatedNum = 0;
         if(this.notes.size() != 0) {
             Note n = this.notes.stream().max(Comparator.comparing(Note::getStartTick)).get();
-            calculatedNum = n.getStartTick() / 32 + 1;
+            calculatedNum = (n.getStartTick() + n.getLength().getErtek()) / 32 + 1;
         }
-        return calculatedNum > this.measureNum ? calculatedNum : this.measureNum;
+        return calculatedNum + 1;
     }
 
     @JsonIgnore
@@ -112,9 +114,9 @@ public class Track {
         return 3;
     }
 
-    public void setMeasureNum(int measureNum) {
-        this.measureNum = measureNum;
-    }
+    //    public void setMeasureNum(int measureNum) {
+    //        this.measureNum = measureNum;
+    //    }
 
     public void removePitches(Pitch p) {
         for(int i = 0; i < this.notes.size(); i++) {
@@ -136,7 +138,7 @@ public class Track {
     @Override
     public Track clone() {
         Track t = new Track();
-        t.setMeasureNum(this.getMeasureNum());
+        //        t.setMeasureNum(this.getMeasureNum());
         List<Note> nots = new ArrayList<>() ;
         this.notes.stream().forEach(n -> {
             nots.add(n.clone());

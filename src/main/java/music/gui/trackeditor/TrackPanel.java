@@ -272,6 +272,11 @@ public class TrackPanel extends JPanel {
             for(int i = 0; i < 1 + (track.getMeasureNum() * 32); i++) {
                 int x = i * incr;
                 if(i % 32 == 0) {
+
+                    //                    g.setColor(App.SELECT_COLOR);
+                    //                    g..fillRect(0, 0, 20, 21);
+
+                    g.setColor(Color.BLACK);
                     g.drawString("" + i / 32, x  + 5, 15);
 
                     g.setColor(Color.BLUE);

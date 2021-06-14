@@ -3,11 +3,13 @@ package music.gui.trackeditor;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
 import javax.swing.JLabel;
+import javax.swing.JPopupMenu;
 import javax.swing.border.LineBorder;
 
 import com.google.common.eventbus.Subscribe;
@@ -110,35 +112,37 @@ public class NoteLabel extends JLabel {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-
-
-                if(NoteLabel.this.isEnabled()) {
-                    NoteLength old = note.getLength();
-                    if(e.getX() > getWidth() - 15) {
-                        NoteLength uj = NoteLength.ofErtek(note.getLength().getErtek() * 2);
-                        note.setLength(uj);
-                        reCalculateSizeAndLocation();
-                        //App.eventBus.post(new TrackNotesUpdatedEvent());
-
-                    } else if (e.getX() < 15) {
-                        if(old.getErtek() > 1) {
-                            NoteLength uj = NoteLength.ofErtek(note.getLength().getErtek() / 2);
+                if(e.getButton() == MouseEvent.BUTTON1) {
+                    if(NoteLabel.this.isEnabled()) {
+                        NoteLength old = note.getLength();
+                        if(e.getX() > getWidth() - 15) {
+                            NoteLength uj = NoteLength.ofErtek(note.getLength().getErtek() * 2);
                             note.setLength(uj);
                             reCalculateSizeAndLocation();
                             //App.eventBus.post(new TrackNotesUpdatedEvent());
-                        }
 
-                    } else {
-                        if(e.getClickCount() == 2) {
-                            Container c = NoteLabel.this.getParent();
-                            c.remove(NoteLabel.this);
-                            c.repaint();
-                            App.eventBus.post(new NoteDeletedEvent(note));
+                        } else if (e.getX() < 15) {
+                            if(old.getErtek() > 1) {
+                                NoteLength uj = NoteLength.ofErtek(note.getLength().getErtek() / 2);
+                                note.setLength(uj);
+                                reCalculateSizeAndLocation();
+                                //App.eventBus.post(new TrackNotesUpdatedEvent());
+                            }
 
-                        }else {
-                            setSelected(!selected);
+                        } else {
+                            if(e.getClickCount() == 2) {
+                                Container c = NoteLabel.this.getParent();
+                                c.remove(NoteLabel.this);
+                                c.repaint();
+                                App.eventBus.post(new NoteDeletedEvent(note));
+
+                            }else {
+                                setSelected(!selected);
+                            }
                         }
                     }
+                } else if (e.getButton() == MouseEvent.BUTTON3) {
+                    showPopup(e.getPoint());
                 }
             }
         });
@@ -270,6 +274,18 @@ public class NoteLabel extends JLabel {
             return false;
         }
         return true;
+    }
+    private void showPopup(Point pos) {
+        JPopupMenu menu = new JPopupMenu();
+        JLabel l = new JLabel("Pitch: " + note.getPitch().getName());
+        menu.add(l);
+        l = new JLabel("start: " + note.getStartTick());
+        menu.add(l);
+        l = new JLabel("length: " + note.getLength());
+        menu.add(l);
+        l = new JLabel("vol: " + note.getVol());
+        menu.add(l);
+        menu.show(this, pos.x, pos.y);
     }
 
 }
