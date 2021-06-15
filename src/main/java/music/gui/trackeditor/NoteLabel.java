@@ -29,8 +29,6 @@ import music.App;
 import music.event.NoteDeletedEvent;
 import music.event.NoteLabelDragEndEvent;
 import music.event.NoteLabelDragEvent;
-import music.event.TickOffEvent;
-import music.event.TickOnEvent;
 import music.theory.Note;
 import music.theory.NoteLength;
 
@@ -219,20 +217,6 @@ public class NoteLabel extends JLabel {
 
     public void setNote(Note note) {
         this.note = note;
-    }
-
-    @Subscribe
-    void handleTickOnEvent(TickOnEvent e) {
-        if(e.getTick()  == note.getStartTick()) {
-            setBackground(playingColor);
-        }
-    }
-
-    @Subscribe
-    void handleTickOffEvent(TickOffEvent e) {
-        if(e.getTick()  == note.getStartTick()) {
-            setBackground(selected ? selectColor : origColor);
-        }
     }
 
     @Subscribe

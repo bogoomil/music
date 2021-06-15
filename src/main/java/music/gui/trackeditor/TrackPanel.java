@@ -36,6 +36,8 @@ import music.event.DuplicateMeasureEvent;
 import music.event.KeyBoardClearButtonEvent;
 import music.event.KeyBoardSelectButtonEvent;
 import music.event.ShiftNotesEvent;
+import music.event.TickOffEvent;
+import music.event.TickOnEvent;
 import music.event.TrackScrollEvent;
 import music.event.ZoomEvent;
 import music.model.Track;
@@ -63,6 +65,8 @@ public class TrackPanel extends JPanel {
     private boolean isRowsEnabled = true;
 
     private Point startDrag, endDrag;
+
+    private int currentTick;
 
     public TrackPanel() {
         super();
@@ -319,6 +323,11 @@ public class TrackPanel extends JPanel {
             int x = this.currentMeasure * (getTickWidth() * 32);
             this.setBounds(-1 * x, this.getBounds().y, newWidth, this.getBounds().height);
         }
+
+        if(this.currentTick != 0) {
+            g.setColor(Color.RED);
+            g.fillRect(getXByCol(currentTick), 0, 3, this.getBounds().height);
+        }
     }
 
     public int getTickWidth() {
@@ -353,7 +362,6 @@ public class TrackPanel extends JPanel {
 
     @Subscribe
     private void handleTrackScrollEvent(TrackScrollEvent e) {
-
         this.currentMeasure = e.getMeasureNum();
 
         int x = this.currentMeasure * (getTickWidth() * 32);
@@ -364,8 +372,6 @@ public class TrackPanel extends JPanel {
             NoteLabel nl = (NoteLabel) this.getComponent(i);
             nl.reCalculateSizeAndLocation();
         }
-
-
         revalidate();
         repaint();
     }
@@ -618,6 +624,20 @@ public class TrackPanel extends JPanel {
         } else {
             JOptionPane.showMessageDialog(this, "Nincs adat", "Hiba", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    @Subscribe
+    void handleTickOnEvent(TickOnEvent e) {
+        this.currentTick = e.getTick();
+        this.repaint();
+
 
     }
+
+    @Subscribe
+    void handleTickOffEvent(TickOffEvent e) {
+        this.currentTick = 0;
+        this.repaint();
+    }
+
 }

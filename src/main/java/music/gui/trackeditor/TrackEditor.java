@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
@@ -40,6 +41,8 @@ public class TrackEditor extends JPanel {
 
     private Track track;
     private JPanel pnNorth;
+
+    private boolean scrollLocked = false;
 
     public TrackEditor() {
         App.eventBus.register(this);
@@ -83,12 +86,27 @@ public class TrackEditor extends JPanel {
     }
 
     private void updateButtons() {
+
         for(Component c : pnNorth.getComponents()) {
-            MeasureButton mb = (MeasureButton) c;
-            App.eventBus.unregister(mb);
+            if(c instanceof MeasureButton) {
+                MeasureButton mb = (MeasureButton) c;
+                App.eventBus.unregister(mb);
+            }
         }
 
         pnNorth.removeAll();
+
+        JCheckBox cbScrollLock = new JCheckBox("Scroll lock");
+        pnNorth.add(cbScrollLock);
+        cbScrollLock.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                scrollLocked = cbScrollLock.isSelected();
+
+            }
+        });
+        cbScrollLock.setSelected(scrollLocked);
 
         if(track != null) {
 
@@ -102,7 +120,9 @@ public class TrackEditor extends JPanel {
 
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        App.eventBus.post(new TrackScrollEvent(measureNum));
+                        if(!scrollLocked) {
+                            App.eventBus.post(new TrackScrollEvent(measureNum));
+                        }
                     }
                 });
             }

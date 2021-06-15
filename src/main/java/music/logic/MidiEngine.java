@@ -203,14 +203,23 @@ public class MidiEngine {
 
     private static void initSequencer() throws MidiUnavailableException, InvalidMidiDataException {
         sequencer = MidiSystem.getSequencer();
+
         sequencer.addMetaEventListener(new MetaEventListener() {
 
             @Override
             public void meta(MetaMessage meta) {
+
+                String s = new String(meta.getData());
+
+                int val = Integer.parseInt(s);
+
+
                 if(meta.getType() == MEASURE_START_MESSAGE_TYPE) {
-                    String s = new String(meta.getData());
-                    int mn = Integer.parseInt(s);
-                    App.eventBus.post(new MeasureStartedEvent(mn));
+                    App.eventBus.post(new MeasureStartedEvent(val));
+                } else if (meta.getType() == TICK_START_MESSAGE_TYPE) {
+                    App.eventBus.post(new TickOnEvent(val));
+                }else if (meta.getType() == TICK_END_MESSAGE_TYPE) {
+                    App.eventBus.post(new TickOffEvent(val));
                 }
             }
         });
@@ -303,11 +312,26 @@ public class MidiEngine {
         Sequencer sequencer = MidiEngine.getSequencer();
 
         sequencer.setTempoFactor(tempoFactor);
+        int counter = 0;
         for(music.model.Track t :tracks) {
             javax.sound.midi.Track track = MidiEngine.getInstrumentTrack(seq, t.getChannel(), t.getInstrument());
             for(Note n : t.getNotes()) {
                 MidiEngine.addNotesToTrack(track, t.getChannel(), n);
             }
+            if(counter == 0) {
+                int maxTick = getMaxTick(tracks);
+                for(int i = 0; i < maxTick; i++) {
+                    byte[] m = String.valueOf(i).getBytes();
+                    final MetaMessage metaMessage = new MetaMessage(TICK_START_MESSAGE_TYPE, m, m.length);
+                    final MidiEvent me2 = new MidiEvent(metaMessage, i);
+                    track.add(me2);
+                }
+                byte[] m = String.valueOf(maxTick).getBytes();
+                final MetaMessage metaMessage = new MetaMessage(TICK_END_MESSAGE_TYPE, m, m.length);
+                final MidiEvent me2 = new MidiEvent(metaMessage, maxTick);
+                track.add(me2);
+            }
+            counter++;
         }
         if(!sequencer.isOpen()) {
             sequencer.open();
@@ -317,6 +341,23 @@ public class MidiEngine {
         sequencer.setTempoInBPM(tempo);
         File file = new File("piece.mid");
         MidiSystem.write(seq,1,file);
+    }
 
+    private static int getMaxTick(List<music.model.Track> tracks) {
+        int max = 0;
+        for(music.model.Track t : tracks) {
+            Note n = t.getNotes().stream().max(new Comparator<Note>() {
+
+                @Override
+                public int compare(Note o1, Note o2) {
+                    // TODO Auto-generated method stub
+                    return Integer.compare(o1.getStartTick() + o1.getLength().getErtek(), o2.getStartTick() + o2.getLength().getErtek() );
+                }
+            }).get();
+            if(max < n.getStartTick() + n.getLength().getErtek()) {
+                max = n.getStartTick() + n.getLength().getErtek();
+            }
+        }
+        return max;
     }
 }
