@@ -21,6 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -38,6 +39,7 @@ import music.event.FileSaveEvent;
 import music.event.NoteDeletedEvent;
 import music.event.ShiftNotesEvent;
 import music.event.TrackSelectedEvent;
+import music.gui.chords.ChordPanel;
 import music.gui.trackeditor.TrackEditorPanel;
 import music.logic.MidiEngine;
 import music.model.Project;
@@ -72,14 +74,14 @@ public class ProjectPanel extends JPanel {
         add(spTracks, BorderLayout.CENTER);
 
         txtTfprojcetname = new JTextField();
-        txtTfprojcetname.setPreferredSize(new Dimension(190, 19));
+        txtTfprojcetname.setPreferredSize(new Dimension(210, 19));
         txtTfprojcetname.setText("noname");
         pnToolbar.add(txtTfprojcetname);
         txtTfprojcetname.setColumns(10);
 
 
         JButton btnPlay = new JButton("Play");
-        btnPlay.setPreferredSize(new Dimension(95, 25));
+        btnPlay.setPreferredSize(new Dimension(80, 25));
         btnPlay.setBackground(App.GREEN);
         pnToolbar.add(btnPlay);
 
@@ -98,7 +100,7 @@ public class ProjectPanel extends JPanel {
         });
 
         JButton btnStop = new JButton("Stop");
-        btnStop.setPreferredSize(new Dimension(95, 25));
+        btnStop.setPreferredSize(new Dimension(80, 25));
         btnStop.setBackground(App.RED);
         pnToolbar.add(btnStop);
 
@@ -109,6 +111,18 @@ public class ProjectPanel extends JPanel {
                 MidiEngine.getSequencer().stop();
                 MidiEngine.getSynth().close();
 
+            }
+        });
+
+        JToggleButton btnRec = new JToggleButton("Rec");
+        btnRec.setPreferredSize(new Dimension(80, 25));
+        pnToolbar.add(btnRec);
+
+        btnRec.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ChordPanel.setRecording(btnRec.isSelected());
             }
         });
 

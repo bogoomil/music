@@ -170,6 +170,7 @@ public class TrackEditor extends JPanel {
     private void handleDeleteNotesFromTrackEvent(DeleteNotesFromTrackEvent e) {
         track.setNotes(new ArrayList<>());
         trackPanel.refreshNoteLabels(track);
+        trackPanel.setSelectedMeasureNum(0);
     }
 
     @Subscribe

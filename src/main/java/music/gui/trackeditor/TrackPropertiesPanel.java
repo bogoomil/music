@@ -24,6 +24,7 @@ import music.event.TrackVolumeChangedEvent;
 import music.event.ZoomEvent;
 import music.gui.InstrumentCombo;
 import music.logic.MidiEngine;
+import music.model.Track;
 import music.theory.Note;
 import music.theory.NoteLength;
 import music.theory.NoteName;
@@ -46,6 +47,8 @@ public class TrackPropertiesPanel extends JPanel {
 
     private JSlider slZoom;
     private JButton btnClear;
+
+    private Track track;
 
     public TrackPropertiesPanel() {
         App.eventBus.register(this);
@@ -89,10 +92,30 @@ public class TrackPropertiesPanel extends JPanel {
 
         cbRoot = new JComboBox();
         cbRoot.setModel(new DefaultComboBoxModel(NoteName.values()));
+        cbRoot.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(track != null) {
+                    track.setRoot(new Pitch(cbRoot.getItemAt(cbRoot.getSelectedIndex()).getMidiCode()));
+                }
+
+            }
+        });
         add(cbRoot);
 
         cbTone = new JComboBox();
         cbTone.setModel(new DefaultComboBoxModel(Tone.values()));
+        cbTone.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(track != null) {
+                    track.setHangnem(cbTone.getItemAt(cbTone.getSelectedIndex()));
+                }
+
+            }
+        });
         add(cbTone);
 
         slTempo = new JSlider();
@@ -199,9 +222,14 @@ public class TrackPropertiesPanel extends JPanel {
 
     @Subscribe
     private void handleTrackSelectionEvent(TrackSelectedEvent e) {
+
+        this.track = e.getTrack();
+
         cbInstr.setSelectedIndex(e.getTrack().getInstrument());
         slVolume.setValue(e.getTrack().getVolume());
         cbChannel.setSelectedIndex(e.getTrack().getChannel());
+        cbRoot.setSelectedItem(e.getTrack().getRoot().getName());
+        cbTone.setSelectedItem(e.getTrack().getHangnem());
 
 
     }

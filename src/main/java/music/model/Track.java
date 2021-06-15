@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import music.theory.Note;
+import music.theory.NoteName;
 import music.theory.Pitch;
 import music.theory.Tone;
 
@@ -18,8 +19,8 @@ public class Track {
     private int instrument;
     private int channel;
 
-    private Pitch root;
-    private Tone hangnem;
+    private Pitch root = new Pitch(NoteName.C.getMidiCode());
+    private Tone hangnem = Tone.MAJ;
 
     private List<Note> notes = new ArrayList<>();
 
