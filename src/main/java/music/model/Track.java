@@ -136,6 +136,13 @@ public class Track {
         });
 
         t.setNotes(nots);
+        t.setRoot(new Pitch(root.getMidiCode()));
+        t.setHangnem(hangnem);
+        t.setChannel(channel);
+        t.setInstrument(instrument);
+        t.setName(name);
+        t.setVolume(volume);
+
         return t;
     }
 
