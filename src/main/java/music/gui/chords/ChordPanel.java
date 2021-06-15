@@ -1,7 +1,7 @@
 package music.gui.chords;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Insets;
@@ -10,10 +10,11 @@ import java.awt.event.ActionListener;
 import java.util.Optional;
 
 import javax.sound.midi.MidiChannel;
-import javax.sound.midi.Synthesizer;
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.border.BevelBorder;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 
 import music.App;
 import music.event.AddNotesToTrackEvent;
@@ -36,7 +37,7 @@ public class ChordPanel extends JPanel {
 
     private JButton btnPlay;
     private JButton btnPlayPlus;
-    private JPanel pnOctaves;
+    //private JPanel pnOctaves;
     private JPanel pnSubstitutions;
     private JButton btnAddToTrack;
 
@@ -65,54 +66,49 @@ public class ChordPanel extends JPanel {
      * @param hangnem
      * @param listener
      */
-    public ChordPanel(Synthesizer synth, Chord chord, ChordDegree deg, NoteLength chordLength, NoteLength arpeggioOffset, NoteName root, ChordType hangnem) {
+    public ChordPanel(Chord chord, ChordDegree deg, NoteLength chordLength, NoteLength arpeggioOffset, NoteName root, ChordType hangnem) {
         this.chord = chord;
         this.degree = deg;
         this.chordLength = chordLength;
         this.arpeggioOffset = arpeggioOffset;
-        setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
-        setLayout(new GridLayout(3, 0, 0, 0));
+        setBorder(new CompoundBorder(new EmptyBorder(5, 5, 5, 5), new LineBorder(new Color(0, 0, 128), 3, true)));
+        setLayout(new GridLayout(2, 0, 0, 0));
+
+        JPanel pnOctaves = new JPanel();
+        pnOctaves.setLayout(new BorderLayout());
+
         pnSubstitutions = new JPanel();
-        FlowLayout flowLayout = (FlowLayout) pnSubstitutions.getLayout();
-        flowLayout.setAlignment(FlowLayout.LEFT);
 
+        pnSubstitutions.setLayout(new GridLayout(1, 2));
 
-        Optional<Chord> counter = Chord.getChordCounterPart(chord);
-        counter.ifPresent(cntr -> {
-            JButton btnCounter = new JButton("c");
-            btnCounter.setFont(new Font("Arial", Font.PLAIN, 8));
-            btnCounter.setMargin(new Insets(0, 3, 0, 3));
-            pnSubstitutions.add(btnCounter);
-            btnCounter.addActionListener(new ActionListener() {
+        JButton btnPlayMinus = new JButton("-o");
+        btnPlayMinus.setFont(new Font("Arial", Font.PLAIN, 8));
+        pnOctaves.add(btnPlayMinus, BorderLayout.WEST);
+        btnPlayMinus.setMargin(new Insets(0, 0, 0, 0));
+        btnPlayMinus.addActionListener(new ActionListener() {
 
-                @Override
-                public void actionPerformed(ActionEvent arg0) {
-                    //                    Measure measure = Measure.createMeasureFromChord(0, counter.get(), getChordLength(), getArpeggioOffset(), root, hangnem);
-                    //                    MeasureSelectedEvent ev = new MeasureSelectedEvent(measure);
-                    //
-                    playChord(synth, counter.get(), instrument);
-
-                    App.eventBus.post(new ChordEvent(counter.get(), degree));
-                    if(isRecording) {
-                        sendRecordingEvent(counter.get());
-                    }
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                Chord minusOctave = chord.shiftOctave(-1);
+                App.eventBus.post(new ChordEvent(minusOctave, degree));
+                playChord(minusOctave, instrument);
+                if(isRecording) {
+                    sendRecordingEvent(minusOctave);
                 }
-            });
 
+            }
         });
+
+
         btnPlay = new JButton("" + chord);
         btnPlay.setFont(new Font("Arial", Font.PLAIN, 8));
-        add(btnPlay);
+        pnOctaves.add(btnPlay, BorderLayout.CENTER);
         btnPlay.setMargin(new Insets(0, 0, 0, 0));
         btnPlay.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                playChord(synth, chord, instrument);
-
-                //                Measure measure = Measure.createMeasureFromChord(0, chord, getChordLength(), getArpeggioOffset(), root, hangnem);
-                //                MeasureSelectedEvent ev = new MeasureSelectedEvent(measure);
-                //                App.eventBus.post(ev);
+                playChord(chord, instrument);
                 App.eventBus.post(new ChordEvent(chord, degree));
 
                 if(isRecording) {
@@ -121,41 +117,11 @@ public class ChordPanel extends JPanel {
 
             }
         });
-        //        btnAddToTrack = new JButton("ADD");
-        //        btnAddToTrack.setFont(new Font("Arial", Font.PLAIN, 8));
-        //        pnSubstitutions.add(btnAddToTrack);
-        //        btnAddToTrack.setMargin(new Insets(0, 3, 0, 3));
-        //        btnAddToTrack.addActionListener(new ActionListener() {
-        //
-        //            @Override
-        //            public void actionPerformed(ActionEvent arg0) {
-        //                playChord(synth, chord, instrument);
-        //
-        //                Note[] notes = new Note[chord.getPitches().length];
-        //                for(int i = 0; i < chord.getPitches().length; i++) {
-        //                    notes[i] = new Note();
-        //                    notes[i].setLength(NoteLength.EGESZ);
-        //                    notes[i].setPitch(chord.getPitches()[i]);
-        //                    notes[i].setStartTick(0);
-        //                }
-        //                App.eventBus.post(new AddNotesToTrackEvent(notes));
-        //                App.eventBus.post(new ChordEvent(chord, degree));
-        //
-        //            }
-        //        });
 
-        pnOctaves = new JPanel();
-        FlowLayout flowLayout_1 = (FlowLayout) pnOctaves.getLayout();
-        flowLayout_1.setAlignment(FlowLayout.LEFT);
-        add(pnOctaves);
 
-        JButton btnPlayMinus = new JButton("-o");
-        btnPlayMinus.setFont(new Font("Arial", Font.PLAIN, 8));
-        pnOctaves.add(btnPlayMinus);
-        btnPlayMinus.setMargin(new Insets(0, 0, 0, 0));
         btnPlayPlus = new JButton("+o");
         btnPlayPlus.setFont(new Font("Arial", Font.PLAIN, 8));
-        pnOctaves.add(btnPlayPlus);
+        pnOctaves.add(btnPlayPlus, BorderLayout.EAST);
         btnPlayPlus.setMargin(new Insets(0, 0, 0, 0));
 
         btnPlayPlus.addActionListener(new ActionListener() {
@@ -164,29 +130,14 @@ public class ChordPanel extends JPanel {
             public void actionPerformed(ActionEvent arg0) {
                 Chord plusOctave = chord.shiftOctave(1);
                 App.eventBus.post(new ChordEvent(plusOctave, degree));
-                playChord(synth, plusOctave, instrument);
+                playChord(plusOctave, instrument);
                 if(isRecording) {
                     sendRecordingEvent(plusOctave);
                 }
             }
         });
-        btnPlayMinus.addActionListener(new ActionListener() {
 
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                Chord minusOctave = chord.shiftOctave(-1);
-
-                //                Measure measure = Measure.createMeasureFromChord(0, minusOctave, getChordLength(), getArpeggioOffset(), root, hangnem);
-                //                App.eventBus.post(new MeasureSelectedEvent(measure));
-                App.eventBus.post(new ChordEvent(minusOctave, degree));
-                playChord(synth, minusOctave, instrument);
-                if(isRecording) {
-                    sendRecordingEvent(minusOctave);
-                }
-
-            }
-        });
-
+        add(pnOctaves);
         add(pnSubstitutions);
 
         JButton btnInversion = new JButton("i");
@@ -199,17 +150,36 @@ public class ChordPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 Chord inv = Chord.getChordInversion(chord);
-                //                Measure measure = Measure.createMeasureFromChord(0, inv, getChordLength(), getArpeggioOffset(), root, hangnem);
-                //                App.eventBus.post(new MeasureSelectedEvent(measure));
                 App.eventBus.post(new ChordEvent(inv, degree));
 
-                playChord(synth, inv, instrument);
+                playChord(inv, instrument);
                 if(isRecording) {
                     sendRecordingEvent(inv);
                 }
 
             }
         });
+        Optional<Chord> counter = Chord.getChordCounterPart(chord);
+        counter.ifPresent(cntr -> {
+            JButton btnCounter = new JButton("c");
+            btnCounter.setFont(new Font("Arial", Font.PLAIN, 8));
+            btnCounter.setMargin(new Insets(0, 3, 0, 3));
+            pnSubstitutions.add(btnCounter);
+            btnCounter.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent arg0) {
+                    playChord(counter.get(), instrument);
+
+                    App.eventBus.post(new ChordEvent(counter.get(), degree));
+                    if(isRecording) {
+                        sendRecordingEvent(counter.get());
+                    }
+                }
+            });
+
+        });
+
     }
 
     public Chord getChord() {
@@ -250,9 +220,9 @@ public class ChordPanel extends JPanel {
         this.arpeggioOffset = arpeggioOffset;
     }
 
-    public static void playChord(Synthesizer synth, Chord chord, int instrument) {
+    public static void playChord(Chord chord, int instrument) {
 
-        MidiChannel[] channels = synth.getChannels();
+        MidiChannel[] channels = MidiEngine.getSynth().getChannels();
         channels[0].programChange(instrument);
         int counter = 0;
         for(Pitch p : chord.getPitches()) {

@@ -24,4 +24,13 @@ public class InstrumentCombo extends JComboBox {
     public int getProgram() {
         return instruments.get(this.getSelectedIndex()).getPatch().getProgram();
     }
+
+    public void setProgram(int program) {
+        for(int i = 0; i < this.instruments.size(); i++) {
+            if(instruments.get(i).getPatch().getProgram() == program) {
+                this.setSelectedIndex(i);
+                break;
+            }
+        }
+    }
 }

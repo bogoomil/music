@@ -42,6 +42,8 @@ public class MidiEngine {
     public static final int CHORD_CHANNEL = 0;
 
     public static final int MEASURE_START_MESSAGE_TYPE = 39;
+    public static final int TICK_START_MESSAGE_TYPE = 40;
+    public static final int TICK_END_MESSAGE_TYPE = 41;
 
     private static final Logger LOG = LoggerFactory.getLogger(MidiEngine.class);
 
@@ -90,6 +92,15 @@ public class MidiEngine {
 
         MidiEvent noteOff = new MidiEvent(b, endInTick);
         track.add(noteOff);
+
+        //        byte[] m = String.valueOf(note.getStartTick()).getBytes();
+        //        MetaMessage mm = new MetaMessage(TICK_START_MESSAGE_TYPE, m, m.length);
+        //        MidiEvent tickOn = new MidiEvent(mm, note.getStartTick());
+        //        track.add(tickOn);
+        //
+        //        mm = new  MetaMessage(TICK_END_MESSAGE_TYPE, m, m.length);
+        //        MidiEvent tickOff = new MidiEvent(mm, note.getStartTick() + 1);
+        //        track.add(tickOff);
 
 
         if(note.getStartTick() % 32 == 0) {
@@ -256,7 +267,7 @@ public class MidiEngine {
     //    }
 
 
-    public static Track getInstrumentTrack(Sequence seq, int channel, int program) throws InvalidMidiDataException {
+    private static Track getInstrumentTrack(Sequence seq, int channel, int program) throws InvalidMidiDataException {
 
 
         Track track = seq.createTrack();

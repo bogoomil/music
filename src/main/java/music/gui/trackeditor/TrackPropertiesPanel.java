@@ -3,10 +3,15 @@ package music.gui.trackeditor;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.Arrays;
 
+import javax.sound.midi.InvalidMidiDataException;
+import javax.sound.midi.MidiUnavailableException;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.border.TitledBorder;
@@ -18,7 +23,6 @@ import com.google.common.eventbus.Subscribe;
 import music.App;
 import music.event.DeleteNotesFromTrackEvent;
 import music.event.PianoKeyEvent;
-import music.event.PlayTrackEvent;
 import music.event.TrackSelectedEvent;
 import music.event.TrackVolumeChangedEvent;
 import music.event.ZoomEvent;
@@ -62,8 +66,16 @@ public class TrackPropertiesPanel extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                App.eventBus.post(new PlayTrackEvent(cbChannel.getSelectedIndex(),cbInstr.getProgram(), slTempo.getValue()));
 
+                try {
+
+                    MidiEngine.play(Arrays.asList(track), slTempo.getValue(), 1);
+                } catch (InvalidMidiDataException | IOException | MidiUnavailableException e1) {
+                    e1.printStackTrace();
+                } catch(NullPointerException np) {
+                    JOptionPane.showMessageDialog(TrackPropertiesPanel.this, "Nincs besettelve a track", "Hiba", JOptionPane.ERROR_MESSAGE);
+
+                }
             }
         });
 
@@ -75,6 +87,7 @@ public class TrackPropertiesPanel extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                MidiEngine.getSequencer().stop();
                 MidiEngine.getSynth().close();
 
             }
@@ -209,7 +222,7 @@ public class TrackPropertiesPanel extends JPanel {
 
 
 
-        MidiEngine.getSynth().getChannels()[cbChannel.getSelectedIndex()].programChange(cbInstr.getProgram());
+        MidiEngine.getSynth().getChannels()[cbChannel.getSelectedIndex()].programChange(track.getInstrument());
 
         Note n = new Note();
         n.setLength(NoteLength.NEGYED);
@@ -225,7 +238,7 @@ public class TrackPropertiesPanel extends JPanel {
 
         this.track = e.getTrack();
 
-        cbInstr.setSelectedIndex(e.getTrack().getInstrument());
+        cbInstr.setProgram(e.getTrack().getInstrument());
         slVolume.setValue(e.getTrack().getVolume());
         cbChannel.setSelectedIndex(e.getTrack().getChannel());
         cbRoot.setSelectedItem(e.getTrack().getRoot().getName());

@@ -2,7 +2,6 @@ package music.gui.chords;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -12,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -23,7 +23,6 @@ import com.google.common.eventbus.Subscribe;
 import music.App;
 import music.event.ChordEvent;
 import music.gui.InstrumentCombo;
-import music.logic.MidiEngine;
 import music.theory.Chord;
 import music.theory.ChordDegree;
 import music.theory.ChordType;
@@ -50,11 +49,13 @@ public class ChordsPanel extends JPanel{
 
         this.setLayout(new BorderLayout());
 
-        centerPanel = new JPanel();
-        centerPanel.setPreferredSize(new Dimension(1800, 700));
-        //        getContentPane().add(centerPanel, BorderLayout.WEST);
-        centerPanel.setLayout(new GridLayout(0, 1, 3, 3));
 
+        centerPanel = new JPanel();
+        //centerPanel.setPreferredSize(new Dimension(1800, 700));
+        //        getContentPane().add(centerPanel, BorderLayout.WEST);
+        centerPanel.setLayout(new GridLayout(1, 0, 3, 3));
+
+        //        JScrollPane scroll = new JScrollPane(centerPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
         pnChords = new JPanel();
         this.add(pnChords, BorderLayout.CENTER);
@@ -103,7 +104,7 @@ public class ChordsPanel extends JPanel{
 
         cbOctave = new JComboBox<>();
         cbOctave.setModel(new DefaultComboBoxModel(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" }));
-        cbOctave.setSelectedIndex(4);
+        cbOctave.setSelectedIndex(5);
         panel_3.add(cbOctave);
         cbOctave.addActionListener(new ActionListener() {
 
@@ -129,6 +130,7 @@ public class ChordsPanel extends JPanel{
             }
         });
         panel_5.add(cbInstr);
+        ChordPanel.setInstrument(cbInstr.getProgram());
 
         this.setVisible(true);
 
@@ -151,7 +153,7 @@ public class ChordsPanel extends JPanel{
         for (ChordDegree deg : degrees) {
 
             JPanel jp = new JPanel();
-            jp.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
+            jp.setLayout(new BoxLayout(jp, BoxLayout.Y_AXIS));
             this.centerPanel.add(jp);
 
             JLabel lbDeg = new JLabel(deg.name());
@@ -164,22 +166,24 @@ public class ChordsPanel extends JPanel{
             Chord c = Chord.getChordDegree(getRootKey(), chordType, deg);
 
 
-            ChordPanel cp = new ChordPanel(MidiEngine.getSynth(), c, deg, NoteLength.EGESZ, null, getRootKey().getName(), chordType);
+            ChordPanel cp = new ChordPanel(c, deg, NoteLength.EGESZ, null, getRootKey().getName(), chordType);
             this.generatedChordPanels.add(cp);
             jp.add(cp);
 
             List<Chord> subs = Chord.getChordsOfPitch(c.getPitches()[0]);
-            for (Chord s : subs) {
 
+            int subCounter = 0;
+            for (Chord s : subs) {
                 if(s.equals(c)) {
                     continue;
                 }
-
-                cp = new ChordPanel(MidiEngine.getSynth(), s, deg, NoteLength.EGESZ, null, getRootKey().getName(), chordType);
+                cp = new ChordPanel(s, deg, NoteLength.EGESZ, null, getRootKey().getName(), chordType);
                 this.generatedChordPanels.add(cp);
                 jp.add(cp);
+                subCounter++;
 
             }
+            System.out.println(deg.name() + " sub count = " + subCounter);
         }
         this.resetColor();
         this.repaint();

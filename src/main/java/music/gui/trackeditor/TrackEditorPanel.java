@@ -45,12 +45,12 @@ public class TrackEditorPanel extends JPanel {
         this.id = counter;
         counter++;
         setTrack(track);
+        App.eventBus.register(this);
     }
 
     public void setTrack(Track track) {
         this.track = track;
         setLayout(new BorderLayout(0, 0));
-        App.eventBus.register(this);
 
         JPanel pnButtons = new JPanel();
         FlowLayout flowLayout_1 = (FlowLayout) pnButtons.getLayout();
@@ -98,10 +98,10 @@ public class TrackEditorPanel extends JPanel {
 
         pnButtons.add(cbInstr);
 
-        try {
-            cbInstr.setSelectedIndex(track.getInstrument());
-        }catch(Exception ex) {
-            ex.printStackTrace();
+        if(track.getInstrument() != 0) {
+            cbInstr.setProgram(track.getInstrument());;
+        } else {
+            track.setInstrument(cbInstr.getProgram());
         }
 
         cbInstr.addActionListener(new ActionListener() {
@@ -157,6 +157,9 @@ public class TrackEditorPanel extends JPanel {
         });
 
         slVolume.setValue(track.getVolume());
+
+        //        JLabel l = new JLabel(track.getRoot().getName().name() + "-" + track.getHangnem().name());
+        //        pnButtons.add(l);
 
         App.eventBus.post(new TrackSelectedEvent(track));
 
