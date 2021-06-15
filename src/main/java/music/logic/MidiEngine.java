@@ -304,10 +304,10 @@ public class MidiEngine {
     }
 
     public static void play(List<music.model.Track> tracks) throws InvalidMidiDataException, IOException, MidiUnavailableException {
-        play(tracks, 120, 1);
+        play(tracks, 120, 1, 0);
     }
 
-    public static void play(List<music.model.Track> tracks, int tempo, float tempoFactor) throws InvalidMidiDataException, IOException, MidiUnavailableException {
+    public static void play(List<music.model.Track> tracks, int tempo, float tempoFactor, int startTick) throws InvalidMidiDataException, IOException, MidiUnavailableException {
         Sequence seq = new Sequence(Sequence.PPQ, MidiEngine.RESOLUTION);
         Sequencer sequencer = MidiEngine.getSequencer();
 
@@ -337,6 +337,9 @@ public class MidiEngine {
             sequencer.open();
         }
         sequencer.setSequence(seq);
+
+        sequencer.setTickPosition(startTick);
+
         sequencer.start();
         sequencer.setTempoInBPM(tempo);
         File file = new File("piece.mid");

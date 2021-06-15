@@ -69,7 +69,7 @@ public class TrackPropertiesPanel extends JPanel {
 
                 try {
 
-                    MidiEngine.play(Arrays.asList(track), slTempo.getValue(), 1);
+                    MidiEngine.play(Arrays.asList(track), slTempo.getValue(), 1, TrackPanel.getCurrentTick());
                 } catch (InvalidMidiDataException | IOException | MidiUnavailableException e1) {
                     e1.printStackTrace();
                 } catch(NullPointerException np) {
@@ -246,7 +246,6 @@ public class TrackPropertiesPanel extends JPanel {
 
 
     }
-
 
 
 }

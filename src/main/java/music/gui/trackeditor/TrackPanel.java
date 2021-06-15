@@ -66,7 +66,7 @@ public class TrackPanel extends JPanel {
 
     private Point startDrag, endDrag;
 
-    private int currentTick;
+    private static int currentTick;
 
     public TrackPanel() {
         super();
@@ -200,6 +200,8 @@ public class TrackPanel extends JPanel {
 
                 selectedCell = new Point(getColByX(e.getX()), getRowByY(e.getY() ));
 
+                currentTick = getColByX(e.getX());
+
                 if(e.getButton() == MouseEvent.BUTTON1) {
                     if(track != null) {
                         int row = getRowByY(e.getY());
@@ -326,7 +328,7 @@ public class TrackPanel extends JPanel {
 
         if(this.currentTick != 0) {
             g.setColor(Color.RED);
-            g.fillRect(getXByCol(currentTick), 0, 3, this.getBounds().height);
+            g.fillRect(getXByCol(currentTick), 0, 2, this.getBounds().height);
         }
     }
 
@@ -628,7 +630,7 @@ public class TrackPanel extends JPanel {
 
     @Subscribe
     void handleTickOnEvent(TickOnEvent e) {
-        this.currentTick = e.getTick();
+        currentTick = e.getTick();
         this.repaint();
 
 
@@ -636,8 +638,12 @@ public class TrackPanel extends JPanel {
 
     @Subscribe
     void handleTickOffEvent(TickOffEvent e) {
-        this.currentTick = 0;
+        currentTick = 0;
         this.repaint();
+    }
+
+    public static int getCurrentTick() {
+        return currentTick;
     }
 
 }

@@ -41,6 +41,7 @@ import music.event.ShiftNotesEvent;
 import music.event.TrackSelectedEvent;
 import music.gui.chords.ChordPanel;
 import music.gui.trackeditor.TrackEditorPanel;
+import music.gui.trackeditor.TrackPanel;
 import music.logic.MidiEngine;
 import music.model.Project;
 import music.model.Track;
@@ -54,6 +55,8 @@ public class ProjectPanel extends JPanel {
     private JSlider slTempo;
     private JComboBox cbTempoFactor;
     private JTextField txtTfprojcetname;
+
+    private int currentTick;
 
     public ProjectPanel() {
         super();
@@ -90,7 +93,7 @@ public class ProjectPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    MidiEngine.play(tracks, slTempo.getValue(), Float.parseFloat("" + cbTempoFactor.getItemAt(cbTempoFactor.getSelectedIndex())));
+                    MidiEngine.play(tracks, slTempo.getValue(), Float.parseFloat("" + cbTempoFactor.getItemAt(cbTempoFactor.getSelectedIndex())), TrackPanel.getCurrentTick());
                 } catch (InvalidMidiDataException | IOException | MidiUnavailableException e1) {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();
