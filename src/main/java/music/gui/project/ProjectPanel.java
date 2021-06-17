@@ -51,7 +51,7 @@ public class ProjectPanel extends JPanel {
 
     private JPanel pnTracks;
     private static List<Track> tracks = new ArrayList<>();
-    private JSlider slTempo;
+    private JSlider slTempo = new TempoSlider();
     private JComboBox cbTempoFactor;
     private JTextField txtTfprojcetname;
 
@@ -166,8 +166,6 @@ public class ProjectPanel extends JPanel {
             }
         });
 
-
-        slTempo = new TempoSlider();
 
         pnToolbar.add(slTempo);
 

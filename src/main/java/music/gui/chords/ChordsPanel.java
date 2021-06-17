@@ -16,8 +16,11 @@ import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -51,6 +54,7 @@ public class ChordsPanel extends JPanel{
 
     private Color defaultColor = this.getBackground();
     private JPanel panel;
+    private JPanel panel_1;
 
     public ChordsPanel() {
 
@@ -136,6 +140,19 @@ public class ChordsPanel extends JPanel{
                 ChordPanel.setNoteLength(cbNoteLength.getItemAt(cbNoteLength.getSelectedIndex()));
                 // TODO Auto-generated method stub
 
+            }
+        });
+
+        panel_1 = new JPanel();
+        northPanel.add(panel_1);
+
+        TempoSlider tempoSlider = new TempoSlider();
+        panel_1.add(tempoSlider);
+        tempoSlider.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                JOptionPane.showMessageDialog(ChordsPanel.this, "Not yet implemented");
             }
         });
 
