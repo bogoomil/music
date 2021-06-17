@@ -142,28 +142,12 @@ public class TrackEditor extends JPanel {
 
     }
 
-    //    @Subscribe
-    //    private void handleAddMeasureToTrackEvent(AddMeasureToTrackEvent e) {
-    //        if(this.track == null) {
-    //            this.track = ProjectPanel.getTracks().get(0);
-    //
-    //        }
-    //        this.track.setMeasureNum(this.track.getMeasureNum() + 1);
-    //        trackPanel.revalidate();
-    //        trackPanel.repaint();
-    //        this.updateButtons();
-    //
-    //    }
-
     @Subscribe
     private void handleAddNotesToTrackEvent(AddNotesToTrackEvent e) {
         if(this.track == null) {
             this.track = ProjectPanel.getTracks().get(0);
         }
-
-        for(int i = 0; i < e.getNotes().length; i++) {
-            e.getNotes()[i].setStartTick(e.getNotes()[i].getStartTick() + (trackPanel.getSelectedMeasureNum() * 32) );
-        }
+        Arrays.asList(e.getNotes()).forEach(n -> n.setStartTick(n.getStartTick() + (trackPanel.getSelectedMeasureNum() * 32) ));
 
         this.track.getNotes().addAll(Arrays.asList(e.getNotes()));
         this.trackPanel.setSelectedMeasureNum(trackPanel.getSelectedMeasureNum() + 1);

@@ -238,9 +238,4 @@ public class ChordPanel extends JPanel {
         ChordPanel.noteLength = noteLength;
     }
 
-    //    @Subscribe
-    //    private void handleNoteLengthChangedEvent(NoteLengthChangedEvent e) {
-    //        noteLength = e.getLength();
-    //    }
-
 }

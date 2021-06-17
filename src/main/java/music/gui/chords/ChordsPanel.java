@@ -25,6 +25,7 @@ import music.App;
 import music.event.ChordEvent;
 import music.gui.InstrumentCombo;
 import music.gui.NoteLengthCombo;
+import music.gui.NoteNameCombo;
 import music.gui.TempoSlider;
 import music.logic.MidiEngine;
 import music.theory.Chord;
@@ -36,7 +37,9 @@ import music.theory.NoteName;
 import music.theory.Pitch;
 
 public class ChordsPanel extends JPanel{
-    private JComboBox<String> cbOctave, cbRoot, cbMinMaj;
+    private JComboBox<String> cbOctave, cbMinMaj;
+
+    private NoteNameCombo cbRoot = new NoteNameCombo();
 
     private JPanel centerPanel;
 
@@ -84,8 +87,6 @@ public class ChordsPanel extends JPanel{
         panel_2.setBorder(new TitledBorder(null, "Key", TitledBorder.LEADING, TitledBorder.TOP, null, null));
         northPanel.add(panel_2);
 
-        cbRoot = new JComboBox<>();
-        cbRoot.setModel(new DefaultComboBoxModel(NoteName.values()));
         panel_2.add(cbRoot);
         cbRoot.addActionListener(new ActionListener() {
 

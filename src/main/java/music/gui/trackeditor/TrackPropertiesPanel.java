@@ -8,14 +8,17 @@ import java.util.Arrays;
 
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiUnavailableException;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -31,18 +34,20 @@ import music.event.TrackSelectedEvent;
 import music.event.TrackVolumeChangedEvent;
 import music.event.ZoomEvent;
 import music.gui.InstrumentCombo;
+import music.gui.NoteLengthCombo;
+import music.gui.NoteNameCombo;
 import music.gui.TempoSlider;
+import music.gui.VolumeSlider;
 import music.logic.MidiEngine;
 import music.model.Track;
 import music.theory.Note;
 import music.theory.NoteLength;
-import music.theory.NoteName;
 import music.theory.Pitch;
 import music.theory.Scale;
 import music.theory.Tone;
 
 public class TrackPropertiesPanel extends JPanel {
-    private static JComboBox<NoteName> cbRoot;
+    private static NoteNameCombo cbRoot = new NoteNameCombo();
     private static JComboBox<Tone> cbTone;
     //private JComboBox<Instrument> cbInstr;
     InstrumentCombo cbInstr = new InstrumentCombo();
@@ -50,7 +55,7 @@ public class TrackPropertiesPanel extends JPanel {
     private JSlider slTempo = new TempoSlider();
     private JPanel panel;
     private JPanel panel_1;
-    private JSlider slVolume;
+    private VolumeSlider slVolume = new VolumeSlider();
     private JButton btnPlay;
     private JButton btnStop;
 
@@ -112,8 +117,6 @@ public class TrackPropertiesPanel extends JPanel {
             }
         });
 
-        cbRoot = new JComboBox();
-        cbRoot.setModel(new DefaultComboBoxModel(NoteName.values()));
         cbRoot.addActionListener(new ActionListener() {
 
             @Override
@@ -142,15 +145,6 @@ public class TrackPropertiesPanel extends JPanel {
 
         add(slTempo);
 
-        slVolume = new JSlider();
-        slVolume.setMaximum(127);
-        slVolume.setMinimum(0);
-        slVolume.setSnapToTicks(true);
-        slVolume.setPaintTicks(true);
-        slVolume.setPaintLabels(true);
-        slVolume.setMajorTickSpacing(50);
-        slVolume.setMinorTickSpacing(5);
-        slVolume.setBorder(new TitledBorder(null, "Volume", TitledBorder.LEADING, TitledBorder.TOP, null, null));
         add(slVolume);
 
         slVolume.addChangeListener(new ChangeListener() {
@@ -201,13 +195,19 @@ public class TrackPropertiesPanel extends JPanel {
         });
         add(slZoom);
 
+        add(new JSeparator(SwingConstants.HORIZONTAL));
+
+        JPanel panel = new JPanel();
+        panel.setBorder(new TitledBorder("Random note generator"));
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        add(panel);
         tfSeed = new JTextField();
         tfSeed.setText("1234");
-        add(tfSeed);
+        panel.add(tfSeed);
         tfSeed.setColumns(10);
 
-        btnRandomize = new JButton("Randomize");
-        add(btnRandomize);
+        btnRandomize = new JButton("Generate");
+        panel.add(btnRandomize);
         btnRandomize.addActionListener(new ActionListener() {
 
             @Override
@@ -217,8 +217,12 @@ public class TrackPropertiesPanel extends JPanel {
             }
         });
 
+        panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBorder(new TitledBorder("Arpeggio generator"));
+        add(panel);
         slShift = new JSlider();
-        slShift.setMinorTickSpacing(4);
+        slShift.setMinorTickSpacing(2);
         slShift.setPaintLabels(true);
         slShift.setPaintTicks(true);
         slShift.setSnapToTicks(true);
@@ -236,26 +240,24 @@ public class TrackPropertiesPanel extends JPanel {
                 b.setTitle("Shift: " + slShift.getValue());
             }
         });
-        add(slShift);
+        panel.add(slShift);
 
         JLabel l = new JLabel("Note length");
-        add(l);
+        panel.add(l);
 
-        JComboBox<NoteLength> cbHossz = new JComboBox<>();
-        cbHossz.setModel(new DefaultComboBoxModel<>(NoteLength.values())) ;
+        JComboBox<NoteLength> cbHossz = new NoteLengthCombo();
         cbHossz.setSelectedIndex(9);
-        add(cbHossz);
+        panel.add(cbHossz);
 
         l = new JLabel("Gap length");
-        add(l);
+        panel.add(l);
 
-        JComboBox<NoteLength> cbSzunet = new JComboBox<>();
-        cbSzunet.setModel(new DefaultComboBoxModel<>(NoteLength.values())) ;
+        JComboBox<NoteLength> cbSzunet = new NoteLengthCombo();
         cbSzunet.setSelectedIndex(9);
-        add(cbSzunet);
+        panel.add(cbSzunet);
 
-        btnArpeggionator = new JButton("Arpeggio");
-        add(btnArpeggionator);
+        btnArpeggionator = new JButton("Generate");
+        panel.add(btnArpeggionator);
         btnArpeggionator.addActionListener(new ActionListener() {
 
             @Override

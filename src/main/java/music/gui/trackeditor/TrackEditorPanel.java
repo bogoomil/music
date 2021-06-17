@@ -14,7 +14,6 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
-import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -23,6 +22,7 @@ import com.google.common.eventbus.Subscribe;
 import music.App;
 import music.event.TrackSelectedEvent;
 import music.gui.InstrumentCombo;
+import music.gui.VolumeSlider;
 import music.model.Track;
 
 public class TrackEditorPanel extends JPanel {
@@ -136,17 +136,8 @@ public class TrackEditorPanel extends JPanel {
             }
         });
 
-        JSlider slVolume = new JSlider();
-        slVolume.setMaximum(127);
-        slVolume.setMinimum(0);
-        slVolume.setSnapToTicks(true);
-        slVolume.setPaintTicks(true);
-        slVolume.setPaintLabels(true);
-        slVolume.setMajorTickSpacing(50);
-        slVolume.setMinorTickSpacing(5);
-        slVolume.setBorder(new TitledBorder(null, "Volume", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-        pnButtons.add(slVolume);
-
+        JSlider slVolume = new VolumeSlider();
+        slVolume.setValue(track.getVolume());
         slVolume.addChangeListener(new ChangeListener() {
 
             @Override
@@ -156,10 +147,7 @@ public class TrackEditorPanel extends JPanel {
             }
         });
 
-        slVolume.setValue(track.getVolume());
-
-        //        JLabel l = new JLabel(track.getRoot().getName().name() + "-" + track.getHangnem().name());
-        //        pnButtons.add(l);
+        pnButtons.add(slVolume);
 
         App.eventBus.post(new TrackSelectedEvent(track));
 
