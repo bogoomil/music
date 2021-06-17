@@ -9,7 +9,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Optional;
 
-import javax.sound.midi.MidiChannel;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.border.CompoundBorder;
@@ -19,14 +18,12 @@ import javax.swing.border.LineBorder;
 import music.App;
 import music.event.AddNotesToTrackEvent;
 import music.event.ChordEvent;
-import music.logic.MidiEngine;
 import music.theory.Chord;
 import music.theory.ChordDegree;
 import music.theory.ChordType;
 import music.theory.Note;
 import music.theory.NoteLength;
 import music.theory.NoteName;
-import music.theory.Pitch;
 
 public class ChordPanel extends JPanel {
 
@@ -45,7 +42,9 @@ public class ChordPanel extends JPanel {
 
     private static boolean isRecording;
 
+    private static int tempo = 120;
 
+    private static NoteLength noteLength = NoteLength.EGESZ;
 
     public static boolean isRecording() {
         return isRecording;
@@ -91,7 +90,7 @@ public class ChordPanel extends JPanel {
             public void actionPerformed(ActionEvent arg0) {
                 Chord minusOctave = chord.shiftOctave(-1);
                 App.eventBus.post(new ChordEvent(minusOctave, degree));
-                playChord(minusOctave, instrument);
+                ChordsPanel.playChord(minusOctave, instrument);
                 if(isRecording) {
                     sendRecordingEvent(minusOctave);
                 }
@@ -108,7 +107,7 @@ public class ChordPanel extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                playChord(chord, instrument);
+                ChordsPanel.playChord(chord, instrument);
                 App.eventBus.post(new ChordEvent(chord, degree));
 
                 if(isRecording) {
@@ -130,7 +129,7 @@ public class ChordPanel extends JPanel {
             public void actionPerformed(ActionEvent arg0) {
                 Chord plusOctave = chord.shiftOctave(1);
                 App.eventBus.post(new ChordEvent(plusOctave, degree));
-                playChord(plusOctave, instrument);
+                ChordsPanel.playChord(plusOctave, instrument);
                 if(isRecording) {
                     sendRecordingEvent(plusOctave);
                 }
@@ -140,7 +139,8 @@ public class ChordPanel extends JPanel {
         add(pnOctaves);
         add(pnSubstitutions);
 
-        JButton btnInversion = new JButton("i");
+        Chord inv = Chord.getChordInversion(chord);
+        JButton btnInversion = new JButton("(i) " + inv);
         btnInversion.setFont(new Font("Arial", Font.PLAIN, 8));
         pnSubstitutions.add(btnInversion);
         btnInversion.setMargin(new Insets(0, 3, 0, 3));
@@ -149,10 +149,9 @@ public class ChordPanel extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                Chord inv = Chord.getChordInversion(chord);
                 App.eventBus.post(new ChordEvent(inv, degree));
 
-                playChord(inv, instrument);
+                ChordsPanel.playChord(inv, instrument);
                 if(isRecording) {
                     sendRecordingEvent(inv);
                 }
@@ -161,7 +160,7 @@ public class ChordPanel extends JPanel {
         });
         Optional<Chord> counter = Chord.getChordCounterPart(chord);
         counter.ifPresent(cntr -> {
-            JButton btnCounter = new JButton("c");
+            JButton btnCounter = new JButton("(c) " + counter.get());
             btnCounter.setFont(new Font("Arial", Font.PLAIN, 8));
             btnCounter.setMargin(new Insets(0, 3, 0, 3));
             pnSubstitutions.add(btnCounter);
@@ -169,8 +168,7 @@ public class ChordPanel extends JPanel {
 
                 @Override
                 public void actionPerformed(ActionEvent arg0) {
-                    playChord(counter.get(), instrument);
-
+                    ChordsPanel.playChord(counter.get(), instrument);
                     App.eventBus.post(new ChordEvent(counter.get(), degree));
                     if(isRecording) {
                         sendRecordingEvent(counter.get());
@@ -179,6 +177,7 @@ public class ChordPanel extends JPanel {
             });
 
         });
+        App.eventBus.register(this);
 
     }
 
@@ -220,30 +219,37 @@ public class ChordPanel extends JPanel {
         this.arpeggioOffset = arpeggioOffset;
     }
 
-    public static void playChord(Chord chord, int instrument) {
-
-        MidiChannel[] channels = MidiEngine.getSynth().getChannels();
-        channels[0].programChange(instrument);
-        int counter = 0;
-        for(Pitch p : chord.getPitches()) {
-            Note n = new Note();
-            n.setPitch(p);
-            n.setLength(NoteLength.EGESZ);
-            MidiEngine.playNote(n, channels[0], App.getTEMPO());
-            counter++;
-        }
-    }
-
     private void sendRecordingEvent(Chord chord) {
         Note[] notes = new Note[chord.getPitches().length];
         for(int i = 0; i < chord.getPitches().length; i++) {
             notes[i] = new Note();
-            notes[i].setLength(NoteLength.EGESZ);
+            notes[i].setLength(noteLength);
             notes[i].setPitch(chord.getPitches()[i]);
             notes[i].setStartTick(0);
         }
         App.eventBus.post(new AddNotesToTrackEvent(notes));
 
     }
+
+    public static int getTempo() {
+        return tempo;
+    }
+
+    public static void setTempo(int tempo) {
+        ChordPanel.tempo = tempo;
+    }
+
+    public static NoteLength getNoteLength() {
+        return noteLength;
+    }
+
+    public static void setNoteLength(NoteLength noteLength) {
+        ChordPanel.noteLength = noteLength;
+    }
+
+    //    @Subscribe
+    //    private void handleNoteLengthChangedEvent(NoteLengthChangedEvent e) {
+    //        noteLength = e.getLength();
+    //    }
 
 }

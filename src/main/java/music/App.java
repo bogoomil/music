@@ -15,7 +15,7 @@ public class App {
     public static final Color RED = new Color(255, 0, 0);
     public static final Color GREEN = new Color(0, 255, 0);
 
-    private static int TEMPO = 120;
+    private static int TEMPO = 140;
 
     public static final EventBus eventBus = new EventBus();
 

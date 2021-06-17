@@ -31,10 +31,12 @@ import javax.swing.border.EtchedBorder;
 import com.google.common.eventbus.Subscribe;
 
 import music.App;
+import music.event.ArpeggioEvent;
 import music.event.DeleteMeasureEvent;
 import music.event.DuplicateMeasureEvent;
 import music.event.KeyBoardClearButtonEvent;
 import music.event.KeyBoardSelectButtonEvent;
+import music.event.RandomizeEvent;
 import music.event.ShiftNotesEvent;
 import music.event.TickOffEvent;
 import music.event.TickOnEvent;
@@ -343,6 +345,22 @@ public class TrackPanel extends JPanel {
 
     public void setZoomFactor(int zoomFactor) {
         this.zoomFactor = zoomFactor;
+    }
+
+    @Subscribe
+    private void handleRandomizeEvent(RandomizeEvent e) {
+        this.track.randomize(e.getSeed());
+        refreshNoteLabels(track);
+        revalidate();
+        repaint();
+    }
+
+    @Subscribe
+    private void handleArpeggioEvent(ArpeggioEvent e) {
+        this.track.generateArpeggio(e.getShift(), e.getHossz(), e.getSzunet());
+        refreshNoteLabels(track);
+        revalidate();
+        repaint();
     }
 
     @Subscribe

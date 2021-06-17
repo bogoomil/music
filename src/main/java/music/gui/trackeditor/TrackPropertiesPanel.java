@@ -11,9 +11,11 @@ import javax.sound.midi.MidiUnavailableException;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -21,8 +23,10 @@ import javax.swing.event.ChangeListener;
 import com.google.common.eventbus.Subscribe;
 
 import music.App;
+import music.event.ArpeggioEvent;
 import music.event.DeleteNotesFromTrackEvent;
 import music.event.PianoKeyEvent;
+import music.event.RandomizeEvent;
 import music.event.TrackSelectedEvent;
 import music.event.TrackVolumeChangedEvent;
 import music.event.ZoomEvent;
@@ -53,10 +57,14 @@ public class TrackPropertiesPanel extends JPanel {
     private JButton btnClear;
 
     private Track track;
+    private JTextField tfSeed;
+    private JButton btnRandomize;
+    private JSlider slShift, slNoteLength;
+    private JButton btnArpeggionator;
 
     public TrackPropertiesPanel() {
         App.eventBus.register(this);
-        setPreferredSize(new Dimension(202, 493));
+        setPreferredSize(new Dimension(202, 722));
 
         btnPlay = new JButton("Play");
         btnPlay.setPreferredSize(new Dimension(90, 25));
@@ -210,6 +218,69 @@ public class TrackPropertiesPanel extends JPanel {
             }
         });
         add(slZoom);
+
+        tfSeed = new JTextField();
+        tfSeed.setText("1234");
+        add(tfSeed);
+        tfSeed.setColumns(10);
+
+        btnRandomize = new JButton("Randomize");
+        add(btnRandomize);
+        btnRandomize.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int seed = Integer.valueOf(tfSeed.getText());
+                App.eventBus.post(new RandomizeEvent(seed));
+            }
+        });
+
+        slShift = new JSlider();
+        slShift.setMinorTickSpacing(4);
+        slShift.setPaintLabels(true);
+        slShift.setPaintTicks(true);
+        slShift.setSnapToTicks(true);
+
+        final TitledBorder b = new TitledBorder(null, "Shift", TitledBorder.LEADING, TitledBorder.TOP, null, null);
+        slShift.setBorder(b);
+        slShift.setValue(0);
+        slShift.setMaximum(16);
+        slShift.setMinimum(-16);
+        slShift.setMajorTickSpacing(8);
+        slShift.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                b.setTitle("Shift: " + slShift.getValue());
+            }
+        });
+        add(slShift);
+
+        JLabel l = new JLabel("Note length");
+        add(l);
+
+        JComboBox<NoteLength> cbHossz = new JComboBox<>();
+        cbHossz.setModel(new DefaultComboBoxModel<>(NoteLength.values())) ;
+        cbHossz.setSelectedIndex(9);
+        add(cbHossz);
+
+        l = new JLabel("Gap length");
+        add(l);
+
+        JComboBox<NoteLength> cbSzunet = new JComboBox<>();
+        cbSzunet.setModel(new DefaultComboBoxModel<>(NoteLength.values())) ;
+        cbSzunet.setSelectedIndex(9);
+        add(cbSzunet);
+
+        btnArpeggionator = new JButton("Arpeggio");
+        add(btnArpeggionator);
+        btnArpeggionator.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                App.eventBus.post(new ArpeggioEvent(slShift.getValue(), cbHossz.getItemAt(cbHossz.getSelectedIndex()), cbSzunet.getItemAt(cbSzunet.getSelectedIndex())));
+            }
+        });
 
     }
 

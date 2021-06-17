@@ -1,13 +1,16 @@
 package music.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import music.theory.Note;
+import music.theory.NoteLength;
 import music.theory.NoteName;
 import music.theory.Pitch;
 import music.theory.Tone;
@@ -25,6 +28,8 @@ public class Track {
     private List<Note> notes = new ArrayList<>();
 
     private int volume = 100;
+
+    private Random random;
 
     public Track(int id) {
         this();
@@ -157,11 +162,11 @@ public class Track {
 
     public void duplicateMeasure(int measureNum) {
 
-        List<Note> origNotes = this.getNotesOfMeasure(measureNum);
+        List<Note> origNotes = this.getCloneOfNotesInMeasure(measureNum);
 
         this.shiftNotesFromMeasureBy(measureNum + 1, 1);
 
-        this.getNotesOfMeasure(measureNum).forEach(n -> {
+        this.getCloneOfNotesInMeasure(measureNum).forEach(n -> {
             Note duplicate = n.clone();
             duplicate.setStartTick(n.getStartTick() + 32);
             this.notes.add(duplicate);
@@ -173,8 +178,12 @@ public class Track {
      * @param measureNum
      * @return
      */
-    public List<Note> getNotesOfMeasure(int measureNum){
+    public List<Note> getCloneOfNotesInMeasure(int measureNum){
         return notes.stream().filter(n -> n.getStartTick() >= measureNum * 32 && n.getStartTick() < (measureNum + 1) * 32).map(n -> n.clone()).collect(Collectors.toList());
+    }
+
+    public List<Note> getNotesInMeasure(int measureNum){
+        return notes.stream().filter(n -> n.getStartTick() >= measureNum * 32 && n.getStartTick() < (measureNum + 1) * 32).collect(Collectors.toList());
     }
 
     public void deleteMeasure(int measureNum) {
@@ -182,4 +191,62 @@ public class Track {
         this.shiftNotesFromMeasureBy(measureNum + 1, -1);
     }
 
+    public void randomize(int seed) {
+        random = new Random(seed);
+        int measureNum = this.getMeasureNum();
+        for(int i = 0; i < measureNum; i++) {
+            List<Note> notesOfMeasure = this.getNotesInMeasure(i);
+
+
+            for(int j = 0; j < notesOfMeasure.size(); j++) {
+                Note currentNote = notesOfMeasure.get(j);
+                notes.remove(currentNote);
+
+                int sumLength = 0;
+                while(sumLength < 32) {
+                    Note newNote = generateRandomNoteOfMeasure(currentNote.getPitch(), i, sumLength);
+                    sumLength += newNote.getStartTick() + newNote.getLength().getErtek();
+
+                    notes.add(newNote);
+                }
+            }
+        }
+    }
+
+    private Note generateRandomNoteOfMeasure(Pitch pitch, int measureNum, int fromTick) {
+        List<NoteLength> lengths = Arrays.asList(NoteLength.NYOLCAD, NoteLength.NEGYED);
+        Note gen = new Note();
+        gen.setPitch(pitch);
+        gen.setLength(chooseFromList(lengths));
+        int startTick = fromTick + random.nextInt(32 - fromTick) + (measureNum * 32);
+        gen.setStartTick(startTick);
+
+        return gen;
+    }
+
+    private <T> T chooseFromList(List<T> l) {
+        int indx = random.nextInt(l.size());
+        return l.get(indx);
+    }
+
+    public void generateArpeggio(int shift, NoteLength hossz, NoteLength szunet) {
+        int measureNum = this.getMeasureNum();
+        for(int i = 0; i < measureNum; i++) {
+            List<Note> notesOfMeasure = this.getNotesInMeasure(i);
+            for(int j = 0; j < notesOfMeasure.size(); j++) {
+                Note currentNote = notesOfMeasure.get(j);
+                notes.remove(currentNote);
+                int sumLength = 0;
+                while(sumLength < 32) {
+                    Note newNote = new Note();
+                    newNote.setLength(hossz);
+                    int startTick = sumLength + (i * 32) + (shift * j);
+                    newNote.setStartTick(startTick);
+                    newNote.setPitch(currentNote.getPitch());
+                    sumLength += hossz.getErtek() + szunet.getErtek();
+                    notes.add(newNote);
+                }
+            }
+        }
+    }
 }

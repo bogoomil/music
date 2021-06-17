@@ -23,8 +23,6 @@ import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -39,6 +37,7 @@ import music.event.FileSaveEvent;
 import music.event.NoteDeletedEvent;
 import music.event.ShiftNotesEvent;
 import music.event.TrackSelectedEvent;
+import music.gui.TempoSlider;
 import music.gui.chords.ChordPanel;
 import music.gui.trackeditor.TrackEditorPanel;
 import music.gui.trackeditor.TrackPanel;
@@ -168,31 +167,8 @@ public class ProjectPanel extends JPanel {
         });
 
 
-        slTempo = new JSlider();
+        slTempo = new TempoSlider();
 
-        final TitledBorder tbTempo = new TitledBorder(null, "Tempo", TitledBorder.LEADING, TitledBorder.TOP, null, null);
-
-
-        slTempo = new JSlider();
-        slTempo.setSnapToTicks(true);
-        slTempo.setMinorTickSpacing(10);
-        slTempo.setMajorTickSpacing(60);
-        slTempo.setPaintLabels(true);
-        slTempo.setPaintTicks(true);
-        slTempo.setMinimum(60);
-        slTempo.setBorder(tbTempo);
-        slTempo.setMaximum(300);
-
-        slTempo.setValue(200);
-
-        slTempo.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                tbTempo.setTitle("Tempo: " + slTempo.getValue());;
-
-            }
-        });
         pnToolbar.add(slTempo);
 
         JPanel panel = new JPanel();

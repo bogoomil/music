@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.sound.midi.MidiChannel;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
@@ -23,9 +24,13 @@ import com.google.common.eventbus.Subscribe;
 import music.App;
 import music.event.ChordEvent;
 import music.gui.InstrumentCombo;
+import music.gui.NoteLengthCombo;
+import music.gui.TempoSlider;
+import music.logic.MidiEngine;
 import music.theory.Chord;
 import music.theory.ChordDegree;
 import music.theory.ChordType;
+import music.theory.Note;
 import music.theory.NoteLength;
 import music.theory.NoteName;
 import music.theory.Pitch;
@@ -38,10 +43,14 @@ public class ChordsPanel extends JPanel{
     private JPanel panel_5;
     private InstrumentCombo cbInstr = new InstrumentCombo();
 
+    private static final NoteLengthCombo cbNoteLength = new NoteLengthCombo();
+    private static final TempoSlider tempoSlider = new TempoSlider();
+
     private List<ChordPanel> generatedChordPanels;
     private JPanel pnChords;
 
     private Color defaultColor = this.getBackground();
+    private JPanel panel;
 
     public ChordsPanel() {
 
@@ -106,11 +115,26 @@ public class ChordsPanel extends JPanel{
         cbOctave.setModel(new DefaultComboBoxModel(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" }));
         cbOctave.setSelectedIndex(5);
         panel_3.add(cbOctave);
+
         cbOctave.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 generateChords();
+
+            }
+        });
+
+        panel = new JPanel();
+        panel.setBorder(new TitledBorder(null, "NoteLength", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+        northPanel.add(panel);
+        panel.add(cbNoteLength);
+        cbNoteLength.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ChordPanel.setNoteLength(cbNoteLength.getItemAt(cbNoteLength.getSelectedIndex()));
+                // TODO Auto-generated method stub
 
             }
         });
@@ -181,9 +205,7 @@ public class ChordsPanel extends JPanel{
                 this.generatedChordPanels.add(cp);
                 jp.add(cp);
                 subCounter++;
-
             }
-            System.out.println(deg.name() + " sub count = " + subCounter);
         }
         this.resetColor();
         this.repaint();
@@ -229,5 +251,20 @@ public class ChordsPanel extends JPanel{
 
         return rootKey;
     }
+
+    public static void playChord(Chord chord, int instrument) {
+
+        MidiChannel[] channels = MidiEngine.getSynth().getChannels();
+        channels[0].programChange(instrument);
+        int counter = 0;
+        for(Pitch p : chord.getPitches()) {
+            Note n = new Note();
+            n.setPitch(p);
+            n.setLength(cbNoteLength.getItemAt(cbNoteLength.getSelectedIndex()));
+            MidiEngine.playNote(n, channels[0], tempoSlider.getValue());
+            counter++;
+        }
+    }
+
 
 }
