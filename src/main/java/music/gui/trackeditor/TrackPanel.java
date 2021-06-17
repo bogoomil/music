@@ -634,10 +634,9 @@ public class TrackPanel extends JPanel {
 
     }
     private void paste() {
+
         if(copyNotes != null && copyNotes.size() > 0) {
-            for(Note n : copyNotes) {
-                n.setStartTick(n.getStartTickRelativeToMeasure() + (getSelectedMeasureNum() * 32));
-            }
+            computeStartTickBySelectedNotes(copyNotes);
             track.getNotes().addAll(copyNotes);
             refreshNoteLabels(track);
             copyNotes = null;
@@ -645,6 +644,25 @@ public class TrackPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Nincs adat", "Hiba", JOptionPane.ERROR_MESSAGE);
         }
     }
+
+    private void computeStartTickBySelectedNotes(List<Note> notes) {
+        List<Integer> measures = new ArrayList<>();
+        notes.forEach(n -> {
+            if(!measures.contains(n.getStartTick() / 32)) {
+                measures.add(n.getStartTick() / 32);
+            }
+        });
+        Collections.sort(measures);
+
+        notes.forEach(n -> {
+            int selectedMeasureOffset = this.getSelectedMeasureNum() * 32;
+
+            int noteMeasureOffset = measures.indexOf(n.getStartTick() / 32) * 32;
+
+            n.setStartTick(n.getStartTickRelativeToMeasure() + selectedMeasureOffset + noteMeasureOffset);
+        });
+    }
+
 
     @Subscribe
     void handleTickOnEvent(TickOnEvent e) {
