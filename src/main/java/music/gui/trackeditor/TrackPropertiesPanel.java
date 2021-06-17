@@ -31,6 +31,7 @@ import music.event.TrackSelectedEvent;
 import music.event.TrackVolumeChangedEvent;
 import music.event.ZoomEvent;
 import music.gui.InstrumentCombo;
+import music.gui.TempoSlider;
 import music.logic.MidiEngine;
 import music.model.Track;
 import music.theory.Note;
@@ -46,7 +47,7 @@ public class TrackPropertiesPanel extends JPanel {
     //private JComboBox<Instrument> cbInstr;
     InstrumentCombo cbInstr = new InstrumentCombo();
     private JComboBox cbChannel;
-    private JSlider slTempo;
+    private JSlider slTempo = new TempoSlider();
     private JPanel panel;
     private JPanel panel_1;
     private JSlider slVolume;
@@ -139,26 +140,7 @@ public class TrackPropertiesPanel extends JPanel {
         });
         add(cbTone);
 
-        slTempo = new JSlider();
-        slTempo.setSnapToTicks(true);
-        slTempo.setPaintTicks(true);
-        slTempo.setPaintLabels(true);
-        slTempo.setMinorTickSpacing(10);
-        slTempo.setMinimum(60);
-        slTempo.setMaximum(300);
-        slTempo.setValue(140);
-        slTempo.setMajorTickSpacing(60);
-        TitledBorder tbTempo = new TitledBorder(null, "Tempo", TitledBorder.LEADING, TitledBorder.TOP, null, null);
-        slTempo.setBorder(tbTempo);
         add(slTempo);
-        slTempo.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                tbTempo.setTitle("Tempo: " + slTempo.getValue());
-
-            }
-        });
 
         slVolume = new JSlider();
         slVolume.setMaximum(127);

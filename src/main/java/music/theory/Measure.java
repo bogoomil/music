@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import music.App;
 import music.interfaces.NoteProducer;
 
 public class Measure implements Cloneable, NoteProducer{
@@ -39,6 +38,7 @@ public class Measure implements Cloneable, NoteProducer{
         this.tempo = tempo;
     }
 
+    @Override
     public List<Note> getNotes() {
         return notes;
     }
@@ -58,27 +58,27 @@ public class Measure implements Cloneable, NoteProducer{
     public void addNote(Note note) {
         this.notes.add(note);
     }
-    public static Measure createMeasureFromChord(int measureNum, Chord ch, NoteLength chordLength, NoteLength arpeggioOffset, NoteName root, ChordType hangnem) {
-        Measure measure = new Measure(measureNum, App.getTEMPO(), root, hangnem );
-        int counter = 0;
-        for(Pitch p : ch.getPitches()) {
-            Note note = new Note();
-            note.setPitch(p);
-            note.setVol(100);
-            note.setLength(chordLength);
-            int start = 0;
-            if(arpeggioOffset != null) {
-                start = (counter * arpeggioOffset.getErtek());
-
-                LOG.debug("counter: {} * (32/{}) = {}", counter, arpeggioOffset.getErtek(), start);
-
-            }
-            note.setStartTick(start);
-            measure.addNote(note);
-            counter++;
-        }
-        return measure;
-    }
+    //    public static Measure createMeasureFromChord(int measureNum, Chord ch, NoteLength chordLength, NoteLength arpeggioOffset, NoteName root, ChordType hangnem) {
+    //        Measure measure = new Measure(measureNum, App.getTEMPO(), root, hangnem );
+    //        int counter = 0;
+    //        for(Pitch p : ch.getPitches()) {
+    //            Note note = new Note();
+    //            note.setPitch(p);
+    //            note.setVol(100);
+    //            note.setLength(chordLength);
+    //            int start = 0;
+    //            if(arpeggioOffset != null) {
+    //                start = (counter * arpeggioOffset.getErtek());
+    //
+    //                LOG.debug("counter: {} * (32/{}) = {}", counter, arpeggioOffset.getErtek(), start);
+    //
+    //            }
+    //            note.setStartTick(start);
+    //            measure.addNote(note);
+    //            counter++;
+    //        }
+    //        return measure;
+    //    }
 
     public NoteName getRoot() {
         return root;

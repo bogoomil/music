@@ -16,11 +16,8 @@ import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -148,13 +145,6 @@ public class ChordsPanel extends JPanel{
 
         TempoSlider tempoSlider = new TempoSlider();
         panel_1.add(tempoSlider);
-        tempoSlider.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                JOptionPane.showMessageDialog(ChordsPanel.this, "Not yet implemented");
-            }
-        });
 
         panel_5 = new JPanel();
         panel_5.setBorder(new TitledBorder(null, "Instrument", TitledBorder.LEADING, TitledBorder.TOP, null, null));

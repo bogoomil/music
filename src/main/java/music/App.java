@@ -15,18 +15,18 @@ public class App {
     public static final Color RED = new Color(255, 0, 0);
     public static final Color GREEN = new Color(0, 255, 0);
 
-    private static int TEMPO = 140;
+    //    private static int TEMPO = 140;
 
     public static final EventBus eventBus = new EventBus();
 
 
-    public static int getTEMPO() {
-        return TEMPO;
-    }
-
-    public static void setTEMPO(int tEMPO) {
-        TEMPO = tEMPO;
-    }
+    //    public static int getTEMPO() {
+    //        return TEMPO;
+    //    }
+    //
+    //    public static void setTEMPO(int tEMPO) {
+    //        TEMPO = tEMPO;
+    //    }
 
     private static final Logger LOG = LoggerFactory.getLogger(App.class);
     public static final Color DEFAULT_NOTE_LABEL_COLOR = Color.CYAN;

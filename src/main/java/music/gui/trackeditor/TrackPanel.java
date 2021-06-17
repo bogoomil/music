@@ -636,7 +636,7 @@ public class TrackPanel extends JPanel {
     private void paste() {
         if(copyNotes != null && copyNotes.size() > 0) {
             for(Note n : copyNotes) {
-                n.setStartTick(n.getStartTick() + (getSelectedMeasureNum() * 32));
+                n.setStartTick(n.getStartTickRelativeToMeasure() + (getSelectedMeasureNum() * 32));
             }
             track.getNotes().addAll(copyNotes);
             refreshNoteLabels(track);

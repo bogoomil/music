@@ -20,7 +20,7 @@ public class TempoSlider extends JSlider {
         this.setBorder(tbTempo);
         this.setMaximum(300);
 
-        this.setValue(200);
+        this.setValue(140);
 
         this.addChangeListener(new ChangeListener() {
 

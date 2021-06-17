@@ -113,7 +113,10 @@ public class Note implements Cloneable{
         this.id = id;
     }
 
-
+    @JsonIgnore
+    public int getStartTickRelativeToMeasure() {
+        return this.startTick % 32;
+    }
 
 
 

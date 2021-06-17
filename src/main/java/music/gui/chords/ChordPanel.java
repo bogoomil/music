@@ -42,8 +42,6 @@ public class ChordPanel extends JPanel {
 
     private static boolean isRecording;
 
-    private static int tempo = 120;
-
     private static NoteLength noteLength = NoteLength.EGESZ;
 
     public static boolean isRecording() {
@@ -231,13 +229,6 @@ public class ChordPanel extends JPanel {
 
     }
 
-    public static int getTempo() {
-        return tempo;
-    }
-
-    public static void setTempo(int tempo) {
-        ChordPanel.tempo = tempo;
-    }
 
     public static NoteLength getNoteLength() {
         return noteLength;
