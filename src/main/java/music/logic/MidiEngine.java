@@ -2,6 +2,7 @@ package music.logic;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -50,7 +51,7 @@ public class MidiEngine {
     private static Map<String, Track> namedTracks = new HashMap<>();
 
     /**
-     * negyed hang felbontása tick-ekre. 4 negyed = 32 tick;
+     * negyed hang felbontása tick-ekre. 4 negyed = MidiEngine.TICKS_IN_MEASURE tick;
      */
     public static final int RESOLUTION = 8;
 
@@ -59,6 +60,8 @@ public class MidiEngine {
     private static Synthesizer synth;
 
     private static Sequencer sequencer;
+
+    private static List<Integer> measureStarts;
 
     public static Sequencer getSequencer() {
         if(sequencer == null) {
@@ -73,7 +76,13 @@ public class MidiEngine {
         return sequencer;
     }
 
-    public static void addNotesToTrack(Track track, int channel, Note note) throws InvalidMidiDataException {
+    private static void addNotesToTrack(Track track, int channel, List<Note> notes) throws InvalidMidiDataException {
+        for(Note n : notes) {
+            addNoteToTrack(track, channel, n);
+        }
+    }
+
+    private static void addNoteToTrack(Track track, int channel, Note note) throws InvalidMidiDataException {
 
 
         int startInTick = note.getStartTick();
@@ -102,13 +111,16 @@ public class MidiEngine {
         //        MidiEvent tickOff = new MidiEvent(mm, note.getStartTick() + 1);
         //        track.add(tickOff);
 
-
-        if(note.getStartTick() % 32 == 0) {
-            byte[] m = String.valueOf(note.getStartTick() / 32).getBytes();
-            final MetaMessage metaMessage = new MetaMessage(MEASURE_START_MESSAGE_TYPE, m, m.length);
-            final MidiEvent me2 = new MidiEvent(metaMessage, note.getStartTick());
-            track.add(me2);
+        if(!measureStarts.contains(note.getMeasure())) {
+            measureStarts.add(note.getMeasure());
         }
+
+        //        m = String.valueOf(note.getStartTick()).getBytes();
+        //        final MetaMessage metaMessage = new MetaMessage(TICK_START_MESSAGE_TYPE, m, m.length);
+        //        final MidiEvent me2 = new MidiEvent(metaMessage, note.getStartTick());
+        //        track.add(me2);
+
+
     }
 
     public static int getNoteLenghtInMs(NoteLength length, int tempo) {
@@ -208,12 +220,8 @@ public class MidiEngine {
 
             @Override
             public void meta(MetaMessage meta) {
-
                 String s = new String(meta.getData());
-
                 int val = Integer.parseInt(s);
-
-
                 if(meta.getType() == MEASURE_START_MESSAGE_TYPE) {
                     App.eventBus.post(new MeasureStartedEvent(val));
                 } else if (meta.getType() == TICK_START_MESSAGE_TYPE) {
@@ -244,8 +252,8 @@ public class MidiEngine {
                     Thread.sleep(offset);
                     App.eventBus.post(new TickOnEvent(note.getStartTick() ));
                     channel.noteOn(note.getPitch().getMidiCode(), note.getVol());
-                    if(note.getStartTick() % 32 == 0) {
-                        int mn = note.getStartTick() / 32;
+                    if(note.getStartTick() % MidiEngine.TICKS_IN_MEASURE == 0) {
+                        int mn = note.getStartTick() / MidiEngine.TICKS_IN_MEASURE;
                         App.eventBus.post(new MeasureStartedEvent(mn));
 
                     }
@@ -308,6 +316,8 @@ public class MidiEngine {
     }
 
     public static void play(List<music.model.Track> tracks, int tempo, float tempoFactor, int startTick) throws InvalidMidiDataException, IOException, MidiUnavailableException {
+        measureStarts = new ArrayList<>();
+
         Sequence seq = new Sequence(Sequence.PPQ, MidiEngine.RESOLUTION);
         Sequencer sequencer = MidiEngine.getSequencer();
 
@@ -315,11 +325,10 @@ public class MidiEngine {
         int counter = 0;
         for(music.model.Track t :tracks) {
             javax.sound.midi.Track track = MidiEngine.getInstrumentTrack(seq, t.getChannel(), t.getInstrument());
-            for(Note n : t.getNotes()) {
-                MidiEngine.addNotesToTrack(track, t.getChannel(), n);
-            }
+            MidiEngine.addNotesToTrack(track, t.getChannel(), t.getNotes());
             if(counter == 0) {
                 int maxTick = getMaxTick(tracks);
+
                 for(int i = 0; i < maxTick; i++) {
                     byte[] m = String.valueOf(i).getBytes();
                     final MetaMessage metaMessage = new MetaMessage(TICK_START_MESSAGE_TYPE, m, m.length);
@@ -330,6 +339,15 @@ public class MidiEngine {
                 final MetaMessage metaMessage = new MetaMessage(TICK_END_MESSAGE_TYPE, m, m.length);
                 final MidiEvent me2 = new MidiEvent(metaMessage, maxTick);
                 track.add(me2);
+
+                for(Integer ms : measureStarts) {
+                    m = String.valueOf(ms).getBytes();
+                    final MetaMessage metaMessageMeasureStart = new MetaMessage(MEASURE_START_MESSAGE_TYPE, m, m.length);
+                    final MidiEvent me = new MidiEvent(metaMessageMeasureStart, ms * MidiEngine.TICKS_IN_MEASURE);
+                    track.add(me);
+
+                }
+
             }
             counter++;
         }

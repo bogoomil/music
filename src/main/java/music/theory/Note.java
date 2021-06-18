@@ -2,6 +2,8 @@ package music.theory;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import music.logic.MidiEngine;
+
 public class Note implements Cloneable{
 
 
@@ -9,6 +11,8 @@ public class Note implements Cloneable{
     NoteLength length;
     int startTick;
     int vol = 100;
+
+    private boolean selected;
 
     static int ID;
 
@@ -115,8 +119,24 @@ public class Note implements Cloneable{
 
     @JsonIgnore
     public int getStartTickRelativeToMeasure() {
-        return this.startTick % 32;
+        return this.startTick % MidiEngine.TICKS_IN_MEASURE;
     }
+
+    @JsonIgnore
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
+    @JsonIgnore
+    public int getMeasure() {
+        return this.startTick / 32;
+    }
+
+
 
 
 

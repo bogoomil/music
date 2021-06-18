@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import music.interfaces.NoteProducer;
+import music.logic.MidiEngine;
 import music.theory.Note;
 import music.theory.NoteLength;
 import music.theory.Pitch;
@@ -21,7 +22,7 @@ public class RythmProducer implements NoteProducer {
             NoteLength beat = beats[i];
             Note n = new Note();
             n.setLength(noteLengths[i]);
-            n.setStartTick(beat.getErtek() * (i * 32));
+            n.setStartTick(beat.getErtek() * (i * MidiEngine.TICKS_IN_MEASURE));
             n.setPitch(new Pitch(midiCode));
         }
         return notes;

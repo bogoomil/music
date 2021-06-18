@@ -11,7 +11,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -19,7 +18,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.border.LineBorder;
-import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -29,6 +27,8 @@ import music.App;
 import music.event.NoteDeletedEvent;
 import music.event.NoteLabelDragEndEvent;
 import music.event.NoteLabelDragEvent;
+import music.gui.NoteLengthCombo;
+import music.gui.VolumeSlider;
 import music.theory.Note;
 import music.theory.NoteLength;
 
@@ -44,8 +44,6 @@ public class NoteLabel extends JLabel {
     private Color origColor = App.DEFAULT_NOTE_LABEL_COLOR;
     private Color selectColor = App.SELECT_COLOR;
     private Color playingColor = App.PLAYING_COLOR;
-
-    private boolean selected;
 
     private TrackPanel trackPanel;
 
@@ -146,7 +144,7 @@ public class NoteLabel extends JLabel {
                                 App.eventBus.post(new NoteDeletedEvent(note));
 
                             }else {
-                                setSelected(!selected);
+                                setSelected(!note.isSelected());
                             }
                         }
                     }
@@ -158,15 +156,9 @@ public class NoteLabel extends JLabel {
     }
 
     public void setSelected(boolean selected) {
-        this.selected = selected;
-        setBackground(selected ? selectColor : origColor);
-        setBorder(selected ? new LineBorder(selectColor, 3, true) : new LineBorder(new Color(0, 0, 0), 3, true));
-
-        //        if(selected) {
-        //            App.eventBus.post(new NoteSelectionEvent(note));
-        //        }else {
-        //            App.eventBus.post(new NoteSelectionEvent(null));
-        //        }
+        this.note.setSelected(selected);
+        revalidate();
+        repaint();
 
     }
 
@@ -198,7 +190,9 @@ public class NoteLabel extends JLabel {
         g.fillRect(this.getWidth() -14, 0, this.getWidth(), this.getHeight());
 
         g.setColor(Color.black);
-        //g.drawString("" + id, 30, 15);
+
+        setBackground(note.isSelected() ? selectColor : origColor);
+        setBorder(note.isSelected() ? new LineBorder(selectColor, 3, true) : new LineBorder(new Color(0, 0, 0), 3, true));
 
     }
 
@@ -221,14 +215,14 @@ public class NoteLabel extends JLabel {
 
     @Subscribe
     void handleDragEvent(NoteLabelDragEvent e) {
-        if(this.id != e.getId() && this.selected && this.isEnabled()) {
+        if(this.id != e.getId() && this.note.isSelected() && this.isEnabled()) {
             this.setBounds(getX() + e.getX(), getY(), getWidth(), getHeight());
         }
     }
 
     @Subscribe
     void handleDragEndEvent(NoteLabelDragEndEvent e) {
-        if(this.id != e.getId() && this.selected && this.isEnabled()) {
+        if(this.id != e.getId() && this.note.isSelected() && this.isEnabled()) {
             int x = getBounds().x;
             int newCellIndex = trackPanel.getColByX(x);
             note.setStartTick(newCellIndex);
@@ -238,7 +232,7 @@ public class NoteLabel extends JLabel {
     }
 
     public boolean getSelected() {
-        return selected;
+        return note.isSelected();
     }
 
     @Override
@@ -270,18 +264,6 @@ public class NoteLabel extends JLabel {
         }
         return true;
     }
-    //    private void showPopup(Point pos) {
-    //        JPopupMenu menu = new JPopupMenu();
-    //        JLabel l = new JLabel("Pitch: " + note.getPitch().getName());
-    //        menu.add(l);
-    //        l = new JLabel("start: " + note.getStartTick());
-    //        menu.add(l);
-    //        l = new JLabel("length: " + note.getLength());
-    //        menu.add(l);
-    //        l = new JLabel("vol: " + note.getVol());
-    //        menu.add(l);
-    //        menu.show(this, pos.x, pos.y);
-    //    }
 
     private void showPopup(Point pos){
         JDialog dialog = new JDialog();
@@ -294,8 +276,7 @@ public class NoteLabel extends JLabel {
         pn.add(l);
 
 
-        JComboBox<NoteLength> cbHossz = new JComboBox<>();
-        cbHossz.setModel(new DefaultComboBoxModel<>(NoteLength.values())) ;
+        JComboBox<NoteLength> cbHossz = new NoteLengthCombo();
         cbHossz.setSelectedItem(note.getLength());
         cbHossz.addActionListener(new ActionListener() {
 
@@ -311,26 +292,16 @@ public class NoteLabel extends JLabel {
         l = new JLabel("Volume");
         pn.add(l);
 
-        JSlider slVolume = new JSlider();
-        slVolume.setMaximum(127);
-        slVolume.setMinimum(0);
-        slVolume.setSnapToTicks(true);
-        slVolume.setPaintTicks(true);
-        slVolume.setPaintLabels(true);
-        slVolume.setMajorTickSpacing(50);
-        slVolume.setMinorTickSpacing(5);
+        JSlider slVolume = new VolumeSlider();
 
         slVolume.setValue(note.getVol());
 
-        TitledBorder border = new TitledBorder(null, "Volume", TitledBorder.LEADING, TitledBorder.TOP, null, null);
-        slVolume.setBorder(border);
         pn.add(slVolume);
 
         slVolume.addChangeListener(new ChangeListener() {
 
             @Override
             public void stateChanged(ChangeEvent e) {
-                border.setTitle("Volume: " + slVolume.getValue());
                 note.setVol(slVolume.getValue());
             }
         });

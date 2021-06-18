@@ -70,7 +70,7 @@ public class Measure implements Cloneable, NoteProducer{
     //            if(arpeggioOffset != null) {
     //                start = (counter * arpeggioOffset.getErtek());
     //
-    //                LOG.debug("counter: {} * (32/{}) = {}", counter, arpeggioOffset.getErtek(), start);
+    //                LOG.debug("counter: {} * (MidiEngine.TICKS_IN_MEASURE/{}) = {}", counter, arpeggioOffset.getErtek(), start);
     //
     //            }
     //            note.setStartTick(start);

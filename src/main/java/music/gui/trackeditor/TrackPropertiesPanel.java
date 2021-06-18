@@ -206,6 +206,9 @@ public class TrackPropertiesPanel extends JPanel {
         panel.add(tfSeed);
         tfSeed.setColumns(10);
 
+        JComboBox<NoteLength> cbNoteLength = new NoteLengthCombo();
+        panel.add(cbNoteLength);
+
         btnRandomize = new JButton("Generate");
         panel.add(btnRandomize);
         btnRandomize.addActionListener(new ActionListener() {
@@ -213,7 +216,7 @@ public class TrackPropertiesPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int seed = Integer.valueOf(tfSeed.getText());
-                App.eventBus.post(new RandomizeEvent(seed));
+                App.eventBus.post(new RandomizeEvent(seed, cbNoteLength.getItemAt(cbNoteLength.getSelectedIndex()).getErtek()));
             }
         });
 

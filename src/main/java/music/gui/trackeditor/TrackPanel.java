@@ -42,6 +42,7 @@ import music.event.TickOffEvent;
 import music.event.TickOnEvent;
 import music.event.TrackScrollEvent;
 import music.event.ZoomEvent;
+import music.logic.MidiEngine;
 import music.model.Track;
 import music.theory.Note;
 import music.theory.NoteLength;
@@ -274,15 +275,15 @@ public class TrackPanel extends JPanel {
         int incr = this.getTickWidth();
         if(this.track != null) {
 
-            for(int i = 0; i < 1 + (track.getMeasureNum() * 32); i++) {
+            for(int i = 0; i < 1 + (track.getMeasureNum() * MidiEngine.TICKS_IN_MEASURE); i++) {
                 int x = i * incr;
-                if(i % 32 == 0) {
+                if(i % MidiEngine.TICKS_IN_MEASURE == 0) {
 
                     //                    g.setColor(App.SELECT_COLOR);
                     //                    g..fillRect(0, 0, 20, 21);
 
                     g.setColor(Color.BLACK);
-                    g.drawString("" + i / 32, x  + 5, 15);
+                    g.drawString("" + i / MidiEngine.TICKS_IN_MEASURE, x  + 5, 15);
 
                     g.setColor(Color.BLUE);
                     g.drawLine(x-1, 0, x-1, this.getHeight());
@@ -323,8 +324,8 @@ public class TrackPanel extends JPanel {
         }
 
         if(track != null && track.getMeasureNum() !=  0) {
-            int newWidth = incr * track.getMeasureNum() * 32;
-            int x = this.currentMeasure * (getTickWidth() * 32);
+            int newWidth = incr * track.getMeasureNum() * MidiEngine.TICKS_IN_MEASURE;
+            int x = this.currentMeasure * (getTickWidth() * MidiEngine.TICKS_IN_MEASURE);
             this.setBounds(-1 * x, this.getBounds().y, newWidth, this.getBounds().height);
         }
 
@@ -349,7 +350,7 @@ public class TrackPanel extends JPanel {
 
     @Subscribe
     private void handleRandomizeEvent(RandomizeEvent e) {
-        this.track.randomize(e.getSeed());
+        this.track.randomize(e.getSeed(), e.getMaxNoteLengthInTicks());
         refreshNoteLabels(track);
         revalidate();
         repaint();
@@ -384,7 +385,7 @@ public class TrackPanel extends JPanel {
     private void handleTrackScrollEvent(TrackScrollEvent e) {
         this.currentMeasure = e.getMeasureNum();
 
-        int x = this.currentMeasure * (getTickWidth() * 32);
+        int x = this.currentMeasure * (getTickWidth() * MidiEngine.TICKS_IN_MEASURE);
 
         this.setBounds(-1 * x, this.getY(), this.getWidth(), this.getHeight());
 
@@ -472,14 +473,14 @@ public class TrackPanel extends JPanel {
     public int getSelectedMeasureNum() {
         if(this.selectedCell != null) {
             int col = selectedCell.x;
-            return col / 32;
+            return col / MidiEngine.TICKS_IN_MEASURE;
         }else {
             return 0;
         }
     }
 
     public void setSelectedMeasureNum(int mn) {
-        this.selectedCell = new Point(mn * 32, 0);
+        this.selectedCell = new Point(mn * MidiEngine.TICKS_IN_MEASURE, 0);
     }
 
     private List<NoteLabel> findAllBetween(Point start, Point end){
@@ -592,7 +593,7 @@ public class TrackPanel extends JPanel {
         List<NoteLabel> retVal = new ArrayList<>();
         for(Component c : getComponents()) {
             NoteLabel nl = (NoteLabel) c;
-            if(nl.getNote().getStartTick() >= measureNum * 32 && nl.getNote().getStartTick() < (measureNum + 1) * 32) {
+            if(nl.getNote().getStartTick() >= measureNum * MidiEngine.TICKS_IN_MEASURE && nl.getNote().getStartTick() < (measureNum + 1) * MidiEngine.TICKS_IN_MEASURE) {
                 retVal.add(nl);
             }
         }
@@ -606,24 +607,22 @@ public class TrackPanel extends JPanel {
                 NoteLabel nl = (NoteLabel) c;
                 if(nl.getSelected()) {
                     Note copy = nl.getNote().clone();
+                    copy.setSelected(true);
                     retVal.add(copy);
+                    nl.setSelected(false);
                 }
             }
         }
         Collections.sort(retVal, new Comparator<Note>() {
-
             @Override
             public int compare(Note o1, Note o2) {
                 // TODO Auto-generated method stub
                 return Integer.compare(o1.getStartTick(), o2.getStartTick());
             }
         });
-
-        int offset = retVal.get(0).getStartTick() / 32;
-
-
+        int offset = retVal.get(0).getStartTick() / MidiEngine.TICKS_IN_MEASURE;
         retVal.forEach(n -> {
-            int modStartTick = n.getStartTick() - (offset * 32);
+            int modStartTick = n.getStartTick() - (offset * MidiEngine.TICKS_IN_MEASURE);
             n.setStartTick(modStartTick);
         });
 
@@ -634,30 +633,41 @@ public class TrackPanel extends JPanel {
 
     }
     private void paste() {
+        for(Component c : getComponents()) {
+            if(c instanceof NoteLabel) {
+                NoteLabel nl = (NoteLabel) c;
+                nl.setSelected(false);
+            }
+        }
 
         if(copyNotes != null && copyNotes.size() > 0) {
             computeStartTickBySelectedNotes(copyNotes);
             track.getNotes().addAll(copyNotes);
             refreshNoteLabels(track);
-            copyNotes = null;
+
+            copyNotes = copyNotes.stream().map(n -> n.clone()).collect(Collectors.toList());
         } else {
             JOptionPane.showMessageDialog(this, "Nincs adat", "Hiba", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void computeStartTickBySelectedNotes(List<Note> notes) {
+        //        notes.forEach(n -> {
+        //
+        //        });
+
         List<Integer> measures = new ArrayList<>();
         notes.forEach(n -> {
-            if(!measures.contains(n.getStartTick() / 32)) {
-                measures.add(n.getStartTick() / 32);
+            if(!measures.contains(n.getStartTick() / MidiEngine.TICKS_IN_MEASURE)) {
+                measures.add(n.getStartTick() / MidiEngine.TICKS_IN_MEASURE);
             }
         });
         Collections.sort(measures);
 
         notes.forEach(n -> {
-            int selectedMeasureOffset = this.getSelectedMeasureNum() * 32;
+            int selectedMeasureOffset = this.getSelectedMeasureNum() * MidiEngine.TICKS_IN_MEASURE;
 
-            int noteMeasureOffset = measures.indexOf(n.getStartTick() / 32) * 32;
+            int noteMeasureOffset = measures.indexOf(n.getStartTick() / MidiEngine.TICKS_IN_MEASURE) * MidiEngine.TICKS_IN_MEASURE;
 
             n.setStartTick(n.getStartTickRelativeToMeasure() + selectedMeasureOffset + noteMeasureOffset);
         });

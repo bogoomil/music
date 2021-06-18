@@ -147,7 +147,7 @@ public class TrackEditor extends JPanel {
         if(this.track == null) {
             this.track = ProjectPanel.getTracks().get(0);
         }
-        Arrays.asList(e.getNotes()).forEach(n -> n.setStartTick(n.getStartTick() + (trackPanel.getSelectedMeasureNum() * 32) ));
+        Arrays.asList(e.getNotes()).forEach(n -> n.setStartTick(n.getStartTick() + (trackPanel.getSelectedMeasureNum() * MidiEngine.TICKS_IN_MEASURE) ));
 
         this.track.getNotes().addAll(Arrays.asList(e.getNotes()));
         this.trackPanel.setSelectedMeasureNum(trackPanel.getSelectedMeasureNum() + 1);
@@ -181,10 +181,10 @@ public class TrackEditor extends JPanel {
     private void handleFillNotesEvent(FillNotesEvent e) {
         int counter = 0;
 
-        while(counter < e.getMeasureNum()  * 32) {
+        while(counter < e.getMeasureNum()  * MidiEngine.TICKS_IN_MEASURE) {
             Note n = new Note();
             n.setLength(e.getLength());
-            n.setStartTick(counter + 32 * e.getFromMeasure());
+            n.setStartTick(counter + MidiEngine.TICKS_IN_MEASURE * e.getFromMeasure());
             n.setPitch(e.getPitch());
             counter += e.getBeat().getErtek();
             track.getNotes().add(n);

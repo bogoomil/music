@@ -2,6 +2,7 @@ package music.event;
 
 public class RandomizeEvent {
     int seed;
+    int maxNoteLengthInTicks;
 
     public int getSeed() {
         return seed;
@@ -11,10 +12,20 @@ public class RandomizeEvent {
         this.seed = seed;
     }
 
-    public RandomizeEvent(int seed) {
+    public int getMaxNoteLengthInTicks() {
+        return maxNoteLengthInTicks;
+    }
+
+    public void setMaxNoteLengthInTicks(int maxNoteLengthInTicks) {
+        this.maxNoteLengthInTicks = maxNoteLengthInTicks;
+    }
+
+    public RandomizeEvent(int seed, int maxNoteLengthInTicks) {
         super();
         this.seed = seed;
+        this.maxNoteLengthInTicks = maxNoteLengthInTicks;
     }
+
 
 
 
