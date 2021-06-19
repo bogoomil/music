@@ -24,7 +24,6 @@ public class MeasureButton extends JButton {
     @Subscribe
     private void handleMeasureStartedEvent(MeasureStartedEvent e) {
         if(e.getMeasureNum() == this.measureNum) {
-            System.out.println("Measure button, measureStartEvent: " + e.getMeasureNum());
             this.setBackground(App.RED);
             this.doClick();
         }else {
