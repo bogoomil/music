@@ -28,6 +28,7 @@ import com.google.common.eventbus.Subscribe;
 import music.App;
 import music.event.ArpeggioEvent;
 import music.event.DeleteNotesFromTrackEvent;
+import music.event.MinOctaveChangedEvent;
 import music.event.PianoKeyEvent;
 import music.event.RandomizeEvent;
 import music.event.TrackSelectedEvent;
@@ -67,6 +68,8 @@ public class TrackPropertiesPanel extends JPanel {
     private JButton btnRandomize;
     private JSlider slShift, slNoteLength;
     private JButton btnArpeggionator;
+    private JButton btnOct;
+    private JButton btnOct_1;
 
     public TrackPropertiesPanel() {
         App.eventBus.register(this);
@@ -142,6 +145,33 @@ public class TrackPropertiesPanel extends JPanel {
             }
         });
         add(cbTone);
+
+        btnOct = new JButton("Oct+");
+        add(btnOct);
+        btnOct.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                App.eventBus.post(new MinOctaveChangedEvent(KeyBoard.getMinOctave() + 1));
+                btnOct_1.setEnabled(true);
+
+            }
+        });
+
+        btnOct_1 = new JButton("Oct-");
+        add(btnOct_1);
+        btnOct_1.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(KeyBoard.getMinOctave() > 1) {
+                    App.eventBus.post(new MinOctaveChangedEvent(KeyBoard.getMinOctave() - 1));
+                    if(KeyBoard.getMinOctave() == 1) {
+                        btnOct_1.setEnabled(false);
+                    }
+                }
+            }
+        });
 
         add(slTempo);
 

@@ -22,6 +22,7 @@ import music.App;
 import music.event.AddNotesToTrackEvent;
 import music.event.DeleteNotesFromTrackEvent;
 import music.event.FillNotesEvent;
+import music.event.MinOctaveChangedEvent;
 import music.event.PlayTrackEvent;
 import music.event.TrackScrollEvent;
 import music.event.TrackSelectedEvent;
@@ -141,6 +142,17 @@ public class TrackEditor extends JPanel {
         this.updateButtons();
 
     }
+
+    @Subscribe
+    private void handleMinOctaveChangedEvent(MinOctaveChangedEvent e) {
+        keyBoard.setMinOctave(e.getMinOctave());
+        trackPanel.setSelectedMeasureNum(0);
+        trackPanel.refreshNoteLabels(track);
+        this.updateButtons();
+
+    }
+
+
 
     @Subscribe
     private void handleAddNotesToTrackEvent(AddNotesToTrackEvent e) {

@@ -29,7 +29,7 @@ import music.theory.Pitch;
 
 public class KeyBoard extends JPanel{
 
-    int minOctave = 3;
+    private static int minOctave = 3;
 
     private static List<Pitch> pitches;
 
@@ -41,14 +41,12 @@ public class KeyBoard extends JPanel{
         setBorder(new EmptyBorder(-16, 0, 10, 0));
 
         //setAlignmentY(TOP_ALIGNMENT);
-        this.minOctave = minOctave;
         initGui();
     }
 
     private void initGui() {
         this.removeAll();
         pitches = new ArrayList<>();
-        int counter = 0;
         for (int o = minOctave + 2; o >= minOctave - 1; o--) {
             for (int i = 11; i >= 0; i--) {
 
@@ -121,13 +119,14 @@ public class KeyBoard extends JPanel{
         return pitches;
     }
 
-    public int getMinOctave() {
-        return minOctave;
-    }
 
     public void setMinOctave(int minOctave) {
-        this.minOctave = minOctave;
+        KeyBoard.minOctave = minOctave;
         initGui();
+    }
+
+    public static int getMinOctave() {
+        return minOctave;
     }
     private JDialog createDialog(Pitch pitch){
         dialog = new JDialog();

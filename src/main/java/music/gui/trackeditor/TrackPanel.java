@@ -463,7 +463,7 @@ public class TrackPanel extends JPanel {
                 return i;
             }
         }
-        return 0;
+        return -50;
     }
 
     public Optional<Pitch> getPitchByRow(int row) {
