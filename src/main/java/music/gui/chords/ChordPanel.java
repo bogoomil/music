@@ -20,10 +20,10 @@ import music.event.AddNotesToTrackEvent;
 import music.event.ChordEvent;
 import music.theory.Chord;
 import music.theory.ChordDegree;
-import music.theory.ChordType;
 import music.theory.Note;
 import music.theory.NoteLength;
 import music.theory.NoteName;
+import music.theory.Tone;
 
 public class ChordPanel extends JPanel {
 
@@ -63,7 +63,7 @@ public class ChordPanel extends JPanel {
      * @param hangnem
      * @param listener
      */
-    public ChordPanel(Chord chord, ChordDegree deg, NoteLength chordLength, NoteLength arpeggioOffset, NoteName root, ChordType hangnem) {
+    public ChordPanel(Chord chord, ChordDegree deg, NoteLength chordLength, NoteLength arpeggioOffset, NoteName root, Tone hangnem) {
         this.chord = chord;
         this.degree = deg;
         this.chordLength = chordLength;

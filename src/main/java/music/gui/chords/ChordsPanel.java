@@ -35,9 +35,10 @@ import music.theory.Note;
 import music.theory.NoteLength;
 import music.theory.NoteName;
 import music.theory.Pitch;
+import music.theory.Tone;
 
 public class ChordsPanel extends JPanel{
-    private JComboBox<String> cbOctave, cbMinMaj;
+    private JComboBox<String> cbOctave, cbTone;
 
     private NoteNameCombo cbRoot = new NoteNameCombo();
 
@@ -97,10 +98,10 @@ public class ChordsPanel extends JPanel{
             }
         });
 
-        cbMinMaj = new JComboBox<>();
-        cbMinMaj.setModel(new DefaultComboBoxModel(new String[] { "MAJ", "MIN" }));
-        panel_2.add(cbMinMaj);
-        cbMinMaj.addActionListener(new ActionListener() {
+        cbTone = new JComboBox<>();
+        cbTone.setModel(new DefaultComboBoxModel(new String[] { "MAJ", "MIN", "LYDIAN", "MIXOLYDIAN", "DORIAN", "PHRYGIAN", "LOCRIAN" }));
+        panel_2.add(cbTone);
+        cbTone.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
@@ -173,11 +174,11 @@ public class ChordsPanel extends JPanel{
 
         this.generatedChordPanels = new ArrayList<>();
 
-        String minMaj = this.cbMinMaj.getSelectedItem().toString();
+        String minMaj = this.cbTone.getSelectedItem().toString();
 
         List<ChordDegree> degrees = Arrays.asList(ChordDegree.values());
 
-        ChordType chordType = ChordType.valueOf(minMaj);
+        Tone chordType = Tone.valueOf(minMaj);
 
 
         this.centerPanel.removeAll();
@@ -225,10 +226,11 @@ public class ChordsPanel extends JPanel{
 
         this.resetColor();
 
-        String minMaj = this.cbMinMaj.getSelectedItem().toString();
+        String minMaj = this.cbTone.getSelectedItem().toString();
         ChordDegree deg = event.getDegree();
 
-        if(deg != null) {
+        if(deg != null && Arrays.asList("MIN", "MAJ").contains(minMaj)) {
+
             List<ChordDegree> possibleDegrees = Chord.getPossibleDegrees(deg, ChordType.valueOf(minMaj));
 
             for (ChordDegree cd : possibleDegrees) {

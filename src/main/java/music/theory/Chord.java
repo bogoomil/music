@@ -105,43 +105,141 @@ public class Chord {
     // The third and fifth intervals are shifted slightly to vary the chord's
     // sound.
 
-    public static Chord getChordDegree(Pitch pitch, ChordType chordType, ChordDegree degree) {
+    public static Chord getChordDegree(Pitch pitch, Tone chordType, ChordDegree degree) {
+
+        Pitch[] p = Scale.getScale(pitch, chordType);
+
         switch (chordType) {
         case MAJ: {
             switch (degree) {
             case i:
-                return getChord(pitch, ChordType.MAJ);
+                return getChord(p[0], ChordType.MAJ);
             case ii:
-                return getChord(new Pitch(pitch.getMidiCode() + 2), ChordType.MIN);
+                return getChord(p[1], ChordType.MIN);
             case iii:
-                return getChord(new Pitch(pitch.getMidiCode() + 4), ChordType.MIN);
+                return getChord(p[2], ChordType.MIN);
             case iv:
-                return getChord(new Pitch(pitch.getMidiCode() + 5), ChordType.MAJ);
+                return getChord(p[3], ChordType.MAJ);
             case v:
-                return getChord(new Pitch(pitch.getMidiCode() + 7), ChordType.MAJ);
+                return getChord(p[4], ChordType.MAJ);
             case vi:
-                return getChord(new Pitch(pitch.getMidiCode() + 9), ChordType.MIN);
+                return getChord(p[5], ChordType.MIN);
             case vii:
-                return getChord(new Pitch(pitch.getMidiCode() + 11), ChordType.DIM);
+                return getChord(p[6], ChordType.DIM);
             }
             break;
         }
         case MIN: {
             switch (degree) {
             case i:
-                return getChord(pitch, ChordType.MIN);
+                return getChord(p[0], ChordType.MIN);
             case ii:
-                return getChord(new Pitch(pitch.getMidiCode() + 2), ChordType.DIM);
+                return getChord(p[1], ChordType.DIM);
             case iii:
-                return getChord(new Pitch(pitch.getMidiCode() + 3), ChordType.MAJ);
+                return getChord(p[2], ChordType.MAJ);
             case iv:
-                return getChord(new Pitch(pitch.getMidiCode() + 5), ChordType.MIN);
+                return getChord(p[3], ChordType.MIN);
             case v:
-                return getChord(new Pitch(pitch.getMidiCode() + 7), ChordType.MIN);
+                return getChord(p[4], ChordType.MIN);
             case vi:
-                return getChord(new Pitch(pitch.getMidiCode() + 8), ChordType.MAJ);
+                return getChord(p[5], ChordType.MAJ);
             case vii:
-                return getChord(new Pitch(pitch.getMidiCode() + 10), ChordType.MAJ);
+                return getChord(p[6], ChordType.MAJ);
+            }
+            break;
+        }
+        case LYDIAN: {
+            switch (degree) {
+            case i:
+                return getChord(p[0], ChordType.MAJ);
+            case ii:
+                return getChord(p[1], ChordType.MAJ);
+            case iii:
+                return getChord(p[2], ChordType.MIN);
+            case iv:
+                return getChord(p[3], ChordType.DIM);
+            case v:
+                return getChord(p[4], ChordType.MAJ);
+            case vi:
+                return getChord(p[5], ChordType.MIN);
+            case vii:
+                return getChord(p[6], ChordType.MIN);
+            }
+            break;
+        }
+        case MIXOLYDIAN: {
+            switch (degree) {
+            case i:
+                return getChord(p[0], ChordType.MAJ);
+            case ii:
+                return getChord(p[1], ChordType.MIN);
+            case iii:
+                return getChord(p[2], ChordType.DIM);
+            case iv:
+                return getChord(p[3], ChordType.MAJ);
+            case v:
+                return getChord(p[4], ChordType.MAJ);
+            case vi:
+                return getChord(p[5], ChordType.MIN);
+            case vii:
+                return getChord(p[6], ChordType.MAJ);
+            }
+            break;
+        }
+        case DORIAN: {
+            switch (degree) {
+            case i:
+                return getChord(p[0], ChordType.MIN);
+            case ii:
+                return getChord(p[1], ChordType.MIN);
+            case iii:
+                return getChord(p[2], ChordType.MAJ);
+            case iv:
+                return getChord(p[3], ChordType.MAJ);
+            case v:
+                return getChord(p[4], ChordType.MIN);
+            case vi:
+                return getChord(p[5], ChordType.DIM);
+            case vii:
+                return getChord(p[6], ChordType.MAJ);
+            }
+            break;
+        }
+        case PHRYGIAN: {
+            switch (degree) {
+            case i:
+                return getChord(p[0], ChordType.MIN);
+            case ii:
+                return getChord(p[1], ChordType.MAJ);
+            case iii:
+                return getChord(p[2], ChordType.MAJ);
+            case iv:
+                return getChord(p[3], ChordType.MIN);
+            case v:
+                return getChord(p[4], ChordType.DIM);
+            case vi:
+                return getChord(p[5], ChordType.MAJ);
+            case vii:
+                return getChord(p[6], ChordType.MIN);
+            }
+            break;
+        }
+        case LOCRIAN: {
+            switch (degree) {
+            case i:
+                return getChord(p[0], ChordType.DIM);
+            case ii:
+                return getChord(p[1], ChordType.MAJ);
+            case iii:
+                return getChord(p[2], ChordType.MIN);
+            case iv:
+                return getChord(p[3], ChordType.MIN);
+            case v:
+                return getChord(p[4], ChordType.MAJ);
+            case vi:
+                return getChord(p[5], ChordType.MAJ);
+            case vii:
+                return getChord(p[6], ChordType.MIN);
             }
             break;
         }

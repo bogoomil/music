@@ -1,6 +1,6 @@
 package music.theory;
 
 public enum Tone {
-    MAJ, MIN;
+    MAJ, MIN, LYDIAN, MIXOLYDIAN, DORIAN, PHRYGIAN, LOCRIAN;
 
 }
