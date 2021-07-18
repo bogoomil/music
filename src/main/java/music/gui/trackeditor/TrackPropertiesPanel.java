@@ -32,13 +32,10 @@ import music.event.MinOctaveChangedEvent;
 import music.event.PianoKeyEvent;
 import music.event.RandomizeEvent;
 import music.event.TrackSelectedEvent;
-import music.event.TrackVolumeChangedEvent;
 import music.event.ZoomEvent;
-import music.gui.InstrumentCombo;
 import music.gui.NoteLengthCombo;
 import music.gui.NoteNameCombo;
-import music.gui.TempoSlider;
-import music.gui.VolumeSlider;
+import music.gui.project.ProjectPanel;
 import music.logic.MidiEngine;
 import music.model.Track;
 import music.theory.Note;
@@ -51,12 +48,12 @@ public class TrackPropertiesPanel extends JPanel {
     private static NoteNameCombo cbRoot = new NoteNameCombo();
     private static JComboBox<Tone> cbTone;
     //private JComboBox<Instrument> cbInstr;
-    InstrumentCombo cbInstr = new InstrumentCombo();
-    private JComboBox cbChannel;
-    private JSlider slTempo = new TempoSlider();
+    //    InstrumentCombo cbInstr = new InstrumentCombo();
+    //    private JComboBox cbChannel;
+    //    private JSlider slTempo = new TempoSlider();
     private JPanel panel;
     private JPanel panel_1;
-    private VolumeSlider slVolume = new VolumeSlider();
+    //    private VolumeSlider slVolume = new VolumeSlider();
     private JButton btnPlay;
     private JButton btnStop;
 
@@ -86,7 +83,7 @@ public class TrackPropertiesPanel extends JPanel {
 
                 try {
 
-                    MidiEngine.play(Arrays.asList(track), slTempo.getValue(), 1, TrackPanel.getCurrentTick());
+                    MidiEngine.play(Arrays.asList(track), ProjectPanel.getTempo(), 1, TrackPanel.getCurrentTick());
                 } catch (InvalidMidiDataException | IOException | MidiUnavailableException e1) {
                     e1.printStackTrace();
                 } catch(NullPointerException np) {
@@ -173,35 +170,35 @@ public class TrackPropertiesPanel extends JPanel {
             }
         });
 
-        add(slTempo);
+        //        add(slTempo);
+        //
+        //        add(slVolume);
+        //
+        //        slVolume.addChangeListener(new ChangeListener() {
+        //
+        //            @Override
+        //            public void stateChanged(ChangeEvent e) {
+        //                App.eventBus.post(new VolumeChangedEvent(slVolume.getValue()));
+        //
+        //            }
+        //        });
 
-        add(slVolume);
-
-        slVolume.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                App.eventBus.post(new TrackVolumeChangedEvent(slVolume.getValue()));
-
-            }
-        });
-
-        panel_1 = new JPanel();
-        panel_1.setBorder(new TitledBorder(null, "Instrument", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-        add(panel_1);
-
-        //cbInstr = new JComboBox<>();
-        panel_1.add(cbInstr);
-        cbInstr.setPreferredSize(new Dimension(180, 24));
-
-        panel = new JPanel();
-        panel.setBorder(new TitledBorder(null, "Midi channel", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-        add(panel);
-
-        cbChannel = new JComboBox();
-        panel.add(cbChannel);
-        cbChannel.setPreferredSize(new Dimension(180, 24));
-        cbChannel.setModel(new DefaultComboBoxModel(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15" }));
+        //        panel_1 = new JPanel();
+        //        panel_1.setBorder(new TitledBorder(null, "Instrument", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+        //        add(panel_1);
+        //
+        //        //cbInstr = new JComboBox<>();
+        //        panel_1.add(cbInstr);
+        //        cbInstr.setPreferredSize(new Dimension(180, 24));
+        //
+        //        panel = new JPanel();
+        //        panel.setBorder(new TitledBorder(null, "Midi channel", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+        //        add(panel);
+        //
+        //        cbChannel = new JComboBox();
+        //        panel.add(cbChannel);
+        //        cbChannel.setPreferredSize(new Dimension(180, 24));
+        //        cbChannel.setModel(new DefaultComboBoxModel(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15" }));
 
         slZoom = new JSlider();
         slZoom.setValue(20);
@@ -310,7 +307,7 @@ public class TrackPropertiesPanel extends JPanel {
 
 
 
-        MidiEngine.getSynth().getChannels()[cbChannel.getSelectedIndex()].programChange(track.getInstrument());
+        MidiEngine.getSynth().getChannels()[track.getChannel()].programChange(track.getInstrument());
 
         Note n = new Note();
         n.setLength(NoteLength.NEGYED);
@@ -318,7 +315,7 @@ public class TrackPropertiesPanel extends JPanel {
         n.setStartTick(0);
 
 
-        MidiEngine.playNote(n, MidiEngine.getSynth().getChannels()[cbChannel.getSelectedIndex()], 120);
+        MidiEngine.playNote(n, MidiEngine.getSynth().getChannels()[track.getChannel()], 120);
     }
 
     @Subscribe
@@ -326,9 +323,9 @@ public class TrackPropertiesPanel extends JPanel {
 
         this.track = e.getTrack();
 
-        cbInstr.setProgram(e.getTrack().getInstrument());
-        slVolume.setValue(e.getTrack().getVolume());
-        cbChannel.setSelectedIndex(e.getTrack().getChannel());
+        //        cbInstr.setProgram(e.getTrack().getInstrument());
+        //        slVolume.setValue(e.getTrack().getVolume());
+        //        cbChannel.setSelectedIndex(e.getTrack().getChannel());
         cbRoot.setSelectedItem(e.getTrack().getRoot().getName());
         cbTone.setSelectedItem(e.getTrack().getHangnem());
 

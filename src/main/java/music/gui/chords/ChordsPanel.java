@@ -26,7 +26,7 @@ import music.event.ChordEvent;
 import music.gui.InstrumentCombo;
 import music.gui.NoteLengthCombo;
 import music.gui.NoteNameCombo;
-import music.gui.TempoSlider;
+import music.gui.project.ProjectPanel;
 import music.logic.MidiEngine;
 import music.theory.Chord;
 import music.theory.ChordDegree;
@@ -48,7 +48,7 @@ public class ChordsPanel extends JPanel{
     private InstrumentCombo cbInstr = new InstrumentCombo();
 
     private static final NoteLengthCombo cbNoteLength = new NoteLengthCombo();
-    private static final TempoSlider tempoSlider = new TempoSlider();
+    //private static final TempoSlider tempoSlider = new TempoSlider();
 
     private List<ChordPanel> generatedChordPanels;
     private JPanel pnChords;
@@ -132,21 +132,10 @@ public class ChordsPanel extends JPanel{
         panel.setBorder(new TitledBorder(null, "NoteLength", TitledBorder.LEADING, TitledBorder.TOP, null, null));
         northPanel.add(panel);
         panel.add(cbNoteLength);
-        cbNoteLength.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ChordPanel.setNoteLength(cbNoteLength.getItemAt(cbNoteLength.getSelectedIndex()));
-                // TODO Auto-generated method stub
-
-            }
-        });
 
         panel_1 = new JPanel();
         northPanel.add(panel_1);
 
-        TempoSlider tempoSlider = new TempoSlider();
-        panel_1.add(tempoSlider);
 
         panel_5 = new JPanel();
         panel_5.setBorder(new TitledBorder(null, "Instrument", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -222,7 +211,7 @@ public class ChordsPanel extends JPanel{
     }
 
     @Subscribe
-    public void chordEvent(ChordEvent event) {
+    public void handleChordEvent(ChordEvent event) {
 
         this.resetColor();
 
@@ -271,10 +260,12 @@ public class ChordsPanel extends JPanel{
             Note n = new Note();
             n.setPitch(p);
             n.setLength(cbNoteLength.getItemAt(cbNoteLength.getSelectedIndex()));
-            MidiEngine.playNote(n, channels[0], tempoSlider.getValue());
+            MidiEngine.playNote(n, channels[0], ProjectPanel.getTempo());
             counter++;
         }
     }
 
-
+    public static NoteLength getNoteLength() {
+        return cbNoteLength.getItemAt(cbNoteLength.getSelectedIndex());
+    }
 }

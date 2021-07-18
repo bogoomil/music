@@ -143,7 +143,6 @@ public class TrackEditorPanel extends JPanel {
             @Override
             public void stateChanged(ChangeEvent e) {
                 track.setVolume(slVolume.getValue());
-
             }
         });
 

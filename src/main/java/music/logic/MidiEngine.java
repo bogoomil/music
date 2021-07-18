@@ -91,8 +91,15 @@ public class MidiEngine {
 
         ShortMessage a = new ShortMessage();
         a.setMessage(ShortMessage.NOTE_ON, channel, note.getPitch().getMidiCode(), note.getVol());
+
+        System.out.println("Note vol: " + note.getVol());
+
         MidiEvent noteOn = new MidiEvent(a, startInTick);
         track.add(noteOn);
+
+        track.add(new MidiEvent(
+                new ShortMessage(ShortMessage.CONTROL_CHANGE, channel, 7, note.getVol()),
+                startInTick));
 
         ShortMessage b = new ShortMessage();
         b.setMessage(ShortMessage.NOTE_OFF, channel, note.getPitch().getMidiCode(), 0);
@@ -102,24 +109,10 @@ public class MidiEngine {
         MidiEvent noteOff = new MidiEvent(b, endInTick);
         track.add(noteOff);
 
-        //        byte[] m = String.valueOf(note.getStartTick()).getBytes();
-        //        MetaMessage mm = new MetaMessage(TICK_START_MESSAGE_TYPE, m, m.length);
-        //        MidiEvent tickOn = new MidiEvent(mm, note.getStartTick());
-        //        track.add(tickOn);
-        //
-        //        mm = new  MetaMessage(TICK_END_MESSAGE_TYPE, m, m.length);
-        //        MidiEvent tickOff = new MidiEvent(mm, note.getStartTick() + 1);
-        //        track.add(tickOff);
 
         if(!measureStarts.contains(note.getMeasure())) {
             measureStarts.add(note.getMeasure());
         }
-
-        //        m = String.valueOf(note.getStartTick()).getBytes();
-        //        final MetaMessage metaMessage = new MetaMessage(TICK_START_MESSAGE_TYPE, m, m.length);
-        //        final MidiEvent me2 = new MidiEvent(metaMessage, note.getStartTick());
-        //        track.add(me2);
-
 
     }
 
@@ -322,6 +315,7 @@ public class MidiEngine {
         Sequencer sequencer = MidiEngine.getSequencer();
 
         sequencer.setTempoFactor(tempoFactor);
+
         int counter = 0;
         for(music.model.Track t :tracks) {
             javax.sound.midi.Track track = MidiEngine.getInstrumentTrack(seq, t.getChannel(), t.getInstrument());
@@ -367,16 +361,19 @@ public class MidiEngine {
     private static int getMaxTick(List<music.model.Track> tracks) {
         int max = 0;
         for(music.model.Track t : tracks) {
-            Note n = t.getNotes().stream().max(new Comparator<Note>() {
+            if(t.getNotes().size() > 0) {
+                Note n = t.getNotes().stream().max(new Comparator<Note>() {
 
-                @Override
-                public int compare(Note o1, Note o2) {
-                    // TODO Auto-generated method stub
-                    return Integer.compare(o1.getStartTick() + o1.getLength().getErtek(), o2.getStartTick() + o2.getLength().getErtek() );
+                    @Override
+                    public int compare(Note o1, Note o2) {
+                        // TODO Auto-generated method stub
+                        return Integer.compare(o1.getStartTick() + o1.getLength().getErtek(), o2.getStartTick() + o2.getLength().getErtek() );
+                    }
+                }).get();
+                if(max < n.getStartTick() + n.getLength().getErtek()) {
+                    max = n.getStartTick() + n.getLength().getErtek();
                 }
-            }).get();
-            if(max < n.getStartTick() + n.getLength().getErtek()) {
-                max = n.getStartTick() + n.getLength().getErtek();
+
             }
         }
         return max;

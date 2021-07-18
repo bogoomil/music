@@ -51,7 +51,7 @@ public class ProjectPanel extends JPanel {
 
     private JPanel pnTracks;
     private static List<Track> tracks = new ArrayList<>();
-    private JSlider slTempo = new TempoSlider();
+    private static JSlider slTempo = new TempoSlider();
     private JComboBox cbTempoFactor;
     private JTextField txtTfprojcetname;
 
@@ -311,5 +311,9 @@ public class ProjectPanel extends JPanel {
     @Subscribe
     private void handleDeleteMeasureEvent(DeleteMeasureEvent e) {
         tracks.forEach(t -> t.deleteMeasure(e.getMeasureNum()));
+    }
+
+    public static int getTempo() {
+        return slTempo.getValue();
     }
 }

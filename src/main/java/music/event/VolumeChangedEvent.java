@@ -1,9 +1,9 @@
 package music.event;
 
-public class TrackVolumeChangedEvent {
+public class VolumeChangedEvent {
     int value;
 
-    public TrackVolumeChangedEvent(int value) {
+    public VolumeChangedEvent(int value) {
         super();
         this.value = value;
     }

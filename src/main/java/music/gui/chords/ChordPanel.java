@@ -42,7 +42,7 @@ public class ChordPanel extends JPanel {
 
     private static boolean isRecording;
 
-    private static NoteLength noteLength = NoteLength.EGESZ;
+    //private static NoteLength noteLength = NoteLength.EGESZ;
 
     public static boolean isRecording() {
         return isRecording;
@@ -221,21 +221,12 @@ public class ChordPanel extends JPanel {
         Note[] notes = new Note[chord.getPitches().length];
         for(int i = 0; i < chord.getPitches().length; i++) {
             notes[i] = new Note();
-            notes[i].setLength(noteLength);
+            notes[i].setLength(ChordsPanel.getNoteLength());
             notes[i].setPitch(chord.getPitches()[i]);
             notes[i].setStartTick(0);
         }
         App.eventBus.post(new AddNotesToTrackEvent(notes));
 
-    }
-
-
-    public static NoteLength getNoteLength() {
-        return noteLength;
-    }
-
-    public static void setNoteLength(NoteLength noteLength) {
-        ChordPanel.noteLength = noteLength;
     }
 
 }

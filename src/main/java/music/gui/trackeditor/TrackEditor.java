@@ -26,7 +26,6 @@ import music.event.MinOctaveChangedEvent;
 import music.event.PlayTrackEvent;
 import music.event.TrackScrollEvent;
 import music.event.TrackSelectedEvent;
-import music.event.TrackVolumeChangedEvent;
 import music.gui.project.ProjectPanel;
 import music.logic.MidiEngine;
 import music.model.Track;
@@ -153,16 +152,28 @@ public class TrackEditor extends JPanel {
     }
 
 
+    private int getLastTickOfNotes(Note[] notes) {
+        int tick = 0;
+        for(int i = 0; i < notes.length; i++) {
+            Note n = notes[i];
+            if(tick < n.getLength().getErtek()) {
+                tick = n.getLength().getErtek();
+            }
+        }
+        return tick;
+    }
+
 
     @Subscribe
     private void handleAddNotesToTrackEvent(AddNotesToTrackEvent e) {
         if(this.track == null) {
             this.track = ProjectPanel.getTracks().get(0);
         }
-        Arrays.asList(e.getNotes()).forEach(n -> n.setStartTick(n.getStartTick() + (trackPanel.getSelectedMeasureNum() * MidiEngine.TICKS_IN_MEASURE) ));
+        Arrays.asList(e.getNotes()).forEach(n -> n.setStartTick(n.getStartTick() + trackPanel.getCursorPosition() ));
 
         this.track.getNotes().addAll(Arrays.asList(e.getNotes()));
-        this.trackPanel.setSelectedMeasureNum(trackPanel.getSelectedMeasureNum() + 1);
+        this.trackPanel.setCursorPosition(trackPanel.getCursorPosition() + this.getLastTickOfNotes(e.getNotes()));
+        //this.trackPanel.setSelectedMeasureNum(trackPanel.getSelectedMeasureNum() + 1);
         keyBoard.setMinOctave(track.getMinOctave());
 
         trackPanel.refreshNoteLabels(track);
@@ -176,11 +187,6 @@ public class TrackEditor extends JPanel {
         MidiEngine.playTrack(track, MidiEngine.getSynth().getChannels()[e.getChannel()], e.getTempo());
     }
 
-
-    @Subscribe
-    private void handleTrackVolumeChangedEvent(TrackVolumeChangedEvent e) {
-        track.getNotes().forEach(n -> n.setVol(e.getValue()));
-    }
 
     @Subscribe
     private void handleDeleteNotesFromTrackEvent(DeleteNotesFromTrackEvent e) {

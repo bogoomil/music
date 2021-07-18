@@ -41,6 +41,7 @@ import music.event.ShiftNotesEvent;
 import music.event.TickOffEvent;
 import music.event.TickOnEvent;
 import music.event.TrackScrollEvent;
+import music.event.VolumeChangedEvent;
 import music.event.ZoomEvent;
 import music.logic.MidiEngine;
 import music.model.Track;
@@ -382,6 +383,19 @@ public class TrackPanel extends JPanel {
     }
 
     @Subscribe
+    private void handleVolumeChangedEvent(VolumeChangedEvent e) {
+        for(Component c : getComponents()) {
+            if(c instanceof NoteLabel) {
+                NoteLabel nl = (NoteLabel) c;
+                if(nl.getSelected()) {
+                    nl.getNote().setVol(e.getValue());
+                }
+            }
+        }
+    }
+
+
+    @Subscribe
     private void handleTrackScrollEvent(TrackScrollEvent e) {
         this.currentMeasure = e.getMeasureNum();
 
@@ -468,6 +482,14 @@ public class TrackPanel extends JPanel {
 
     public Optional<Pitch> getPitchByRow(int row) {
         return KeyBoard.getPitches() != null ?  Optional.of(KeyBoard.getPitches().get(row)) : Optional.empty();
+    }
+
+    public int getCursorPosition() {
+        return this.selectedCell.x;
+    }
+
+    public void setCursorPosition(int x) {
+        this.selectedCell = new Point(x, 0);
     }
 
     public int getSelectedMeasureNum() {
